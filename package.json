@@ -8,5 +8,7 @@
     "express-session": "^1.15.5",
     "lodash": "^4.17.4",
     "wafer-node-session": "^1.0.10"
-  }
+  },
+  "private": true,
+  "license": "MIT"
 }
