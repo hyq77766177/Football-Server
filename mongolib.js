@@ -6,11 +6,11 @@ module.exports = class MongoUtil {
      * @param {any} data data to be inserted
      * @param {function} callback
      */
-    static insertData (db, col, data, callback) {  
+    static insertData (db, col, data, callback) {
         //连接到表 games
         const collection = db.collection(col);
-        collection.insert(data, (err, result) => { 
-            if(err) {
+        collection.insert(data, (err, result) => {
+            if (err) {
                 console.log('Error:'+ err)
                 return
             }
@@ -27,7 +27,7 @@ module.exports = class MongoUtil {
     static showAllData(db, col, callback) {
         const collection = db.collection(col)
         collection.find().toArray((err, result) => {
-            if(err) {
+            if (err) {
                 console.log('Error: ', err)
                 return
             }
