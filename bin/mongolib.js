@@ -1,3 +1,5 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var mongoUtil;
 (function (mongoUtil) {
     /**
@@ -36,5 +38,5 @@ var mongoUtil;
         });
     }
     mongoUtil.showAllData = showAllData;
-})(mongoUtil || (mongoUtil = {}));
+})(mongoUtil = exports.mongoUtil || (exports.mongoUtil = {}));
 //# sourceMappingURL=mongolib.js.map

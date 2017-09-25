@@ -5,6 +5,7 @@ var express = require("express");
 var https = require("https");
 var mongoDb = require("mongodb");
 var config_1 = require("./config");
+var mongolib_1 = require("./mongolib");
 var server;
 (function (server) {
     var MongoClient = mongoDb.MongoClient;
@@ -21,7 +22,7 @@ var server;
                 console.log(err);
             }
             console.log("mongo insert");
-            mongoUtil.insertData(db, 'games', document, function (result) {
+            mongolib_1.mongoUtil.insertData(db, 'games', document, function (result) {
                 console.log(result);
                 db.close();
                 next();
@@ -50,7 +51,7 @@ var server;
         var allGames = [];
         MongoClient.connect(DB_CONN_STR, function (err, db) {
             console.log('mongo show all');
-            mongoUtil.showAllData(db, 'games', function (result) {
+            mongolib_1.mongoUtil.showAllData(db, 'games', function (result) {
                 console.log(result);
                 res.write(JSON.stringify(result));
                 db.close();
