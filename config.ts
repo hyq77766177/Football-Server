@@ -1,4 +1,4 @@
-namespace config {
+export namespace config {
 
   export const port = 8012;
   export const appId = 'wx9b38dcab2de2fd02';

@@ -37,3 +37,4 @@ var mongoUtil;
     }
     mongoUtil.showAllData = showAllData;
 })(mongoUtil || (mongoUtil = {}));
+//# sourceMappingURL=mongolib.js.map
