@@ -7,6 +7,7 @@ import * as qs from 'querystring';
 import * as _ from 'lodash';
 import * as mongoDb from 'mongodb';
 import { config } from './config';
+import { mongoUtil } from './mongolib';
 
 namespace server {
 

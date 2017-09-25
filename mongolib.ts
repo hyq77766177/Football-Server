@@ -1,4 +1,4 @@
-namespace mongoUtil {
+export namespace mongoUtil {
     /**
      * insert data to db.col
      * @param {string} db
