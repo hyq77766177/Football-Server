@@ -21,7 +21,7 @@ var server;
             if (err) {
                 console.log(err);
             }
-            console.log("mongo insert");
+            console.log(new Date(), "mongo insert");
             mongolib_1.mongoUtil.insertData(db, 'games', document, function (result) {
                 console.log(result);
                 db.close();
@@ -40,7 +40,7 @@ var server;
                     data_1 += chunk;
                 });
                 hres.on('end', function () {
-                    console.log('*** parsedData: ', data_1);
+                    console.log(new Date(), '*** parsedData: ', data_1);
                     res.write(data_1);
                     res.end();
                 });
@@ -50,7 +50,7 @@ var server;
     app.use('/all', function (req, res, next) {
         var allGames = [];
         MongoClient.connect(DB_CONN_STR, function (err, db) {
-            console.log('mongo show all');
+            console.log(new Date(), 'mongo show all');
             mongolib_1.mongoUtil.showAllData(db, 'games', function (result) {
                 console.log(result);
                 res.write(JSON.stringify(result));
@@ -60,10 +60,10 @@ var server;
         });
     });
     app.use(function (req, res, next) {
-        res.write('Response from express');
+        res.write('Response from express, ' + new Date());
         res.end();
     });
     app.listen(config_1.config.port);
-    console.log("server listening at 127.0.0.1: " + config_1.config.port);
+    console.log(new Date(), "server listening at 127.0.0.1: " + config_1.config.port);
 })(server || (server = {}));
 //# sourceMappingURL=app.js.map

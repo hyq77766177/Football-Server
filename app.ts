@@ -26,7 +26,7 @@ namespace server {
       if (err) {
         console.log(err);
       }
-      console.log("mongo insert");
+      console.log(new Date(), "mongo insert");
       mongoUtil.insertData(db, 'games', document, (result) => {
         console.log(result);
         db.close();
@@ -46,7 +46,7 @@ namespace server {
           data += chunk;
         })
         hres.on('end', () => {
-          console.log('*** parsedData: ', data);
+          console.log(new Date(), '*** parsedData: ', data);
           res.write(data);
           res.end();
         })
@@ -57,7 +57,7 @@ namespace server {
   app.use('/all', (req, res, next) => {
     let allGames = [];
     MongoClient.connect(DB_CONN_STR, (err, db) => {
-      console.log('mongo show all');
+      console.log(new Date(), 'mongo show all');
       mongoUtil.showAllData(db, 'games', result => {
         console.log(result);
         res.write(JSON.stringify(result));
@@ -68,11 +68,11 @@ namespace server {
   })
 
   app.use((req, res, next) => {
-    res.write('Response from express');
+    res.write('Response from express, ' + new Date());
     res.end();
   })
   app.listen(config.port);
 
-  console.log(`server listening at 127.0.0.1: ${config.port}`);
+  console.log(new Date(), `server listening at 127.0.0.1: ${config.port}`);
 
 }
