@@ -7,6 +7,20 @@ var mongoDb = require("mongodb");
 var log4js = require("log4js");
 var config_1 = require("./config");
 var mongolib_1 = require("./mongolib");
+log4js.configure({
+    appenders: {
+        app: {
+            type: 'console',
+        }
+    },
+    categories: {
+        default: {
+            appenders: ['app'],
+            level: 'debug'
+        },
+    },
+    pm2: true,
+});
 var logger = log4js.getLogger('app.js');
 var server;
 (function (server) {

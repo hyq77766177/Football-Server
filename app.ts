@@ -11,6 +11,21 @@ import * as log4js from 'log4js';
 import { config } from './config';
 import { mongoUtil } from './mongolib';
 
+log4js.configure({
+  appenders: {
+    app: {
+      type: 'console',
+    }
+  },
+  categories: {
+    default: {
+      appenders: [ 'app' ],
+      level: 'debug'
+    },
+  },
+  pm2: true,
+});
+
 const logger = log4js.getLogger('app.js');
 
 namespace server {
