@@ -6,8 +6,12 @@ import * as https from 'https';
 import * as qs from 'querystring';
 import * as _ from 'lodash';
 import * as mongoDb from 'mongodb';
+import * as log4js from 'log4js';
+
 import { config } from './config';
 import { mongoUtil } from './mongolib';
+
+const logger = log4js.getLogger('app.js');
 
 namespace server {
 
@@ -24,11 +28,11 @@ namespace server {
     // console.log('document: ', document)
     MongoClient.connect(DB_CONN_STR, (err, db) => {
       if (err) {
-        console.log(err);
+        logger.error(err);
       }
-      console.log(new Date(), "mongo insert");
-      mongoUtil.insertData(db, 'games', document, (result) => {
-        console.log(result);
+      logger.debug("mongo insert");
+      mongoUtil.insertData(db, 'games', document, result => {
+        logger.debug(result)
         db.close();
         next();
       })
@@ -36,7 +40,7 @@ namespace server {
   })
 
   app.use('/openid', (req, res, next) => {
-    console.log(req.query);
+    logger.debug('req_query: ', req.query);
     let code = req.query.code;
     if (code) {
       let url = `https://api.weixin.qq.com/sns/jscode2session?appId=${config.appId}&secret=${config.appSecret}&js_code=${code}&grant_type=authorization_code`;
@@ -46,7 +50,7 @@ namespace server {
           data += chunk;
         })
         hres.on('end', () => {
-          console.log(new Date(), '*** parsedData: ', data);
+          logger.debug('parsedData: ', data);
           res.write(data);
           res.end();
         })
@@ -57,9 +61,9 @@ namespace server {
   app.use('/all', (req, res, next) => {
     let allGames = [];
     MongoClient.connect(DB_CONN_STR, (err, db) => {
-      console.log(new Date(), 'mongo show all');
+      logger.debug('mongo show all');
       mongoUtil.showAllData(db, 'games', result => {
-        console.log(result);
+        logger.debug(result);
         res.write(JSON.stringify(result));
         db.close();
         res.end();
@@ -73,6 +77,6 @@ namespace server {
   })
   app.listen(config.port);
 
-  console.log(new Date(), `server listening at 127.0.0.1: ${config.port}`);
+  logger.info(`server listening at 127.0.0.1: ${config.port}`);
 
 }

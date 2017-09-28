@@ -4,8 +4,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var express = require("express");
 var https = require("https");
 var mongoDb = require("mongodb");
+var log4js = require("log4js");
 var config_1 = require("./config");
 var mongolib_1 = require("./mongolib");
+var logger = log4js.getLogger('app.js');
 var server;
 (function (server) {
     var MongoClient = mongoDb.MongoClient;
@@ -19,18 +21,18 @@ var server;
         // console.log('document: ', document)
         MongoClient.connect(DB_CONN_STR, function (err, db) {
             if (err) {
-                console.log(err);
+                logger.error(err);
             }
-            console.log(new Date(), "mongo insert");
+            logger.debug("mongo insert");
             mongolib_1.mongoUtil.insertData(db, 'games', document, function (result) {
-                console.log(result);
+                logger.debug(result);
                 db.close();
                 next();
             });
         });
     });
     app.use('/openid', function (req, res, next) {
-        console.log(req.query);
+        logger.debug('req_query: ', req.query);
         var code = req.query.code;
         if (code) {
             var url = "https://api.weixin.qq.com/sns/jscode2session?appId=" + config_1.config.appId + "&secret=" + config_1.config.appSecret + "&js_code=" + code + "&grant_type=authorization_code";
@@ -40,7 +42,7 @@ var server;
                     data_1 += chunk;
                 });
                 hres.on('end', function () {
-                    console.log(new Date(), '*** parsedData: ', data_1);
+                    logger.debug('parsedData: ', data_1);
                     res.write(data_1);
                     res.end();
                 });
@@ -50,9 +52,9 @@ var server;
     app.use('/all', function (req, res, next) {
         var allGames = [];
         MongoClient.connect(DB_CONN_STR, function (err, db) {
-            console.log(new Date(), 'mongo show all');
+            logger.debug('mongo show all');
             mongolib_1.mongoUtil.showAllData(db, 'games', function (result) {
-                console.log(result);
+                logger.debug(result);
                 res.write(JSON.stringify(result));
                 db.close();
                 res.end();
@@ -64,6 +66,6 @@ var server;
         res.end();
     });
     app.listen(config_1.config.port);
-    console.log(new Date(), "server listening at 127.0.0.1: " + config_1.config.port);
+    logger.info("server listening at 127.0.0.1: " + config_1.config.port);
 })(server || (server = {}));
 //# sourceMappingURL=app.js.map
