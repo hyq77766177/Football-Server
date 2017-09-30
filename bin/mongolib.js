@@ -45,7 +45,7 @@ var mongoUtil;
     mongoUtil.showAllData = showAllData;
     function queryGameById(db, col, id, callback) {
         var collection = db.collection(col);
-        collection.find(JSON.parse("{\"_id\":\"" + id + "\"})")).toArray(function (err, result) {
+        collection.find(JSON.parse("{\"_id\":\"" + id + "\"}")).toArray(function (err, result) {
             if (err) {
                 logger.error('Error: ', err);
                 return;

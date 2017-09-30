@@ -45,7 +45,7 @@ export namespace mongoUtil {
 
     export function queryGameById(db, col, id, callback) {
         const collection = db.collection(col);
-        collection.find(JSON.parse(`{"_id":"${id}"})`)).toArray((err, result) => {
+        collection.find(JSON.parse(`{"_id":"${id}"}`)).toArray((err, result) => {
             if (err) {
                 logger.error('Error: ', err);
                 return;
