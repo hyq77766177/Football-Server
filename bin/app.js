@@ -14,7 +14,7 @@ var server;
     var MongoClient = mongoDb.MongoClient;
     var DB_CONN_STR = "mongodb://" + config_1.config.mongoUser + ":" + config_1.config.mongoPass + "@" + config_1.config.mongoHost + ":" + config_1.config.mongoPort + "/" + config_1.config.mongoDb;
     var app = express();
-    app.use('/creategame', function (req, res, next) {
+    app.post('/creategame', function (req, res, next) {
         // console.log(req)
         var formData = req.body.formData;
         var document = JSON.parse(formData);
@@ -32,7 +32,7 @@ var server;
             });
         });
     });
-    app.use('/openid', function (req, res, next) {
+    app.post('/openid', function (req, res, next) {
         logger.debug('req_body: ', req.body);
         var code = req.body.code;
         if (code) {
@@ -50,7 +50,7 @@ var server;
             });
         }
     });
-    app.use('/all', function (req, res, next) {
+    app.post('/all', function (req, res, next) {
         MongoClient.connect(DB_CONN_STR, function (err, db) {
             logger.debug('mongo show all');
             var openid = req.body.openid;
@@ -62,7 +62,7 @@ var server;
             });
         });
     });
-    app.use('/gamebyid', function (req, res, next) {
+    app.post('/gamebyid', function (req, res, next) {
         try {
             MongoClient.connect(DB_CONN_STR, function (err, db) {
                 logger.debug('mongo query by id connected, request: ', req.body);

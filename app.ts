@@ -22,7 +22,7 @@ namespace server {
 
   let app = express();
 
-  app.use('/creategame', (req, res, next) => {
+  app.post('/creategame', (req, res, next) => {
     // console.log(req)
     let formData = req.body.formData;
     let document = JSON.parse(formData);
@@ -41,7 +41,7 @@ namespace server {
     })
   })
 
-  app.use('/openid', (req, res, next) => {
+  app.post('/openid', (req, res, next) => {
     logger.debug('req_body: ', req.body);
     let code = req.body.code;
     if (code) {
@@ -60,7 +60,7 @@ namespace server {
     }
   })
 
-  app.use('/all', (req, res, next) => {
+  app.post('/all', (req, res, next) => {
     MongoClient.connect(DB_CONN_STR, (err, db) => {
       logger.debug('mongo show all');
       const openid = req.body.openid;
@@ -73,7 +73,7 @@ namespace server {
     })
   })
 
-  app.use('/gamebyid', (req, res, next) => {
+  app.post('/gamebyid', (req, res, next) => {
     try {
       MongoClient.connect(DB_CONN_STR, (err, db) => {
         logger.debug('mongo query by id connected, request: ', req.body);
