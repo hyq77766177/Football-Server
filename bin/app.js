@@ -16,9 +16,9 @@ var server;
     var app = express();
     app.use('/creategame', function (req, res, next) {
         // console.log(req)
-        var formData = req.query.formData;
+        var formData = req.body.formData;
         var document = JSON.parse(formData);
-        document['openid'] = req.query.openid;
+        document['openid'] = req.body.openid;
         // console.log('document: ', document)
         MongoClient.connect(DB_CONN_STR, function (err, db) {
             if (err) {
@@ -33,8 +33,8 @@ var server;
         });
     });
     app.use('/openid', function (req, res, next) {
-        logger.debug('req_query: ', req.query);
-        var code = req.query.code;
+        logger.debug('req_body: ', req.body);
+        var code = req.body.code;
         if (code) {
             var url = "https://api.weixin.qq.com/sns/jscode2session?appId=" + config_1.config.appId + "&secret=" + config_1.config.appSecret + "&js_code=" + code + "&grant_type=authorization_code";
             var data_1 = '';
@@ -53,7 +53,8 @@ var server;
     app.use('/all', function (req, res, next) {
         MongoClient.connect(DB_CONN_STR, function (err, db) {
             logger.debug('mongo show all');
-            mongolib_1.mongoUtil.showAllData(db, 'games', function (result) {
+            var openid = req.body.openid;
+            mongolib_1.mongoUtil.showAllData(db, 'games', openid, function (result) {
                 logger.debug(result);
                 res.write(JSON.stringify(result));
                 db.close();
@@ -64,8 +65,8 @@ var server;
     app.use('/gamebyid', function (req, res, next) {
         try {
             MongoClient.connect(DB_CONN_STR, function (err, db) {
-                logger.debug('mongo query by id connected, request: ', req.query);
-                mongolib_1.mongoUtil.queryGameById(db, 'games', req.query.colId, function (result) {
+                logger.debug('mongo query by id connected, request: ', req.body);
+                mongolib_1.mongoUtil.queryGameById(db, 'games', req.body.colId, function (result) {
                     logger.debug(result);
                     result = result[0];
                     res.write(JSON.stringify(result));

@@ -33,9 +33,9 @@ export namespace mongoUtil {
      * @param {string} col collection
      * @param {function} callback
      */
-    export function showAllData(db, col, callback) {
+    export function showAllData(db, col, openid, callback) {
         const collection = db.collection(col);
-        collection.find().toArray((err, result) => {
+        collection.find({ "_id": openid }).toArray((err, result) => {
             if (err) {
                 logger.error('Error: ', err);
                 return;

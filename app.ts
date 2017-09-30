@@ -24,9 +24,9 @@ namespace server {
 
   app.use('/creategame', (req, res, next) => {
     // console.log(req)
-    let formData = req.query.formData;
+    let formData = req.body.formData;
     let document = JSON.parse(formData);
-    document['openid'] = req.query.openid;
+    document['openid'] = req.body.openid;
     // console.log('document: ', document)
     MongoClient.connect(DB_CONN_STR, (err, db) => {
       if (err) {
@@ -42,8 +42,8 @@ namespace server {
   })
 
   app.use('/openid', (req, res, next) => {
-    logger.debug('req_query: ', req.query);
-    let code = req.query.code;
+    logger.debug('req_body: ', req.body);
+    let code = req.body.code;
     if (code) {
       let url = `https://api.weixin.qq.com/sns/jscode2session?appId=${config.appId}&secret=${config.appSecret}&js_code=${code}&grant_type=authorization_code`;
       let data = '';
@@ -63,7 +63,8 @@ namespace server {
   app.use('/all', (req, res, next) => {
     MongoClient.connect(DB_CONN_STR, (err, db) => {
       logger.debug('mongo show all');
-      mongoUtil.showAllData(db, 'games', result => {
+      const openid = req.body.openid;
+      mongoUtil.showAllData(db, 'games', openid, result => {
         logger.debug(result);
         res.write(JSON.stringify(result));
         db.close();
@@ -75,8 +76,8 @@ namespace server {
   app.use('/gamebyid', (req, res, next) => {
     try {
       MongoClient.connect(DB_CONN_STR, (err, db) => {
-        logger.debug('mongo query by id connected, request: ', req.query);
-        mongoUtil.queryGameById(db, 'games', req.query.colId, result => {
+        logger.debug('mongo query by id connected, request: ', req.body);
+        mongoUtil.queryGameById(db, 'games', req.body.colId, result => {
           logger.debug(result);
           result = result[0];
           res.write(JSON.stringify(result));
