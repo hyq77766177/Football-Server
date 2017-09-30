@@ -5,6 +5,7 @@ var express = require("express");
 var https = require("https");
 var mongoDb = require("mongodb");
 var log4js = require("log4js");
+var bodyParser = require("body-parser");
 var config_1 = require("./config");
 var mongolib_1 = require("./mongolib");
 log4js.configure(config_1.config.log4js_conf);
@@ -14,6 +15,10 @@ var server;
     var MongoClient = mongoDb.MongoClient;
     var DB_CONN_STR = "mongodb://" + config_1.config.mongoUser + ":" + config_1.config.mongoPass + "@" + config_1.config.mongoHost + ":" + config_1.config.mongoPort + "/" + config_1.config.mongoDb;
     var app = express();
+    app.use(bodyParser.json({ limit: '1mb' }));
+    app.use(bodyParser.urlencoded({
+        extended: true
+    }));
     app.post('/creategame', function (req, res, next) {
         // console.log(req)
         var formData = req.body.formData;

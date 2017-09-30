@@ -7,6 +7,7 @@ import * as qs from 'querystring';
 import * as _ from 'lodash';
 import * as mongoDb from 'mongodb';
 import * as log4js from 'log4js';
+import * as bodyParser from 'body-parser';
 
 import { config } from './config';
 import { mongoUtil } from './mongolib';
@@ -21,6 +22,11 @@ namespace server {
   const DB_CONN_STR = `mongodb://${config.mongoUser}:${config.mongoPass}@${config.mongoHost}:${config.mongoPort}/${config.mongoDb}`
 
   let app = express();
+
+  app.use(bodyParser.json({limit: '1mb'}));
+  app.use(bodyParser.urlencoded({
+    extended: true
+  }));
 
   app.post('/creategame', (req, res, next) => {
     // console.log(req)
