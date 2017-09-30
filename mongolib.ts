@@ -1,6 +1,7 @@
 /// <reference path="./config.ts" />
 
 import * as log4js from 'log4js';
+import * as mongodb from 'mongodb'
 import { config } from './config';
 
 log4js.configure(config.log4js_conf);
@@ -45,7 +46,9 @@ export namespace mongoUtil {
 
     export function queryGameById(db, col, id, callback) {
         const collection = db.collection(col);
-        collection.find(JSON.parse(`{"_id":"${id}"}`)).toArray((err, result) => {
+        const objId = new mongodb.ObjectId(id);
+        const queryData = { "_id": objId };
+        collection.find(queryData).toArray((err, result) => {
             if (err) {
                 logger.error('Error: ', err);
                 return;
