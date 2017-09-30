@@ -62,16 +62,21 @@ var server;
         });
     });
     app.use('/gamebyid', function (req, res, next) {
-        MongoClient.connet(DB_CONN_STR, function (err, db) {
-            logger.debug('mongo query by id connected, request: ', req.query);
-            mongolib_1.mongoUtil.queryGameById(db, 'games', req.query.id, function (result) {
-                logger.debug(result);
-                result = result[0];
-                res.write(JSON.stringify(result));
-                db.close;
-                res.end();
+        try {
+            MongoClient.connect(DB_CONN_STR, function (err, db) {
+                logger.debug('mongo query by id connected, request: ', req.query);
+                mongolib_1.mongoUtil.queryGameById(db, 'games', req.query.id, function (result) {
+                    logger.debug(result);
+                    result = result[0];
+                    res.write(JSON.stringify(result));
+                    db.close;
+                    res.end();
+                });
             });
-        });
+        }
+        catch (e) {
+            logger.error(e);
+        }
     });
     app.use('/enrol', function (req, res, next) {
         res.write('Enrol succeess!');

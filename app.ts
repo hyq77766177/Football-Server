@@ -73,16 +73,20 @@ namespace server {
   })
 
   app.use('/gamebyid', (req, res, next) => {
-    MongoClient.connet(DB_CONN_STR, (err, db) => {
-      logger.debug('mongo query by id connected, request: ', req.query);
-      mongoUtil.queryGameById(db, 'games', req.query.id, result => {
-        logger.debug(result);
-        result = result[0];
-        res.write(JSON.stringify(result));
-        db.close;
-        res.end();
+    try {
+      MongoClient.connect(DB_CONN_STR, (err, db) => {
+        logger.debug('mongo query by id connected, request: ', req.query);
+        mongoUtil.queryGameById(db, 'games', req.query.id, result => {
+          logger.debug(result);
+          result = result[0];
+          res.write(JSON.stringify(result));
+          db.close;
+          res.end();
+        })
       })
-    })
+    } catch (e) {
+      logger.error(e);
+    }
   })
 
   app.use('/enrol', (req, res, next) => {
