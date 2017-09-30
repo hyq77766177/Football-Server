@@ -63,7 +63,7 @@ var server;
     });
     app.use('/gamebyid', function (req, res, next) {
         MongoClient.connet(DB_CONN_STR, function (err, db) {
-            logger.debug('mongo query by id connected');
+            logger.debug('mongo query by id connected, request: ', req.query);
             mongolib_1.mongoUtil.queryGameById(db, 'games', req.query.id, function (result) {
                 logger.debug(result);
                 result = result[0];
@@ -72,6 +72,10 @@ var server;
                 res.end();
             });
         });
+    });
+    app.use('/enrol', function (req, res, next) {
+        res.write('Enrol succeess!');
+        res.end();
     });
     app.use(function (req, res, next) {
         res.write('Response from express, ' + new Date());

@@ -74,7 +74,7 @@ namespace server {
 
   app.use('/gamebyid', (req, res, next) => {
     MongoClient.connet(DB_CONN_STR, (err, db) => {
-      logger.debug('mongo query by id connected');
+      logger.debug('mongo query by id connected, request: ', req.query);
       mongoUtil.queryGameById(db, 'games', req.query.id, result => {
         logger.debug(result);
         result = result[0];
@@ -83,6 +83,11 @@ namespace server {
         res.end();
       })
     })
+  })
+
+  app.use('/enrol', (req, res, next) => {
+    res.write('Enrol succeess!');
+    res.end();
   })
 
   app.use((req, res, next) => {
