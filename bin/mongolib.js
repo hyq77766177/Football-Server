@@ -2,6 +2,7 @@
 /// <reference path="./config.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
 var log4js = require("log4js");
+var mongodb = require("mongodb");
 var config_1 = require("./config");
 log4js.configure(config_1.config.log4js_conf);
 var logger = log4js.getLogger('mongoUtil.js');
@@ -45,7 +46,9 @@ var mongoUtil;
     mongoUtil.showAllData = showAllData;
     function queryGameById(db, col, id, callback) {
         var collection = db.collection(col);
-        collection.find(JSON.parse("{\"_id\":\"" + id + "\"}")).toArray(function (err, result) {
+        var objId = new mongodb.ObjectId(id);
+        var queryData = { "_id": objId };
+        collection.find(queryData).toArray(function (err, result) {
             if (err) {
                 logger.error('Error: ', err);
                 return;
