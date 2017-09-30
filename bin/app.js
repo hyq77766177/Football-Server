@@ -7,20 +7,7 @@ var mongoDb = require("mongodb");
 var log4js = require("log4js");
 var config_1 = require("./config");
 var mongolib_1 = require("./mongolib");
-log4js.configure({
-    appenders: {
-        app: {
-            type: 'console',
-        }
-    },
-    categories: {
-        default: {
-            appenders: ['app'],
-            level: 'debug'
-        },
-    },
-    pm2: true,
-});
+log4js.configure(config_1.config.log4js_conf);
 var logger = log4js.getLogger('app.js');
 var server;
 (function (server) {
@@ -64,13 +51,24 @@ var server;
         }
     });
     app.use('/all', function (req, res, next) {
-        var allGames = [];
         MongoClient.connect(DB_CONN_STR, function (err, db) {
             logger.debug('mongo show all');
             mongolib_1.mongoUtil.showAllData(db, 'games', function (result) {
                 logger.debug(result);
                 res.write(JSON.stringify(result));
                 db.close();
+                res.end();
+            });
+        });
+    });
+    app.use('/gamebyid', function (req, res, next) {
+        MongoClient.connet(DB_CONN_STR, function (err, db) {
+            logger.debug('mongo query by id connected');
+            mongolib_1.mongoUtil.queryGameById(db, 'games', req.query.id, function (result) {
+                logger.debug(result);
+                result = result[0];
+                res.write(JSON.stringify(result));
+                db.close;
                 res.end();
             });
         });

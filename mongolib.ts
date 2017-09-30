@@ -1,3 +1,11 @@
+/// <reference path="./config.ts" />
+
+import * as log4js from 'log4js';
+import { config } from './config';
+
+log4js.configure(config.log4js_conf);
+const logger = log4js.getLogger('mongoUtil.js');
+
 export namespace mongoUtil {
     /**
      * insert data to db.col
@@ -11,7 +19,7 @@ export namespace mongoUtil {
         const collection = db.collection(col);
         collection.insert(data, (err, result) => {
             if (err) {
-                console.log('Error:', err)
+                logger.error('Error:', err)
                 return
             }
             callback(result)
@@ -25,11 +33,22 @@ export namespace mongoUtil {
      * @param {function} callback
      */
     export function showAllData(db, col, callback) {
-        const collection = db.collection(col)
+        const collection = db.collection(col);
         collection.find().toArray((err, result) => {
             if (err) {
-                console.log('Error: ', err)
-                return
+                logger.error('Error: ', err);
+                return;
+            }
+            callback(result);
+        })
+    }
+
+    export function queryGameById(db, col, id, callback) {
+        const collection = db.collection(col);
+        collection.find(`{"_id":"${id}"}`).toArray((err, result) => {
+            if (err) {
+                logger.error('Error: ', err);
+                return;
             }
             callback(result);
         })

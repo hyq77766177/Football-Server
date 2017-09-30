@@ -10,5 +10,19 @@ var config;
     config.mongoUser = 'sorayama';
     config.mongoPass = 'sorayama';
     config.mongoDb = 'football';
+    config.log4js_conf = {
+        appenders: {
+            app: {
+                type: 'console',
+            }
+        },
+        categories: {
+            default: {
+                appenders: ['app'],
+                level: 'debug'
+            },
+        },
+        pm2: true,
+    };
 })(config = exports.config || (exports.config = {}));
 //# sourceMappingURL=config.js.map

@@ -1,5 +1,10 @@
 "use strict";
+/// <reference path="./config.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
+var log4js = require("log4js");
+var config_1 = require("./config");
+log4js.configure(config_1.config.log4js_conf);
+var logger = log4js.getLogger('mongoUtil.js');
 var mongoUtil;
 (function (mongoUtil) {
     /**
@@ -14,7 +19,7 @@ var mongoUtil;
         var collection = db.collection(col);
         collection.insert(data, function (err, result) {
             if (err) {
-                console.log('Error:', err);
+                logger.error('Error:', err);
                 return;
             }
             callback(result);
@@ -31,12 +36,23 @@ var mongoUtil;
         var collection = db.collection(col);
         collection.find().toArray(function (err, result) {
             if (err) {
-                console.log('Error: ', err);
+                logger.error('Error: ', err);
                 return;
             }
             callback(result);
         });
     }
     mongoUtil.showAllData = showAllData;
+    function queryGameById(db, col, id, callback) {
+        var collection = db.collection(col);
+        collection.find("{\"_id\":\"" + id + "\"}").toArray(function (err, result) {
+            if (err) {
+                logger.error('Error: ', err);
+                return;
+            }
+            callback(result);
+        });
+    }
+    mongoUtil.queryGameById = queryGameById;
 })(mongoUtil = exports.mongoUtil || (exports.mongoUtil = {}));
 //# sourceMappingURL=mongolib.js.map

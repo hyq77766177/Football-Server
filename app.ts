@@ -11,20 +11,7 @@ import * as log4js from 'log4js';
 import { config } from './config';
 import { mongoUtil } from './mongolib';
 
-log4js.configure({
-  appenders: {
-    app: {
-      type: 'console',
-    }
-  },
-  categories: {
-    default: {
-      appenders: [ 'app' ],
-      level: 'debug'
-    },
-  },
-  pm2: true,
-});
+log4js.configure(config.log4js_conf);
 
 const logger = log4js.getLogger('app.js');
 
@@ -74,13 +61,25 @@ namespace server {
   })
 
   app.use('/all', (req, res, next) => {
-    let allGames = [];
     MongoClient.connect(DB_CONN_STR, (err, db) => {
       logger.debug('mongo show all');
       mongoUtil.showAllData(db, 'games', result => {
         logger.debug(result);
         res.write(JSON.stringify(result));
         db.close();
+        res.end();
+      })
+    })
+  })
+
+  app.use('/gamebyid', (req, res, next) => {
+    MongoClient.connet(DB_CONN_STR, (err, db) => {
+      logger.debug('mongo query by id connected');
+      mongoUtil.queryGameById(db, 'games', req.query.id, result => {
+        logger.debug(result);
+        result = result[0];
+        res.write(JSON.stringify(result));
+        db.close;
         res.end();
       })
     })

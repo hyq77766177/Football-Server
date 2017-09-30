@@ -9,4 +9,19 @@ export namespace config {
   export const mongoPass = 'sorayama';
   export const mongoDb = 'football';
 
+  export const log4js_conf = {
+    appenders: {
+      app: {
+        type: 'console',
+      }
+    },
+    categories: {
+      default: {
+        appenders: [ 'app' ],
+        level: 'debug'
+      },
+    },
+    pm2: true,
+  };
+
 }
