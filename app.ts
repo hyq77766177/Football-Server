@@ -76,7 +76,7 @@ namespace server {
     try {
       MongoClient.connect(DB_CONN_STR, (err, db) => {
         logger.debug('mongo query by id connected, request: ', req.query);
-        mongoUtil.queryGameById(db, 'games', req.query.id, result => {
+        mongoUtil.queryGameById(db, 'games', req.query.colId, result => {
           logger.debug(result);
           result = result[0];
           res.write(JSON.stringify(result));

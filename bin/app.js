@@ -65,7 +65,7 @@ var server;
         try {
             MongoClient.connect(DB_CONN_STR, function (err, db) {
                 logger.debug('mongo query by id connected, request: ', req.query);
-                mongolib_1.mongoUtil.queryGameById(db, 'games', req.query.id, function (result) {
+                mongolib_1.mongoUtil.queryGameById(db, 'games', req.query.colId, function (result) {
                     logger.debug(result);
                     result = result[0];
                     res.write(JSON.stringify(result));
