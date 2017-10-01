@@ -20,22 +20,27 @@ var server;
         extended: true
     }));
     app.post('/creategame', function (req, res, next) {
-        // console.log(req)
+        logger.debug(req.body);
         var formData = req.body.formData;
-        var document = JSON.parse(formData);
-        document['openid'] = req.body.openid;
-        // console.log('document: ', document)
-        MongoClient.connect(DB_CONN_STR, function (err, db) {
-            if (err) {
-                logger.error(err);
-            }
-            logger.debug("mongo insert");
-            mongolib_1.mongoUtil.insertData(db, 'games', document, function (result) {
-                logger.debug(result);
-                db.close();
-                next();
+        try {
+            var document_1 = JSON.parse(formData);
+            document_1['openid'] = req.body.openid;
+            // console.log('document: ', document)
+            MongoClient.connect(DB_CONN_STR, function (err, db) {
+                if (err) {
+                    logger.error(err);
+                }
+                logger.debug("mongo insert");
+                mongolib_1.mongoUtil.insertData(db, 'games', document_1, function (result) {
+                    logger.debug(result);
+                    db.close();
+                    next();
+                });
             });
-        });
+        }
+        catch (e) {
+            logger.error(e);
+        }
     });
     app.post('/openid', function (req, res, next) {
         logger.debug('req_body: ', req.body);

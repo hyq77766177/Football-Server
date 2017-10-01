@@ -29,22 +29,26 @@ namespace server {
   }));
 
   app.post('/creategame', (req, res, next) => {
-    // console.log(req)
+    logger.debug(req.body);
     let formData = req.body.formData;
-    let document = JSON.parse(formData);
-    document['openid'] = req.body.openid;
-    // console.log('document: ', document)
-    MongoClient.connect(DB_CONN_STR, (err, db) => {
-      if (err) {
-        logger.error(err);
-      }
-      logger.debug("mongo insert");
-      mongoUtil.insertData(db, 'games', document, result => {
-        logger.debug(result)
-        db.close();
-        next();
+    try {
+      let document = JSON.parse(formData);
+      document['openid'] = req.body.openid;
+      // console.log('document: ', document)
+      MongoClient.connect(DB_CONN_STR, (err, db) => {
+        if (err) {
+          logger.error(err);
+        }
+        logger.debug("mongo insert");
+        mongoUtil.insertData(db, 'games', document, result => {
+          logger.debug(result)
+          db.close();
+          next();
+        })
       })
-    })
+    } catch(e) {
+      logger.error(e);
+    }
   })
 
   app.post('/openid', (req, res, next) => {
