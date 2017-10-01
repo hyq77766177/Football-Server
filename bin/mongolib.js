@@ -35,7 +35,7 @@ var mongoUtil;
      */
     function showAllData(db, col, openid, callback) {
         var collection = db.collection(col);
-        collection.find({ "_id": openid }).toArray(function (err, result) {
+        collection.find({ "openid": openid }).toArray(function (err, result) {
             if (err) {
                 logger.error('Error: ', err);
                 return;
