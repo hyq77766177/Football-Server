@@ -32,7 +32,7 @@ namespace server {
     logger.debug(req.body);
     let formData = req.body.formData;
     try {
-      let document = JSON.parse(formData);
+      let document = formData;
       document['openid'] = req.body.openid;
       // console.log('document: ', document)
       MongoClient.connect(DB_CONN_STR, (err, db) => {
