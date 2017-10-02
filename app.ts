@@ -120,8 +120,8 @@ namespace server {
           mongoUtil.enrol(db, 'games', data, result => {
             logger.debug('enrol cb res: ', result);
             res.write('enrol success!');
-            res.end();
             db.close();
+            res.end();
           })
         })
       }

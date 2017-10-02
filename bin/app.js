@@ -101,8 +101,8 @@ var server;
                     mongolib_1.mongoUtil.enrol(db, 'games', data_2, function (result) {
                         logger.debug('enrol cb res: ', result);
                         res.write('enrol success!');
-                        res.end();
                         db.close();
+                        res.end();
                     });
                 });
             }
