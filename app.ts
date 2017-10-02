@@ -137,8 +137,11 @@ export namespace server {
               let exists = resl.referees && resl['referees'].some(r => r.refereeName === data.refereeName);
               if (exists) {
                 logger.debug('exists：', exists);
-                res.status(errorCode.errCode.enrolExist);
-                res.send('不能重复报名！');
+                const errMsg = {
+                  status: errorCode.errCode.enrolExist,
+                  msg: '不能重复报名！',
+                }
+                res.end(JSON.stringify(errMsg));
                 db.close();
               } else {
                 mongoUtil.enrol(db, 'games', data, () => {
