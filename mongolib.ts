@@ -82,7 +82,10 @@ export namespace mongoUtil {
                 return;
             }
             logger.debug('enrol find result: ', result);
-            if (!!result.shift().referees && result.shift().referees.some(r => r.refereeName === data.refereeName)) {
+            let curGame = result.shift();
+            logger.debug('enrol curgame: ', curGame);
+            logger.debug('enrol curgame.referees: ', curGame.referees);
+            if (!!curGame.referees && curGame.referees.some(r => r.refereeName === data.refereeName)) {
                 returnValue = false;
                 return;
             } else {

@@ -69,7 +69,10 @@ var mongoUtil;
                 return;
             }
             logger.debug('enrol find result: ', result);
-            if (!!result.shift().referees && result.shift().referees.some(function (r) { return r.refereeName === data.refereeName; })) {
+            var curGame = result.shift();
+            logger.debug('enrol curgame: ', curGame);
+            logger.debug('enrol curgame.referees: ', curGame.referees);
+            if (!!curGame.referees && curGame.referees.some(function (r) { return r.refereeName === data.refereeName; })) {
                 returnValue = false;
                 return;
             }
