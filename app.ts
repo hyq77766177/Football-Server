@@ -109,7 +109,7 @@ namespace server {
 
   app.post('/enrol', (req, res, next) => {
     logger.debug('enrol data: ', req.body);
-    try {
+    // try {
       let data = req.body.data;
       if (data) {
         MongoClient.connect(DB_CONN_STR, (err, db) => {
@@ -124,10 +124,12 @@ namespace server {
             res.end();
           })
         })
+      } else {
+        logger.error('no enrol data!');
       }
-    } catch(e) {
-      logger.error(e);
-    }
+    // } catch(e) {
+    //   logger.error(e);
+    // }
   })
 
   app.use((req, res, next) => {

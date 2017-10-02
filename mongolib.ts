@@ -70,6 +70,7 @@ export namespace mongoUtil {
     }
 
     export function enrol(db: mongodb.Db, col: string, data, callback: Function) {
+        logger.debug('mongoUtil.enrol has invoked');
         const collection = db.collection(col);
         const id = data.colId as string;
         queryGameById(db, col, id, result => {
