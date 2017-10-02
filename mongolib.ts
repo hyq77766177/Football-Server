@@ -79,9 +79,8 @@ export namespace mongoUtil {
                 result['referees'] = [];
             }
             (result['referees'] as server.enrolReq[]).push(data);
-            collection.update({ "_id": new mongodb.ObjectId(id) }, { $set: { "referees": result['referees'] }}).catch(e => {
-                logger.error('update error: ', e);
-            })
+            logger.debug('result.referees: ', result['referees']);
+            collection.updateOne({ "_id": new mongodb.ObjectId(id) }, { $set: { "referees": result['referees'] }});
         });
     }
 }

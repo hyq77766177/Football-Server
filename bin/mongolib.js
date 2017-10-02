@@ -66,9 +66,8 @@ var mongoUtil;
                 result['referees'] = [];
             }
             result['referees'].push(data);
-            collection.update({ "_id": new mongodb.ObjectId(id) }, { $set: { "referees": result['referees'] } }).catch(function (e) {
-                logger.error('update error: ', e);
-            });
+            logger.debug('result.referees: ', result['referees']);
+            collection.updateOne({ "_id": new mongodb.ObjectId(id) }, { $set: { "referees": result['referees'] } });
         });
     }
     mongoUtil.enrol = enrol;
