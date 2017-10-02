@@ -58,6 +58,7 @@ var mongoUtil;
     }
     mongoUtil.queryGameById = queryGameById;
     function enrol(db, col, data, callback) {
+        logger.debug('mongoUtil.enrol has invoked');
         var collection = db.collection(col);
         var id = data.colId;
         queryGameById(db, col, id, function (result) {

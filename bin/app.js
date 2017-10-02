@@ -90,26 +90,28 @@ var server;
     });
     app.post('/enrol', function (req, res, next) {
         logger.debug('enrol data: ', req.body);
-        try {
-            var data_2 = req.body.data;
-            if (data_2) {
-                MongoClient.connect(DB_CONN_STR, function (err, db) {
-                    if (err) {
-                        logger.error(err);
-                        return;
-                    }
-                    mongolib_1.mongoUtil.enrol(db, 'games', data_2, function (result) {
-                        logger.debug('enrol cb res: ', result);
-                        res.write('enrol success!');
-                        db.close();
-                        res.end();
-                    });
+        // try {
+        var data = req.body.data;
+        if (data) {
+            MongoClient.connect(DB_CONN_STR, function (err, db) {
+                if (err) {
+                    logger.error(err);
+                    return;
+                }
+                mongolib_1.mongoUtil.enrol(db, 'games', data, function (result) {
+                    logger.debug('enrol cb res: ', result);
+                    res.write('enrol success!');
+                    db.close();
+                    res.end();
                 });
-            }
+            });
         }
-        catch (e) {
-            logger.error(e);
+        else {
+            logger.error('no enrol data!');
         }
+        // } catch(e) {
+        //   logger.error(e);
+        // }
     });
     app.use(function (req, res, next) {
         res.write('Response from express, ' + new Date());
