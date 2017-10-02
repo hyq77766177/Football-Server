@@ -45,7 +45,7 @@ var server;
         logger.debug('req_body: ', req.body);
         var code = req.body.code;
         if (code) {
-            var url = "https://api.weixin.qq.com/sns/jscode2session?appId=" + config_1.config.appId + "&secret=" + config_1.config.appSecret + "&js_code=" + code + "&grant_type=authorization_code";
+            var url = config_1.config.getWXOpenIdUrl(code);
             var data_1 = '';
             var hreq = https.get(url, function (hres) {
                 hres.on('data', function (chunk) {
@@ -88,7 +88,14 @@ var server;
             logger.error(e);
         }
     });
-    app.use('/enrol', function (req, res, next) {
+    app.post('/enrol', function (req, res, next) {
+        logger.debug('enrol data: ', req.body);
+        // try {
+        //   let formData = req.body.formData;
+        //   if (formData) {
+        //     mongoUtil.
+        //   }
+        // }
         res.write('Enrol succeess!');
         res.end();
     });

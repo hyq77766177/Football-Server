@@ -56,4 +56,9 @@ export namespace mongoUtil {
             callback(result);
         })
     }
+
+    // export function enrol(db: mongodb.Db, col, formData, callback) {
+    //     const collection = db.collection(col);
+    //     collection.update({  }, )
+    // }
 }
