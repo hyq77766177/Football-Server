@@ -107,8 +107,11 @@ var server;
                             var exists = resl.referees && resl['referees'].some(function (r) { return r.refereeName === data_2.refereeName; });
                             if (exists) {
                                 logger.debug('exists：', exists);
-                                res.status(errorCode_1.errorCode.errCode.enrolExist);
-                                res.send('不能重复报名！');
+                                var errMsg = {
+                                    status: errorCode_1.errorCode.errCode.enrolExist,
+                                    msg: '不能重复报名！',
+                                };
+                                res.end(JSON.stringify(errMsg));
                                 db.close();
                             }
                             else {
