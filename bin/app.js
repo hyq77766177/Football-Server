@@ -106,9 +106,10 @@ var server;
                             logger.debug('find result.referees: ', resl['referees']);
                             var exists = resl.referees && resl['referees'].some(function (r) { return r.refereeName === data_2.refereeName; });
                             if (exists) {
-                                db.close();
+                                logger.debug('exists：', exists);
                                 res.status(errorCode_1.errorCode.errCode.enrolExist);
                                 res.write('不能重复报名！');
+                                db.close();
                                 res.end();
                             }
                             else {
