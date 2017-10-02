@@ -109,7 +109,7 @@ export namespace server {
 
   app.post('/enrol', (req, res, next) => {
     logger.debug('enrol data: ', req.body);
-    // try {
+    try {
       let data = req.body.data as enrolReq;
       if (data) {
         MongoClient.connect(DB_CONN_STR, (err, db) => {
@@ -117,19 +117,21 @@ export namespace server {
             logger.error(err);
             return;
           }
-          mongoUtil.enrol(db, 'games', data, result => {
-            logger.debug('enrol cb res: ', result);
+          try {
+            mongoUtil.enrol(db, 'games', data);
             res.write('enrol success!');
             db.close();
             res.end();
-          })
+          } catch(e) {
+            logger.error(e);
+          }
         })
       } else {
         logger.error('no enrol data!');
       }
-    // } catch(e) {
-    //   logger.error(e);
-    // }
+    } catch(e) {
+      logger.error(e);
+    }
   })
 
   app.use((req, res, next) => {
