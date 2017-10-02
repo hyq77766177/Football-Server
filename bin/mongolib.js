@@ -57,7 +57,7 @@ var mongoUtil;
         });
     }
     mongoUtil.queryGameById = queryGameById;
-    function enrol(db, col, data, callback) {
+    function enrol(db, col, data) {
         logger.debug('mongoUtil.enrol has invoked');
         var collection = db.collection(col);
         var id = data.gameId;

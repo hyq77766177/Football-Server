@@ -70,7 +70,7 @@ export namespace mongoUtil {
         });
     }
 
-    export function enrol(db: mongodb.Db, col: string, data: server.enrolReq, callback: Function) {
+    export function enrol(db: mongodb.Db, col: string, data: server.enrolReq) {
         logger.debug('mongoUtil.enrol has invoked');
         const collection = db.collection(col);
         const id = data.gameId;
