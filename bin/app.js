@@ -79,7 +79,7 @@ var server;
                     logger.debug(result);
                     result = result[0];
                     res.write(JSON.stringify(result));
-                    db.close;
+                    db.close();
                     res.end();
                 });
             });
@@ -90,12 +90,22 @@ var server;
     });
     app.post('/enrol', function (req, res, next) {
         logger.debug('enrol data: ', req.body);
-        // try {
-        //   let formData = req.body.formData;
-        //   if (formData) {
-        //     mongoUtil.
-        //   }
-        // }
+        try {
+            var data_2 = req.body.data;
+            if (data_2) {
+                MongoClient.connect(DB_CONN_STR, function (err, db) {
+                    mongolib_1.mongoUtil.enrol(db, 'games', data_2, function (result) {
+                        logger.debug('enrol cb res: ', result);
+                        res.write('enrol success!');
+                        res.end();
+                        db.close();
+                    });
+                });
+            }
+        }
+        catch (e) {
+            logger.error(e);
+        }
         res.write('Enrol succeess!');
         res.end();
     });
