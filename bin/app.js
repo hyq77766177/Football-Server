@@ -94,6 +94,10 @@ var server;
             var data_2 = req.body.data;
             if (data_2) {
                 MongoClient.connect(DB_CONN_STR, function (err, db) {
+                    if (err) {
+                        logger.error(err);
+                        return;
+                    }
                     mongolib_1.mongoUtil.enrol(db, 'games', data_2, function (result) {
                         logger.debug('enrol cb res: ', result);
                         res.write('enrol success!');
@@ -106,8 +110,6 @@ var server;
         catch (e) {
             logger.error(e);
         }
-        res.write('Enrol succeess!');
-        res.end();
     });
     app.use(function (req, res, next) {
         res.write('Response from express, ' + new Date());

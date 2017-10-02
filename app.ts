@@ -113,6 +113,10 @@ namespace server {
       let data = req.body.data;
       if (data) {
         MongoClient.connect(DB_CONN_STR, (err, db) => {
+          if (err) {
+            logger.error(err);
+            return;
+          }
           mongoUtil.enrol(db, 'games', data, result => {
             logger.debug('enrol cb res: ', result);
             res.write('enrol success!');
@@ -124,8 +128,6 @@ namespace server {
     } catch(e) {
       logger.error(e);
     }
-    res.write('Enrol succeess!');
-    res.end();
   })
 
   app.use((req, res, next) => {
