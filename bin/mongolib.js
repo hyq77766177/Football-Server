@@ -65,8 +65,8 @@ var mongoUtil;
             if (!result.referees) {
                 result['referees'] = [];
             }
-            var newRefArr = result['referees'].push(data);
-            collection.update({ "_id": new mongodb.ObjectId(id) }, { $set: { "referees": newRefArr } }).catch(function (e) {
+            result['referees'].push(data);
+            collection.update({ "_id": new mongodb.ObjectId(id) }, { $set: { "referees": result['referees'] } }).catch(function (e) {
                 logger.error('update error: ', e);
             });
         });
