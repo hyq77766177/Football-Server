@@ -73,15 +73,16 @@ export namespace mongoUtil {
     export function enrol(db: mongodb.Db, col: string, data: server.enrolReq): boolean {
         logger.debug('mongoUtil.enrol has invoked');
         const collection = db.collection(col);
-        const id = data.gameId;
-        const document = collection.find({ "_id": new mongodb.ObjectId(id) });
+        const id = new mongodb.ObjectId(data.gameId);
+        const document = collection.find({ "_id": id });
         let returnValue = true;
         document.toArray((err, result) => {
             if (err) {
                 logger.error(err);
                 return;
             }
-            if (result.shift().referees && result.shift().referees.some(r => r.refereeName === data.refereeName)) {
+            logger.debug('enrol find result: ', result);
+            if (!!result.shift().referees && result.shift().referees.some(r => r.refereeName === data.refereeName)) {
                 returnValue = false;
                 return;
             } else {
