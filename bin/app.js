@@ -102,7 +102,9 @@ var server;
                     try {
                         mongolib_1.mongoUtil.queryGameById(db, 'games', data_2.gameId, function (result) {
                             var resl = result;
-                            var exists = resl.referees.filter(function (r) { return r.refereeName === data_2.refereeName; }).shift();
+                            logger.debug('find result: ', resl);
+                            logger.debug('find result.referees: ', resl['referees']);
+                            var exists = resl.referees && resl['referees'].filter(function (r) { return r.refereeName === data_2.refereeName; }).length > 0;
                             if (exists) {
                                 db.close();
                                 res.status(errorCode_1.errorCode.errCode.enrolExist);
