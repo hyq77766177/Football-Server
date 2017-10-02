@@ -138,9 +138,8 @@ export namespace server {
               if (exists) {
                 logger.debug('exists：', exists);
                 res.status(errorCode.errCode.enrolExist);
-                res.write('不能重复报名！');
+                res.send('不能重复报名！');
                 db.close();
-                res.end();
               } else {
                 mongoUtil.enrol(db, 'games', data, () => {
                   res.write('enrol success!');

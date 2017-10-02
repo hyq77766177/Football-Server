@@ -108,9 +108,8 @@ var server;
                             if (exists) {
                                 logger.debug('exists：', exists);
                                 res.status(errorCode_1.errorCode.errCode.enrolExist);
-                                res.write('不能重复报名！');
+                                res.send('不能重复报名！');
                                 db.close();
-                                res.end();
                             }
                             else {
                                 mongolib_1.mongoUtil.enrol(db, 'games', data_2, function () {
