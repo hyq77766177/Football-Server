@@ -141,7 +141,7 @@ export namespace server {
                   status: errorCode.errCode.enrolExist,
                   msg: '不能重复报名！',
                 }
-                res.status(errorCode.errCode.enrolExist);
+                res.status(400); // errorCode.errCode.enrolExist);
                 res.end(JSON.stringify(errMsg));
                 db.close();
               } else {
