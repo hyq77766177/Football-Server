@@ -33,8 +33,7 @@ namespace server {
     let formData = req.body.formData;
     try {
       let document = formData;
-      document['openid'] = req.body.openid;
-      // console.log('document: ', document)
+      logger.debug('document: ', document);
       MongoClient.connect(DB_CONN_STR, (err, db) => {
         if (err) {
           logger.error(err);
@@ -55,7 +54,7 @@ namespace server {
     logger.debug('req_body: ', req.body);
     let code = req.body.code;
     if (code) {
-      let url = `https://api.weixin.qq.com/sns/jscode2session?appId=${config.appId}&secret=${config.appSecret}&js_code=${code}&grant_type=authorization_code`;
+      let url = config.getWXOpenIdUrl(code);
       let data = '';
       let hreq = https.get(url, hres => {
         hres.on('data', chunk => {
@@ -100,7 +99,14 @@ namespace server {
     }
   })
 
-  app.use('/enrol', (req, res, next) => {
+  app.post('/enrol', (req, res, next) => {
+    logger.debug('enrol data: ', req.body);
+    // try {
+    //   let formData = req.body.formData;
+    //   if (formData) {
+    //     mongoUtil.
+    //   }
+    // }
     res.write('Enrol succeess!');
     res.end();
   })

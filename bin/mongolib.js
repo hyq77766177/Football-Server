@@ -57,5 +57,9 @@ var mongoUtil;
         });
     }
     mongoUtil.queryGameById = queryGameById;
+    // export function enrol(db: mongodb.Db, col, formData, callback) {
+    //     const collection = db.collection(col);
+    //     collection.update({  }, )
+    // }
 })(mongoUtil = exports.mongoUtil || (exports.mongoUtil = {}));
 //# sourceMappingURL=mongolib.js.map
