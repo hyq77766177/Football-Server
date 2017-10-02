@@ -23,9 +23,8 @@ var server;
         logger.debug(req.body);
         var formData = req.body.formData;
         try {
-            var document_1 = JSON.parse(formData);
-            document_1['openid'] = req.body.openid;
-            // console.log('document: ', document)
+            var document_1 = formData;
+            logger.debug('document: ', document_1);
             MongoClient.connect(DB_CONN_STR, function (err, db) {
                 if (err) {
                     logger.error(err);

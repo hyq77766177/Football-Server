@@ -32,9 +32,8 @@ namespace server {
     logger.debug(req.body);
     let formData = req.body.formData;
     try {
-      let document = JSON.parse(formData);
-      document['openid'] = req.body.openid;
-      // console.log('document: ', document)
+      let document = formData;
+      logger.debug('document: ', document);
       MongoClient.connect(DB_CONN_STR, (err, db) => {
         if (err) {
           logger.error(err);
