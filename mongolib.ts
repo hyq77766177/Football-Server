@@ -77,7 +77,7 @@ export namespace mongoUtil {
                 result['referees'] = [];
             }
             let newRefArr = (result['referees'] as string[]).push(data);
-            collection.update({ "_id": id }, { $set: { "referees": newRefArr }}).catch(e => {
+            collection.update({ "_id": new mongodb.ObjectId(id) }, { $set: { "referees": newRefArr }}).catch(e => {
                 logger.error('update error: ', e);
             })
         });
