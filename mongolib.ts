@@ -3,6 +3,7 @@
 import * as log4js from 'log4js';
 import * as mongodb from 'mongodb'
 import { config } from './config';
+import { server } from './app'
 
 log4js.configure(config.log4js_conf);
 const logger = log4js.getLogger('mongoUtil.js');
@@ -69,15 +70,15 @@ export namespace mongoUtil {
         });
     }
 
-    export function enrol(db: mongodb.Db, col: string, data, callback: Function) {
+    export function enrol(db: mongodb.Db, col: string, data: server.enrolReq, callback: Function) {
         logger.debug('mongoUtil.enrol has invoked');
         const collection = db.collection(col);
-        const id = data.colId as string;
+        const id = data.gameId;
         queryGameById(db, col, id, result => {
             if (!result.referees) {
                 result['referees'] = [];
             }
-            let newRefArr = (result['referees'] as string[]).push(data);
+            let newRefArr = (result['referees'] as server.enrolReq[]).push(data);
             collection.update({ "_id": new mongodb.ObjectId(id) }, { $set: { "referees": newRefArr }}).catch(e => {
                 logger.error('update error: ', e);
             })

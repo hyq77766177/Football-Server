@@ -16,7 +16,7 @@ log4js.configure(config.log4js_conf);
 
 const logger = log4js.getLogger('app.js');
 
-namespace server {
+export namespace server {
 
   const MongoClient = mongoDb.MongoClient;
   const DB_CONN_STR = `mongodb://${config.mongoUser}:${config.mongoPass}@${config.mongoHost}:${config.mongoPort}/${config.mongoDb}`
@@ -99,7 +99,7 @@ namespace server {
     }
   });
 
-  type enrolReq = {
+  export type enrolReq = {
     gameId: string,
     openid: string,
     startRefTime: string,
@@ -110,7 +110,7 @@ namespace server {
   app.post('/enrol', (req, res, next) => {
     logger.debug('enrol data: ', req.body);
     // try {
-      let data = req.body.data;
+      let data = req.body.data as enrolReq;
       if (data) {
         MongoClient.connect(DB_CONN_STR, (err, db) => {
           if (err) {

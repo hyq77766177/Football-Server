@@ -119,5 +119,5 @@ var server;
     });
     app.listen(config_1.config.port);
     logger.info("server listening at 127.0.0.1: " + config_1.config.port);
-})(server || (server = {}));
+})(server = exports.server || (exports.server = {}));
 //# sourceMappingURL=app.js.map

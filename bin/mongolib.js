@@ -60,7 +60,7 @@ var mongoUtil;
     function enrol(db, col, data, callback) {
         logger.debug('mongoUtil.enrol has invoked');
         var collection = db.collection(col);
-        var id = data.colId;
+        var id = data.gameId;
         queryGameById(db, col, id, function (result) {
             if (!result.referees) {
                 result['referees'] = [];
