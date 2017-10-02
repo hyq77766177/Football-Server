@@ -74,13 +74,14 @@ export namespace mongoUtil {
         logger.debug('mongoUtil.enrol has invoked');
         const collection = db.collection(col);
         const id = data.gameId;
-        queryGameById(db, col, id, result => {
-            if (!result.referees) {
-                result['referees'] = [];
-            }
-            (result['referees'] as server.enrolReq[]).push(data);
-            logger.debug('result.referees: ', result['referees']);
-            collection.updateOne({ "_id": new mongodb.ObjectId(id) }, { $set: { "referees": result['referees'] }});
-        });
+        collection.update({
+            "_id": new mongodb.ObjectId(id)
+        }, {
+            "$push": { "referees": data }
+        }, {
+            upsert: true
+        }).catch(e => {
+            logger.error('update error:' , e);
+        }) ;
     }
 }
