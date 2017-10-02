@@ -111,7 +111,7 @@ var server;
                                     status: errorCode_1.errorCode.errCode.enrolExist,
                                     msg: '不能重复报名！',
                                 };
-                                res.statusCode = errorCode_1.errorCode.errCode.enrolExist;
+                                res.status(errorCode_1.errorCode.errCode.enrolExist);
                                 res.end(JSON.stringify(errMsg));
                                 db.close();
                             }
