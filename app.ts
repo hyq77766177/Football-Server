@@ -11,6 +11,7 @@ import * as bodyParser from 'body-parser';
 
 import { config } from './config';
 import { mongoUtil } from './mongolib';
+import { errorCode } from './errorCode';
 
 log4js.configure(config.log4js_conf);
 
@@ -118,10 +119,15 @@ export namespace server {
             return;
           }
           try {
-            mongoUtil.enrol(db, 'games', data);
-            res.write('enrol success!');
-            db.close();
-            res.end();
+            if (mongoUtil.enrol(db, 'games', data)) {
+              res.write('enrol success!');
+              db.close();
+              res.end();
+            } else {
+              res.status(errorCode.errCode.enrolExist);
+              res.send('不能重复报名！');
+            }
+
           } catch(e) {
             logger.error(e);
           }
