@@ -131,14 +131,15 @@ export namespace server {
           }
           try {
             mongoUtil.queryGameById(db, 'games', data.gameId, result => {
-              const resl = result as gameData;
+              const resl = result[0] as gameData;
               logger.debug('find result: ', resl);
               logger.debug('find result.referees: ', resl['referees']);
-              let exists = resl.referees && resl['referees'].filter(r => r.refereeName === data.refereeName).length > 0;
+              let exists = resl.referees && resl['referees'].some(r => r.refereeName === data.refereeName);
               if (exists) {
                 db.close();
                 res.status(errorCode.errCode.enrolExist);
-                res.send('不能重复报名！');
+                res.write('不能重复报名！');
+                res.end();
               } else {
                 mongoUtil.enrol(db, 'games', data, () => {
                   res.write('enrol success!');

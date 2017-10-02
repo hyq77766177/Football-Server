@@ -101,14 +101,15 @@ var server;
                     }
                     try {
                         mongolib_1.mongoUtil.queryGameById(db, 'games', data_2.gameId, function (result) {
-                            var resl = result;
+                            var resl = result[0];
                             logger.debug('find result: ', resl);
                             logger.debug('find result.referees: ', resl['referees']);
-                            var exists = resl.referees && resl['referees'].filter(function (r) { return r.refereeName === data_2.refereeName; }).length > 0;
+                            var exists = resl.referees && resl['referees'].some(function (r) { return r.refereeName === data_2.refereeName; });
                             if (exists) {
                                 db.close();
                                 res.status(errorCode_1.errorCode.errCode.enrolExist);
-                                res.send('不能重复报名！');
+                                res.write('不能重复报名！');
+                                res.end();
                             }
                             else {
                                 mongolib_1.mongoUtil.enrol(db, 'games', data_2, function () {
