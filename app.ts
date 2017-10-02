@@ -132,7 +132,9 @@ export namespace server {
           try {
             mongoUtil.queryGameById(db, 'games', data.gameId, result => {
               const resl = result as gameData;
-              let exists = resl.referees.filter(r => r.refereeName === data.refereeName).shift();
+              logger.debug('find result: ', resl);
+              logger.debug('find result.referees: ', resl['referees']);
+              let exists = resl.referees && resl['referees'].filter(r => r.refereeName === data.refereeName).length > 0;
               if (exists) {
                 db.close();
                 res.status(errorCode.errCode.enrolExist);
