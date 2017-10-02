@@ -60,15 +60,16 @@ var mongoUtil;
     function enrol(db, col, data) {
         logger.debug('mongoUtil.enrol has invoked');
         var collection = db.collection(col);
-        var id = data.gameId;
-        var document = collection.find({ "_id": new mongodb.ObjectId(id) });
+        var id = new mongodb.ObjectId(data.gameId);
+        var document = collection.find({ "_id": id });
         var returnValue = true;
         document.toArray(function (err, result) {
             if (err) {
                 logger.error(err);
                 return;
             }
-            if (result.shift().referees && result.shift().referees.some(function (r) { return r.refereeName === data.refereeName; })) {
+            logger.debug('enrol find result: ', result);
+            if (!!result.shift().referees && result.shift().referees.some(function (r) { return r.refereeName === data.refereeName; })) {
                 returnValue = false;
                 return;
             }
