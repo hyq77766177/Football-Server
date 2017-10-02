@@ -61,13 +61,14 @@ var mongoUtil;
         logger.debug('mongoUtil.enrol has invoked');
         var collection = db.collection(col);
         var id = data.gameId;
-        queryGameById(db, col, id, function (result) {
-            if (!result.referees) {
-                result['referees'] = [];
-            }
-            result['referees'].push(data);
-            logger.debug('result.referees: ', result['referees']);
-            collection.updateOne({ "_id": new mongodb.ObjectId(id) }, { $set: { "referees": result['referees'] } });
+        collection.update({
+            "_id": new mongodb.ObjectId(id)
+        }, {
+            "$push": { "referees": data }
+        }, {
+            upsert: true
+        }).catch(function (e) {
+            logger.error('update error:', e);
         });
     }
     mongoUtil.enrol = enrol;
