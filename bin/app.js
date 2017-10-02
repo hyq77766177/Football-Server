@@ -14,7 +14,7 @@ var logger = log4js.getLogger('app.js');
 var server;
 (function (server) {
     var MongoClient = mongoDb.MongoClient;
-    var DB_CONN_STR = "mongodb://" + config_1.config.mongoUser + ":" + config_1.config.mongoPass + "@" + config_1.config.mongoHost + ":" + config_1.config.mongoPort + "/" + config_1.config.mongoDb;
+    var DB_CONN_STR = mongolib_1.mongoUtil.mongoUrl;
     var app = express();
     app.use(bodyParser.json({ limit: '1mb' }));
     app.use(bodyParser.urlencoded({
@@ -100,15 +100,22 @@ var server;
                         return;
                     }
                     try {
-                        if (mongolib_1.mongoUtil.enrol(db, 'games', data_2)) {
-                            res.write('enrol success!');
-                            db.close();
-                            res.end();
-                        }
-                        else {
-                            res.status(errorCode_1.errorCode.errCode.enrolExist);
-                            res.send('不能重复报名！');
-                        }
+                        mongolib_1.mongoUtil.queryGameById(db, 'games', data_2.gameId, function (result) {
+                            var resl = result;
+                            var exists = resl.referees.filter(function (r) { return r.refereeName === data_2.refereeName; }).shift();
+                            if (exists) {
+                                db.close();
+                                res.status(errorCode_1.errorCode.errCode.enrolExist);
+                                res.send('不能重复报名！');
+                            }
+                            else {
+                                mongolib_1.mongoUtil.enrol(db, 'games', data_2, function () {
+                                    res.write('enrol success!');
+                                    db.close();
+                                    res.end();
+                                });
+                            }
+                        });
                     }
                     catch (e) {
                         logger.error(e);

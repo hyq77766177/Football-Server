@@ -8,19 +8,10 @@ import { server } from './app'
 log4js.configure(config.log4js_conf);
 const logger = log4js.getLogger('mongoUtil.js');
 
-export type gameData = {
-    _id: mongodb.ObjectId;
-    gameName: string,
-    gameDate: string,
-    gameTime: string,
-    gameEndTime: string,
-    refereeNumber: number,
-    openid: string,
-    referees?: string[],
-    refereeIds?: string[],
-}
-
 export namespace mongoUtil {
+
+    export const mongoUrl = `mongodb://${config.mongoUser}:${config.mongoPass}@${config.mongoHost}:${config.mongoPort}/${config.mongoDb}`;
+
     /**
      * insert data to db.col
      * @param {mongodb.Db} db
@@ -70,36 +61,20 @@ export namespace mongoUtil {
         });
     }
 
-    export function enrol(db: mongodb.Db, col: string, data: server.enrolReq): boolean {
+    export function enrol(db: mongodb.Db, col: string, data: server.enrolReq, callback: Function) {
         logger.debug('mongoUtil.enrol has invoked');
         const collection = db.collection(col);
         const id = new mongodb.ObjectId(data.gameId);
         const document = collection.find({ "_id": id });
-        let returnValue = true;
-        document.toArray((err, result) => {
-            if (err) {
-                logger.error(err);
-                return;
-            }
-            logger.debug('enrol find result: ', result);
-            let curGame = result.shift();
-            logger.debug('enrol curgame: ', curGame);
-            logger.debug('enrol curgame.referees: ', curGame.referees);
-            if (!!curGame.referees && curGame.referees.some(r => r.refereeName === data.refereeName)) {
-                returnValue = false;
-                return;
-            } else {
-                collection.update({
-                    "_id": new mongodb.ObjectId(id)
-                }, {
-                    "$push": { "referees": data }
-                }, {
-                    upsert: true
-                }).catch(e => {
-                    logger.error('update error:' , e);
-                });
-            }
-        })
-        return returnValue;
+        collection.update({
+            "_id": new mongodb.ObjectId(id)
+        }, {
+            "$push": { "referees": data }
+        }, {
+            upsert: true
+        }).catch(e => {
+            logger.error('update error:' , e);
+        });
+        callback();
     }
 }
