@@ -90,23 +90,40 @@ namespace server {
           logger.debug(result);
           result = result[0];
           res.write(JSON.stringify(result));
-          db.close;
+          db.close();
           res.end();
         })
       })
     } catch (e) {
       logger.error(e);
     }
-  })
+  });
+
+  type enrolReq = {
+    gameId: string,
+    openid: string,
+    startRefTime: string,
+    endRefTime: string,
+    refereeName: string,
+  };
 
   app.post('/enrol', (req, res, next) => {
     logger.debug('enrol data: ', req.body);
-    // try {
-    //   let formData = req.body.formData;
-    //   if (formData) {
-    //     mongoUtil.
-    //   }
-    // }
+    try {
+      let data = req.body.data;
+      if (data) {
+        MongoClient.connect(DB_CONN_STR, (err, db) => {
+          mongoUtil.enrol(db, 'games', data, result => {
+            logger.debug('enrol cb res: ', result);
+            res.write('enrol success!');
+            res.end();
+            db.close();
+          })
+        })
+      }
+    } catch(e) {
+      logger.error(e);
+    }
     res.write('Enrol succeess!');
     res.end();
   })

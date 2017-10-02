@@ -7,15 +7,27 @@ import { config } from './config';
 log4js.configure(config.log4js_conf);
 const logger = log4js.getLogger('mongoUtil.js');
 
+export type gameData = {
+    _id: mongodb.ObjectId;
+    gameName: string,
+    gameDate: string,
+    gameTime: string,
+    gameEndTime: string,
+    refereeNumber: number,
+    openid: string,
+    referees?: string[],
+    refereeIds?: string[],
+}
+
 export namespace mongoUtil {
     /**
      * insert data to db.col
-     * @param {string} db
+     * @param {mongodb.Db} db
      * @param {string} col collection
      * @param {any} data data to be inserted
      * @param {function} callback
      */
-    export function insertData (db, col, data, callback) {
+    export function insertData (db: mongodb.Db, col: string, data, callback: Function) {
         //连接到表 games
         const collection = db.collection(col);
         collection.insert(data, (err, result) => {
@@ -29,11 +41,11 @@ export namespace mongoUtil {
 
     /**
      * show all data from db.col
-     * @param {string} db
+     * @param {mongodb.Db} db
      * @param {string} col collection
      * @param {function} callback
      */
-    export function showAllData(db, col, openid, callback) {
+    export function showAllData(db: mongodb.Db, col: string, openid: string, callback: Function) {
         const collection = db.collection(col);
         collection.find({ "openid": openid }).toArray((err, result) => {
             if (err) {
@@ -44,7 +56,7 @@ export namespace mongoUtil {
         })
     }
 
-    export function queryGameById(db, col, id, callback) {
+    export function queryGameById(db: mongodb.Db, col: string, id: string, callback: Function) {
         const collection = db.collection(col);
         const objId = new mongodb.ObjectId(id);
         const queryData = { "_id": objId };
@@ -54,11 +66,20 @@ export namespace mongoUtil {
                 return;
             }
             callback(result);
-        })
+        });
     }
 
-    // export function enrol(db: mongodb.Db, col, formData, callback) {
-    //     const collection = db.collection(col);
-    //     collection.update({  }, )
-    // }
+    export function enrol(db: mongodb.Db, col: string, data, callback: Function) {
+        const collection = db.collection(col);
+        const id = data.colId as string;
+        queryGameById(db, col, id, result => {
+            if (!result.referees) {
+                result['referees'] = [];
+            }
+            let newRefArr = (result['referees'] as string[]).push(data);
+            collection.update({ "_id": id }, { $set: { "referees": newRefArr }}).catch(e => {
+                logger.error('update error: ', e);
+            })
+        });
+    }
 }

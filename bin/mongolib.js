@@ -10,7 +10,7 @@ var mongoUtil;
 (function (mongoUtil) {
     /**
      * insert data to db.col
-     * @param {string} db
+     * @param {mongodb.Db} db
      * @param {string} col collection
      * @param {any} data data to be inserted
      * @param {function} callback
@@ -29,7 +29,7 @@ var mongoUtil;
     mongoUtil.insertData = insertData;
     /**
      * show all data from db.col
-     * @param {string} db
+     * @param {mongodb.Db} db
      * @param {string} col collection
      * @param {function} callback
      */
@@ -57,9 +57,19 @@ var mongoUtil;
         });
     }
     mongoUtil.queryGameById = queryGameById;
-    // export function enrol(db: mongodb.Db, col, formData, callback) {
-    //     const collection = db.collection(col);
-    //     collection.update({  }, )
-    // }
+    function enrol(db, col, data, callback) {
+        var collection = db.collection(col);
+        var id = data.colId;
+        queryGameById(db, col, id, function (result) {
+            if (!result.referees) {
+                result['referees'] = [];
+            }
+            var newRefArr = result['referees'].push(data);
+            collection.update({ "_id": id }, { $set: { "referees": newRefArr } }).catch(function (e) {
+                logger.error('update error: ', e);
+            });
+        });
+    }
+    mongoUtil.enrol = enrol;
 })(mongoUtil = exports.mongoUtil || (exports.mongoUtil = {}));
 //# sourceMappingURL=mongolib.js.map
