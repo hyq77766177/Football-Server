@@ -78,8 +78,8 @@ export namespace mongoUtil {
             if (!result.referees) {
                 result['referees'] = [];
             }
-            let newRefArr = (result['referees'] as server.enrolReq[]).push(data);
-            collection.update({ "_id": new mongodb.ObjectId(id) }, { $set: { "referees": newRefArr }}).catch(e => {
+            (result['referees'] as server.enrolReq[]).push(data);
+            collection.update({ "_id": new mongodb.ObjectId(id) }, { $set: { "referees": result['referees'] }}).catch(e => {
                 logger.error('update error: ', e);
             })
         });
