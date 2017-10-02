@@ -19,8 +19,19 @@ const logger = log4js.getLogger('app.js');
 
 export namespace server {
 
+  export type gameData = {
+    "_id" : mongoDb.ObjectId,
+    "gameName" : string,
+    "gameDate" : string,
+    "gameTime" : string,
+    "gameEndTime" : string,
+    "refereeNumber" : number,
+    "openid" : string,
+    "referees" : enrolReq[],
+  }
+
   const MongoClient = mongoDb.MongoClient;
-  const DB_CONN_STR = `mongodb://${config.mongoUser}:${config.mongoPass}@${config.mongoHost}:${config.mongoPort}/${config.mongoDb}`
+  const DB_CONN_STR = mongoUtil.mongoUrl;
 
   let app = express();
 
@@ -119,15 +130,21 @@ export namespace server {
             return;
           }
           try {
-            if (mongoUtil.enrol(db, 'games', data)) {
-              res.write('enrol success!');
-              db.close();
-              res.end();
-            } else {
-              res.status(errorCode.errCode.enrolExist);
-              res.send('不能重复报名！');
-            }
-
+            mongoUtil.queryGameById(db, 'games', data.gameId, result => {
+              const resl = result as gameData;
+              let exists = resl.referees.filter(r => r.refereeName === data.refereeName).shift();
+              if (exists) {
+                db.close();
+                res.status(errorCode.errCode.enrolExist);
+                res.send('不能重复报名！');
+              } else {
+                mongoUtil.enrol(db, 'games', data, () => {
+                  res.write('enrol success!');
+                  db.close();
+                  res.end();
+                });
+              }
+            })
           } catch(e) {
             logger.error(e);
           }

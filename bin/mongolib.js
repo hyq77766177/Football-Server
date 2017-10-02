@@ -8,6 +8,7 @@ log4js.configure(config_1.config.log4js_conf);
 var logger = log4js.getLogger('mongoUtil.js');
 var mongoUtil;
 (function (mongoUtil) {
+    mongoUtil.mongoUrl = "mongodb://" + config_1.config.mongoUser + ":" + config_1.config.mongoPass + "@" + config_1.config.mongoHost + ":" + config_1.config.mongoPort + "/" + config_1.config.mongoDb;
     /**
      * insert data to db.col
      * @param {mongodb.Db} db
@@ -57,38 +58,21 @@ var mongoUtil;
         });
     }
     mongoUtil.queryGameById = queryGameById;
-    function enrol(db, col, data) {
+    function enrol(db, col, data, callback) {
         logger.debug('mongoUtil.enrol has invoked');
         var collection = db.collection(col);
         var id = new mongodb.ObjectId(data.gameId);
         var document = collection.find({ "_id": id });
-        var returnValue = true;
-        document.toArray(function (err, result) {
-            if (err) {
-                logger.error(err);
-                return;
-            }
-            logger.debug('enrol find result: ', result);
-            var curGame = result.shift();
-            logger.debug('enrol curgame: ', curGame);
-            logger.debug('enrol curgame.referees: ', curGame.referees);
-            if (!!curGame.referees && curGame.referees.some(function (r) { return r.refereeName === data.refereeName; })) {
-                returnValue = false;
-                return;
-            }
-            else {
-                collection.update({
-                    "_id": new mongodb.ObjectId(id)
-                }, {
-                    "$push": { "referees": data }
-                }, {
-                    upsert: true
-                }).catch(function (e) {
-                    logger.error('update error:', e);
-                });
-            }
+        collection.update({
+            "_id": new mongodb.ObjectId(id)
+        }, {
+            "$push": { "referees": data }
+        }, {
+            upsert: true
+        }).catch(function (e) {
+            logger.error('update error:', e);
         });
-        return returnValue;
+        callback();
     }
     mongoUtil.enrol = enrol;
 })(mongoUtil = exports.mongoUtil || (exports.mongoUtil = {}));
