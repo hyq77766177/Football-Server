@@ -61,15 +61,30 @@ var mongoUtil;
         logger.debug('mongoUtil.enrol has invoked');
         var collection = db.collection(col);
         var id = data.gameId;
-        collection.update({
-            "_id": new mongodb.ObjectId(id)
-        }, {
-            "$push": { "referees": data }
-        }, {
-            upsert: true
-        }).catch(function (e) {
-            logger.error('update error:', e);
+        var document = collection.find({ "_id": new mongodb.ObjectId(id) });
+        var returnValue = true;
+        document.toArray(function (err, result) {
+            if (err) {
+                logger.error(err);
+                return;
+            }
+            if (result.shift().referees && result.shift().referees.some(function (r) { return r.refereeName === data.refereeName; })) {
+                returnValue = false;
+                return;
+            }
+            else {
+                collection.update({
+                    "_id": new mongodb.ObjectId(id)
+                }, {
+                    "$push": { "referees": data }
+                }, {
+                    upsert: true
+                }).catch(function (e) {
+                    logger.error('update error:', e);
+                });
+            }
         });
+        return returnValue;
     }
     mongoUtil.enrol = enrol;
 })(mongoUtil = exports.mongoUtil || (exports.mongoUtil = {}));

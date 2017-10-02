@@ -8,6 +8,7 @@ var log4js = require("log4js");
 var bodyParser = require("body-parser");
 var config_1 = require("./config");
 var mongolib_1 = require("./mongolib");
+var errorCode_1 = require("./errorCode");
 log4js.configure(config_1.config.log4js_conf);
 var logger = log4js.getLogger('app.js');
 var server;
@@ -99,10 +100,15 @@ var server;
                         return;
                     }
                     try {
-                        mongolib_1.mongoUtil.enrol(db, 'games', data_2);
-                        res.write('enrol success!');
-                        db.close();
-                        res.end();
+                        if (mongolib_1.mongoUtil.enrol(db, 'games', data_2)) {
+                            res.write('enrol success!');
+                            db.close();
+                            res.end();
+                        }
+                        else {
+                            res.status(errorCode_1.errorCode.errCode.enrolExist);
+                            res.send('不能重复报名！');
+                        }
                     }
                     catch (e) {
                         logger.error(e);

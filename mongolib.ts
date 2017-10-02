@@ -28,7 +28,7 @@ export namespace mongoUtil {
      * @param {any} data data to be inserted
      * @param {function} callback
      */
-    export function insertData (db: mongodb.Db, col: string, data, callback: Function) {
+    export function insertData(db: mongodb.Db, col: string, data, callback: Function) {
         //连接到表 games
         const collection = db.collection(col);
         collection.insert(data, (err, result) => {
@@ -70,18 +70,32 @@ export namespace mongoUtil {
         });
     }
 
-    export function enrol(db: mongodb.Db, col: string, data: server.enrolReq) {
+    export function enrol(db: mongodb.Db, col: string, data: server.enrolReq): boolean {
         logger.debug('mongoUtil.enrol has invoked');
         const collection = db.collection(col);
         const id = data.gameId;
-        collection.update({
-            "_id": new mongodb.ObjectId(id)
-        }, {
-            "$push": { "referees": data }
-        }, {
-            upsert: true
-        }).catch(e => {
-            logger.error('update error:' , e);
-        }) ;
+        const document = collection.find({ "_id": new mongodb.ObjectId(id) });
+        let returnValue = true;
+        document.toArray((err, result) => {
+            if (err) {
+                logger.error(err);
+                return;
+            }
+            if (result.shift().referees && result.shift().referees.some(r => r.refereeName === data.refereeName)) {
+                returnValue = false;
+                return;
+            } else {
+                collection.update({
+                    "_id": new mongodb.ObjectId(id)
+                }, {
+                    "$push": { "referees": data }
+                }, {
+                    upsert: true
+                }).catch(e => {
+                    logger.error('update error:' , e);
+                });
+            }
+        })
+        return returnValue;
     }
 }
