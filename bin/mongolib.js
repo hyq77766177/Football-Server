@@ -86,6 +86,7 @@ var mongoUtil;
             logger.error('update error:', e);
             callback(e);
         });
+        callback(null);
     }
     mongoUtil.enrol = enrol;
     function enrolUpdate(db, col, data, callback) {
@@ -108,6 +109,7 @@ var mongoUtil;
             logger.error('update error:', e);
             callback(e);
         });
+        callback(null);
     }
     mongoUtil.enrolUpdate = enrolUpdate;
     function cancelEnrol(db, col, data, callback) {
@@ -126,6 +128,7 @@ var mongoUtil;
             logger.error('cancel error:', e);
             callback(e);
         });
+        callback(null);
     }
     mongoUtil.cancelEnrol = cancelEnrol;
 })(mongoUtil = exports.mongoUtil || (exports.mongoUtil = {}));

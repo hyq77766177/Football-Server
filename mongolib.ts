@@ -89,6 +89,7 @@ export namespace mongoUtil {
             logger.error('update error:' , e);
             callback(e);
         });
+        callback(null);        
     }
 
     export function enrolUpdate(db: mongodb.Db, col: string, data: server.enrolReq, callback: Function) {
@@ -111,7 +112,7 @@ export namespace mongoUtil {
             logger.error('update error:' , e);
             callback(e);
         });
-        
+        callback(null);
     }
 
     export function cancelEnrol(db: mongodb.Db, col: string, data: server.cancelEnrolData, callback: Function) {
@@ -130,6 +131,6 @@ export namespace mongoUtil {
             logger.error('cancel error:', e);
             callback(e);
         });
-        
+        callback(null);        
     }
 }
