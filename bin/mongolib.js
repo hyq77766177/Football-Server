@@ -93,7 +93,7 @@ var mongoUtil;
         logger.debug('mongoUtil.enrolUpdate has been invoked, data: ', data);
         var id = new mongodb.ObjectId(data.gameId);
         var collection = db.collection(col);
-        collection.update({
+        collection.updateOne({
             "_id": id,
         }, {
             "$pull": {
@@ -101,17 +101,13 @@ var mongoUtil;
                     openid: data.openid,
                 }
             },
-        })
-            .then(function () {
-            collection.update({
+        }).then(function (result) {
+            collection.updateOne({
                 "_id": id,
             }, {
                 "$push": { "referees": data }
-            }, {
-                upsert: true
             });
-        })
-            .catch(function (e) {
+        }).catch(function (e) {
             logger.error('update error:', e);
             callback(e);
         });

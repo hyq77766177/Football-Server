@@ -96,7 +96,7 @@ export namespace mongoUtil {
         logger.debug('mongoUtil.enrolUpdate has been invoked, data: ', data);
         const id = new mongodb.ObjectId(data.gameId);
         const collection = db.collection(col);
-        collection.update({
+        collection.updateOne({
             "_id": id,
         }, {
             "$pull": { 
@@ -104,17 +104,13 @@ export namespace mongoUtil {
                     openid: data.openid,
                 }
             },
-        })
-        .then(() => {
-           collection.update({
+        }).then((result) => {
+           collection.updateOne({
                "_id": id,
            }, {
                "$push": { "referees": data }
-           }, {
-               upsert: true
            })
-        })
-        .catch(e => {
+        }).catch(e => {
             logger.error('update error:', e);
             callback(e);
         });
