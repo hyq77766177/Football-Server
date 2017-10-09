@@ -172,6 +172,7 @@ var server;
             }
             mongolib_1.mongoUtil.cancelEnrol(db, 'games', data, function (err) {
                 if (err) {
+                    res.status(400);
                     var errMsg = {
                         status: errorCode_1.errorCode.errCode.cancelError,
                         msg: err,
@@ -197,6 +198,7 @@ var server;
                 try {
                     mongolib_1.mongoUtil.enrolUpdate(db, 'games', data, function (err) {
                         if (err) {
+                            res.status(400);
                             var errMsg = {
                                 status: errorCode_1.errorCode.errCode.enrolUpdateError,
                                 msg: err,
@@ -206,7 +208,7 @@ var server;
                         }
                         else {
                             db.close();
-                            res.end('Cansole Success!' + new Date().toLocaleString());
+                            res.end('update enrol Success!' + new Date().toLocaleString());
                         }
                     });
                 }

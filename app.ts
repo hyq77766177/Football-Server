@@ -208,6 +208,7 @@ export namespace server {
       }
       mongoUtil.cancelEnrol(db, 'games', data, err => {
         if (err) {
+          res.status(400);          
           const errMsg: server.errMsg = {
             status: errorCode.errCode.cancelError,
             msg: err,
@@ -233,6 +234,7 @@ export namespace server {
         try {
           mongoUtil.enrolUpdate(db, 'games', data, err => {
             if (err) {
+              res.status(400);
               const errMsg: server.errMsg = {
                 status: errorCode.errCode.enrolUpdateError,
                 msg: err,
@@ -241,7 +243,7 @@ export namespace server {
               res.end(JSON.stringify(errMsg));
             } else {
               db.close();
-              res.end('Cansole Success!' + new Date().toLocaleString());
+              res.end('update enrol Success!' + new Date().toLocaleString());
             }
           });
         } catch(e) {

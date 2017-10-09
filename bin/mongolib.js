@@ -102,10 +102,15 @@ var mongoUtil;
                     openid: data.openid,
                 }
             },
-            "$push": { "referees": data }
-        }, {
-            upsert: true
-        }).catch(function (e) {
+        }).then(function (r) {
+            logger.debug('update then.r: ', r);
+            collection.update({
+                "_id": new mongodb.ObjectId(id),
+            }, {
+                "$push": { 'referees': data }
+            });
+        })
+            .catch(function (e) {
             logger.error('update error:', e);
             callback(e);
         });
