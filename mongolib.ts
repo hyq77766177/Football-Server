@@ -93,10 +93,9 @@ export namespace mongoUtil {
     }
 
     export function enrolUpdate(db: mongodb.Db, col: string, data: server.enrolReq, callback: Function) {
-        logger.debug('mongoUtil.enrol has invoked');
+        logger.debug('mongoUtil.enrolUpdate has invoked, data: ', data);
         const collection = db.collection(col);
         const id = new mongodb.ObjectId(data.gameId);
-        const document = collection.find({ "_id": id });
         collection.update({
             "_id": new mongodb.ObjectId(id),
         }, {
@@ -105,15 +104,13 @@ export namespace mongoUtil {
                     openid: data.openid,
                 }
             },
-        }).then(r => {
-            logger.debug('update then.r: ', r);
+        }).then((res) => {
             collection.update({
                 "_id": new mongodb.ObjectId(id),
             }, {
-                "$push": { 'referees': data }
+                "$push": { "referees": data }
             })
-        })
-        .catch(e => {
+        }).catch(e => {
             logger.error('update error:' , e);
             callback(e);
         });

@@ -90,10 +90,9 @@ var mongoUtil;
     }
     mongoUtil.enrol = enrol;
     function enrolUpdate(db, col, data, callback) {
-        logger.debug('mongoUtil.enrol has invoked');
+        logger.debug('mongoUtil.enrolUpdate has invoked, data: ', data);
         var collection = db.collection(col);
         var id = new mongodb.ObjectId(data.gameId);
-        var document = collection.find({ "_id": id });
         collection.update({
             "_id": new mongodb.ObjectId(id),
         }, {
@@ -102,15 +101,13 @@ var mongoUtil;
                     openid: data.openid,
                 }
             },
-        }).then(function (r) {
-            logger.debug('update then.r: ', r);
+        }).then(function (res) {
             collection.update({
                 "_id": new mongodb.ObjectId(id),
             }, {
-                "$push": { 'referees': data }
+                "$push": { "referees": data }
             });
-        })
-            .catch(function (e) {
+        }).catch(function (e) {
             logger.error('update error:', e);
             callback(e);
         });
