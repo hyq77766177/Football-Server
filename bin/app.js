@@ -79,17 +79,7 @@ var server;
                     logger.debug('myCreatedGames:', resultC);
                     mongolib_1.mongoUtil.myEnroledGames(db, 'games', openid, function (resultE) {
                         logger.debug('myEnroledGames:', resultE);
-                        var availableGames = resAll.filter(function (r) {
-                            for (var _i = 0, resultC_1 = resultC; _i < resultC_1.length; _i++) {
-                                var c = resultC_1[_i];
-                                return r._id !== c._id;
-                            }
-                        }).filter(function (r) {
-                            for (var _i = 0, resultE_1 = resultE; _i < resultE_1.length; _i++) {
-                                var e = resultE_1[_i];
-                                return r._id !== e._id;
-                            }
-                        });
+                        var availableGames = resAll.filter(function (r) { return resultC.every(function (c) { return c._id !== r._id; }); }).filter(function (r) { return resultE.every(function (e) { return e._id !== r._id; }); });
                         logger.debug('availableGames: ', availableGames);
                         var responseData = {
                             availableGames: availableGames,
