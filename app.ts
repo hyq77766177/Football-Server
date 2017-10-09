@@ -105,21 +105,7 @@ export namespace server {
           logger.debug('myCreatedGames:', resultC);
           mongoUtil.myEnroledGames(db, 'games', openid, resultE => {
             logger.debug('myEnroledGames:', resultE);
-            let availableGames = resAll.filter(r => {
-              for (let c of resultC) {
-                if (c._id === r._id) {
-                  return false;
-                }
-              }
-              return true;
-            }).filter(r => {
-              for (let e of resultE) {
-                if (e._id === r._id) {
-                  return false;
-                }
-              }
-              return true;
-            });
+            let availableGames = resAll.filter(r => !resultC.some(c => c._id.toHexString() === r._id.toHexString()) && !resultE.some(e => e._id.toHexString() === r._id.toHexString()));
             logger.debug('availableGames: ', availableGames);
             let responseData = {
               availableGames: availableGames,
