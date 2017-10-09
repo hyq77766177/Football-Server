@@ -102,15 +102,6 @@ var mongoUtil;
                 }
             },
         })
-            .then(function () {
-            collection.update({
-                "_id": id,
-            }, {
-                "$push": { "referees": data }
-            }, {
-                upsert: true
-            });
-        })
             .catch(function (e) {
             logger.error('update error:', e);
             callback(e);

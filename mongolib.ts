@@ -105,15 +105,15 @@ export namespace mongoUtil {
                 }
             },
         })
-        .then(() => {
-            collection.update({
-                "_id": id,
-            }, {
-                "$push": { "referees": data }
-            }, {
-                upsert: true
-            })
-        })
+        //.then(() => {
+        //    collection.update({
+        //        "_id": id,
+        //    }, {
+        //        "$push": { "referees": data }
+        //    }, {
+        //        upsert: true
+        //    })
+        //})
         .catch(e => {
             logger.error('update error:', e);
             callback(e);
