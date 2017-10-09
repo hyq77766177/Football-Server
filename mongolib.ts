@@ -93,9 +93,9 @@ export namespace mongoUtil {
     }
 
     export function enrolUpdate(db: mongodb.Db, col: string, data: server.enrolReq, callback: Function) {
-        logger.debug('mongoUtil.enrolUpdate has invoked, data: ', data);
-        const collection = db.collection(col);
+        logger.debug('mongoUtil.enrolUpdate has been invoked, data: ', data);
         const id = new mongodb.ObjectId(data.gameId);
+        const collection = db.collection(col);
         collection.update({
             "_id": id,
         }, {
@@ -104,7 +104,12 @@ export namespace mongoUtil {
                     openid: data.openid,
                 }
             },
-        })
+        }).catch(e => {
+            logger.error('cancel error:', e);
+            callback(e);
+        });
+        callback(null);   
+        
         //.then(() => {
         //    collection.update({
         //        "_id": id,
@@ -114,15 +119,15 @@ export namespace mongoUtil {
         //        upsert: true
         //    })
         //})
-        .catch(e => {
-            logger.error('update error:', e);
-            callback(e);
-        });
-        callback(null);
+        // .catch(e => {
+        //     logger.error('update error:', e);
+        //     callback(e);
+        // });
+        // callback(null);
     }
 
     export function cancelEnrol(db: mongodb.Db, col: string, data: server.cancelEnrolData, callback: Function) {
-        logger.debug('mongoUtil.cancelEnrol has been invoked');
+        logger.debug('mongoUtil.cancelEnrol has been invoked, data: ', data);
         const id = new mongodb.ObjectId(data.gameId);
         const collection = db.collection(col);
         collection.update({
