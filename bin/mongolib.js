@@ -34,9 +34,9 @@ var mongoUtil;
      * @param {string} col collection
      * @param {string} openid openid
      */
-    function myGames(db, col, openid, callback) {
+    function myCreatedGames(db, col, openid, callback) {
         var collection = db.collection(col);
-        collection.find({ "openid": openid }).comment('myCreatedGames')
+        collection.find({ "openid": openid })
             .toArray(function (err, result) {
             if (err) {
                 logger.error('Error: ', err);
@@ -45,7 +45,19 @@ var mongoUtil;
             callback(result);
         });
     }
-    mongoUtil.myGames = myGames;
+    mongoUtil.myCreatedGames = myCreatedGames;
+    function myEnroledGames(db, col, openid, callback) {
+        var collection = db.collection(col);
+        collection.find({ "referees.openid": openid })
+            .toArray(function (err, result) {
+            if (err) {
+                logger.error('Error: ', err);
+                return;
+            }
+            callback(result);
+        });
+    }
+    mongoUtil.myEnroledGames = myEnroledGames;
     function queryGameById(db, col, id, callback) {
         var collection = db.collection(col);
         var objId = new mongodb.ObjectId(id);

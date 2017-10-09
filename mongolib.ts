@@ -37,9 +37,21 @@ export namespace mongoUtil {
      * @param {string} col collection
      * @param {string} openid openid
      */
-    export function myGames(db: mongodb.Db, col: string, openid: string, callback: Function) {
+    export function myCreatedGames(db: mongodb.Db, col: string, openid: string, callback: Function) {
         const collection = db.collection(col);
-        collection.find({ "openid": openid }).comment('myCreatedGames')
+        collection.find({ "openid": openid })
+        .toArray((err, result) => {
+            if (err) {
+                logger.error('Error: ', err);
+                return;
+            }
+            callback(result);
+        })
+    }
+    
+    export function myEnroledGames(db: mongodb.Db, col: string, openid: string, callback: Function) {
+        const collection = db.collection(col);
+        collection.find({ "referees.openid": openid })
         .toArray((err, result) => {
             if (err) {
                 logger.error('Error: ', err);

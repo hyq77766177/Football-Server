@@ -99,12 +99,18 @@ export namespace server {
         res.end(JSON.stringify(errMsg));
         return;
       }
-      mongoUtil.myGames(db, 'games', openid, result => {
-        logger.debug(result);
-        
-        res.write(JSON.stringify(result));
-        db.close();
-        res.end();
+      mongoUtil.myCreatedGames(db, 'games', openid, resultC => {
+        logger.debug('myCreatedGames:', resultC);
+        mongoUtil.myEnroledGames(db, 'games', openid, resultE => {
+          logger.debug('myEnroledGames:', resultE);
+          let responseData = {
+            myCreatedGames: resultC,
+            myEnroledGames: resultE,
+          }
+          res.write(JSON.stringify(responseData));
+          db.close();
+          res.end();
+        })
       })
     })
   })

@@ -73,11 +73,18 @@ var server;
                 res.end(JSON.stringify(errMsg));
                 return;
             }
-            mongolib_1.mongoUtil.myGames(db, 'games', openid, function (result) {
-                logger.debug(result);
-                res.write(JSON.stringify(result));
-                db.close();
-                res.end();
+            mongolib_1.mongoUtil.myCreatedGames(db, 'games', openid, function (resultC) {
+                logger.debug('myCreatedGames:', resultC);
+                mongolib_1.mongoUtil.myEnroledGames(db, 'games', openid, function (resultE) {
+                    logger.debug('myEnroledGames:', resultE);
+                    var responseData = {
+                        myCreatedGames: resultC,
+                        myEnroledGames: resultE,
+                    };
+                    res.write(JSON.stringify(responseData));
+                    db.close();
+                    res.end();
+                });
             });
         });
     });
