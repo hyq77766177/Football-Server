@@ -101,25 +101,21 @@ var mongoUtil;
                     openid: data.openid,
                 }
             },
-        }).catch(function (e) {
-            logger.error('cancel error:', e);
+        })
+            .then(function () {
+            collection.update({
+                "_id": id,
+            }, {
+                "$push": { "referees": data }
+            }, {
+                upsert: true
+            });
+        })
+            .catch(function (e) {
+            logger.error('update error:', e);
             callback(e);
         });
         callback(null);
-        //.then(() => {
-        //    collection.update({
-        //        "_id": id,
-        //    }, {
-        //        "$push": { "referees": data }
-        //    }, {
-        //        upsert: true
-        //    })
-        //})
-        // .catch(e => {
-        //     logger.error('update error:', e);
-        //     callback(e);
-        // });
-        // callback(null);
     }
     mongoUtil.enrolUpdate = enrolUpdate;
     function cancelEnrol(db, col, data, callback) {

@@ -188,7 +188,7 @@ var server;
         });
     });
     app.post('/updateenrol', function (req, res, next) {
-        var data = req.body;
+        var data = req.body.data;
         if (data) {
             MongoClient.connect(DB_CONN_STR, function (err, db) {
                 if (err) {

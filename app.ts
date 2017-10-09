@@ -224,7 +224,7 @@ export namespace server {
   });
 
   app.post('/updateenrol', (req, res, next) => {
-    const data = req.body as enrolReq;
+    const data = req.body.data as enrolReq;
     if (data) { 
       MongoClient.connect(DB_CONN_STR, (err, db) => {
         if (err) {

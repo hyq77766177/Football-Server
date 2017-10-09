@@ -104,26 +104,21 @@ export namespace mongoUtil {
                     openid: data.openid,
                 }
             },
-        }).catch(e => {
-            logger.error('cancel error:', e);
+        })
+        .then(() => {
+           collection.update({
+               "_id": id,
+           }, {
+               "$push": { "referees": data }
+           }, {
+               upsert: true
+           })
+        })
+        .catch(e => {
+            logger.error('update error:', e);
             callback(e);
         });
-        callback(null);   
-        
-        //.then(() => {
-        //    collection.update({
-        //        "_id": id,
-        //    }, {
-        //        "$push": { "referees": data }
-        //    }, {
-        //        upsert: true
-        //    })
-        //})
-        // .catch(e => {
-        //     logger.error('update error:', e);
-        //     callback(e);
-        // });
-        // callback(null);
+        callback(null);
     }
 
     export function cancelEnrol(db: mongodb.Db, col: string, data: server.cancelEnrolData, callback: Function) {
