@@ -32,11 +32,12 @@ var mongoUtil;
      * show all data from db.col
      * @param {mongodb.Db} db
      * @param {string} col collection
-     * @param {function} callback
+     * @param {string} openid openid
      */
-    function showAllData(db, col, openid, callback) {
+    function myGames(db, col, openid, callback) {
         var collection = db.collection(col);
-        collection.find({ "openid": openid }).toArray(function (err, result) {
+        collection.find({ "openid": openid }).comment('myCreatedGames')
+            .toArray(function (err, result) {
             if (err) {
                 logger.error('Error: ', err);
                 return;
@@ -44,7 +45,7 @@ var mongoUtil;
             callback(result);
         });
     }
-    mongoUtil.showAllData = showAllData;
+    mongoUtil.myGames = myGames;
     function queryGameById(db, col, id, callback) {
         var collection = db.collection(col);
         var objId = new mongodb.ObjectId(id);

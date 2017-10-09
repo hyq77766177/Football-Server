@@ -19,6 +19,11 @@ const logger = log4js.getLogger('app.js');
 
 export namespace server {
 
+  export type errMsg = {
+    status: number,
+    msg: string,
+  }
+
   export type gameData = {
     "_id" : mongoDb.ObjectId,
     "gameName" : string,
@@ -35,7 +40,7 @@ export namespace server {
 
   let app = express();
 
-  app.use(bodyParser.json({limit: '1mb'}));
+  app.use(bodyParser.json({ limit: '1mb' }));
   app.use(bodyParser.urlencoded({
     extended: true
   }));
@@ -85,8 +90,18 @@ export namespace server {
     MongoClient.connect(DB_CONN_STR, (err, db) => {
       logger.debug('mongo show all');
       const openid = req.body.openid;
-      mongoUtil.showAllData(db, 'games', openid, result => {
+      if (!openid) {
+        const errMsg: server.errMsg = {
+          status: errorCode.errCode.noOpenId,
+          msg: '没有openid',
+        }
+        res.status(400);
+        res.end(JSON.stringify(errMsg));
+        return;
+      }
+      mongoUtil.myGames(db, 'games', openid, result => {
         logger.debug(result);
+        
         res.write(JSON.stringify(result));
         db.close();
         res.end();
@@ -137,7 +152,7 @@ export namespace server {
               let exists = resl.referees && resl['referees'].some(r => r.refereeName === data.refereeName);
               if (exists) {
                 logger.debug('exists：', exists);
-                const errMsg = {
+                const errMsg: server.errMsg = {
                   status: errorCode.errCode.enrolExist,
                   msg: '不能重复报名！',
                 }

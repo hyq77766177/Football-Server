@@ -35,11 +35,12 @@ export namespace mongoUtil {
      * show all data from db.col
      * @param {mongodb.Db} db
      * @param {string} col collection
-     * @param {function} callback
+     * @param {string} openid openid
      */
-    export function showAllData(db: mongodb.Db, col: string, openid: string, callback: Function) {
+    export function myGames(db: mongodb.Db, col: string, openid: string, callback: Function) {
         const collection = db.collection(col);
-        collection.find({ "openid": openid }).toArray((err, result) => {
+        collection.find({ "openid": openid }).comment('myCreatedGames')
+        .toArray((err, result) => {
             if (err) {
                 logger.error('Error: ', err);
                 return;

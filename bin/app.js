@@ -64,7 +64,16 @@ var server;
         MongoClient.connect(DB_CONN_STR, function (err, db) {
             logger.debug('mongo show all');
             var openid = req.body.openid;
-            mongolib_1.mongoUtil.showAllData(db, 'games', openid, function (result) {
+            if (!openid) {
+                var errMsg = {
+                    status: errorCode_1.errorCode.errCode.noOpenId,
+                    msg: '没有openid',
+                };
+                res.status(400);
+                res.end(JSON.stringify(errMsg));
+                return;
+            }
+            mongolib_1.mongoUtil.myGames(db, 'games', openid, function (result) {
                 logger.debug(result);
                 res.write(JSON.stringify(result));
                 db.close();
