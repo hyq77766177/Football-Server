@@ -95,9 +95,10 @@ var mongoUtil;
         var collection = db.collection(col);
         collection.updateOne({
             "_id": id,
+            "referees.openid": data.openid,
         }, {
             "$set": {
-                "referees": data,
+                "referees.$": data,
             },
         }).catch(function (e) {
             logger.error('update pull error:', e);
