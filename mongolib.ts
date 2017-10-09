@@ -104,15 +104,18 @@ export namespace mongoUtil {
                     openid: data.openid,
                 }
             },
-        }).then((res) => {
-            
+        })
+        .then(() => {
             collection.update({
                 "_id": id,
             }, {
                 "$push": { "referees": data }
+            }, {
+                upsert: true
             })
-        }).catch(e => {
-            logger.error('update error:' , e);
+        })
+        .catch(e => {
+            logger.error('update error:', e);
             callback(e);
         });
         callback(null);
