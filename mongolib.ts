@@ -98,13 +98,10 @@ export namespace mongoUtil {
         const collection = db.collection(col);
         collection.updateOne({
             "_id": id,
+            "referees": { "openid": data.openid }
         }, {
             "$set": { 
-                "referees": {
-                    "refereeName": data.refereeName,
-                    "startRefTime": data.startRefTime,
-                    "endRefTime": data.endRefTime,
-                }
+                "referees": data,
             },
         }).catch(e => {
             logger.error('update pull error:', e);

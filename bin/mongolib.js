@@ -97,11 +97,7 @@ var mongoUtil;
             "_id": id,
         }, {
             "$set": {
-                "referees": {
-                    "refereeName": data.refereeName,
-                    "startRefTime": data.startRefTime,
-                    "endRefTime": data.endRefTime,
-                }
+                "referees": data,
             },
         }).catch(function (e) {
             logger.error('update pull error:', e);
