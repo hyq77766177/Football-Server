@@ -28,12 +28,6 @@ var mongoUtil;
         });
     }
     mongoUtil.insertData = insertData;
-    /**
-     * show all data from db.col
-     * @param {mongodb.Db} db
-     * @param {string} col collection
-     * @param {string} openid openid
-     */
     function myCreatedGames(db, col, openid, callback) {
         var collection = db.collection(col);
         collection.find({ "openid": openid })
@@ -58,6 +52,18 @@ var mongoUtil;
         });
     }
     mongoUtil.myEnroledGames = myEnroledGames;
+    function allGames(db, col, callback) {
+        var collection = db.collection(col);
+        collection.find()
+            .toArray(function (err, result) {
+            if (err) {
+                logger.error('Error: ', err);
+                return;
+            }
+            callback(result);
+        });
+    }
+    mongoUtil.allGames = allGames;
     function queryGameById(db, col, id, callback) {
         var collection = db.collection(col);
         var objId = new mongodb.ObjectId(id);

@@ -99,17 +99,31 @@ export namespace server {
         res.end(JSON.stringify(errMsg));
         return;
       }
-      mongoUtil.myCreatedGames(db, 'games', openid, resultC => {
-        logger.debug('myCreatedGames:', resultC);
-        mongoUtil.myEnroledGames(db, 'games', openid, resultE => {
-          logger.debug('myEnroledGames:', resultE);
-          let responseData = {
-            myCreatedGames: resultC,
-            myEnroledGames: resultE,
-          }
-          res.write(JSON.stringify(responseData));
-          db.close();
-          res.end();
+      mongoUtil.allGames(db, 'games', resAll => {
+        logger.debug('allGames:', resAll);
+        mongoUtil.myCreatedGames(db, 'games', openid, resultC => {
+          logger.debug('myCreatedGames:', resultC);
+          mongoUtil.myEnroledGames(db, 'games', openid, resultE => {
+            logger.debug('myEnroledGames:', resultE);
+            let availableGames = resAll.filter(r => {
+              for (let c of resultC) {
+                return r._id !== c._id;
+              }
+            }).filter(r => {
+              for (let e of resultE) {
+                return r._id !== e._id;
+              }
+            });
+            logger.debug('availableGames: ', availableGames);
+            let responseData = {
+              availableGames: availableGames,
+              myCreatedGames: resultC,
+              myEnroledGames: resultE,
+            }
+            res.write(JSON.stringify(responseData));
+            db.close();
+            res.end();
+          })
         })
       })
     })

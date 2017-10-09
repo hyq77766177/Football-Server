@@ -31,12 +31,6 @@ export namespace mongoUtil {
         })
     }
 
-    /**
-     * show all data from db.col
-     * @param {mongodb.Db} db
-     * @param {string} col collection
-     * @param {string} openid openid
-     */
     export function myCreatedGames(db: mongodb.Db, col: string, openid: string, callback: Function) {
         const collection = db.collection(col);
         collection.find({ "openid": openid })
@@ -52,6 +46,18 @@ export namespace mongoUtil {
     export function myEnroledGames(db: mongodb.Db, col: string, openid: string, callback: Function) {
         const collection = db.collection(col);
         collection.find({ "referees.openid": openid })
+        .toArray((err, result) => {
+            if (err) {
+                logger.error('Error: ', err);
+                return;
+            }
+            callback(result);
+        })
+    }
+
+    export function allGames(db: mongodb.Db, col: string, callback: Function) {
+        const collection = db.collection(col);
+        collection.find()
         .toArray((err, result) => {
             if (err) {
                 logger.error('Error: ', err);

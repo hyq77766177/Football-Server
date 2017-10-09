@@ -73,17 +73,33 @@ var server;
                 res.end(JSON.stringify(errMsg));
                 return;
             }
-            mongolib_1.mongoUtil.myCreatedGames(db, 'games', openid, function (resultC) {
-                logger.debug('myCreatedGames:', resultC);
-                mongolib_1.mongoUtil.myEnroledGames(db, 'games', openid, function (resultE) {
-                    logger.debug('myEnroledGames:', resultE);
-                    var responseData = {
-                        myCreatedGames: resultC,
-                        myEnroledGames: resultE,
-                    };
-                    res.write(JSON.stringify(responseData));
-                    db.close();
-                    res.end();
+            mongolib_1.mongoUtil.allGames(db, 'games', function (resAll) {
+                logger.debug('allGames:', resAll);
+                mongolib_1.mongoUtil.myCreatedGames(db, 'games', openid, function (resultC) {
+                    logger.debug('myCreatedGames:', resultC);
+                    mongolib_1.mongoUtil.myEnroledGames(db, 'games', openid, function (resultE) {
+                        logger.debug('myEnroledGames:', resultE);
+                        var availableGames = resAll.filter(function (r) {
+                            for (var _i = 0, resultC_1 = resultC; _i < resultC_1.length; _i++) {
+                                var c = resultC_1[_i];
+                                return r._id !== c._id;
+                            }
+                        }).filter(function (r) {
+                            for (var _i = 0, resultE_1 = resultE; _i < resultE_1.length; _i++) {
+                                var e = resultE_1[_i];
+                                return r._id !== e._id;
+                            }
+                        });
+                        logger.debug('availableGames: ', availableGames);
+                        var responseData = {
+                            availableGames: availableGames,
+                            myCreatedGames: resultC,
+                            myEnroledGames: resultE,
+                        };
+                        res.write(JSON.stringify(responseData));
+                        db.close();
+                        res.end();
+                    });
                 });
             });
         });
