@@ -155,7 +155,7 @@ export namespace server {
               const resl = result[0] as gameData;
               logger.debug('find result: ', resl);
               logger.debug('find result.referees: ', resl['referees']);
-              let exists = resl.referees && resl['referees'].some(r => r.refereeName === data.refereeName);
+              let exists = resl.referees && resl['referees'].some(r => r.openid === data.openid);
               if (exists) {
                 logger.debug('exists：', exists);
                 const errMsg: server.errMsg = {
@@ -166,10 +166,18 @@ export namespace server {
                 res.end(JSON.stringify(errMsg));
                 db.close();
               } else {
-                mongoUtil.enrol(db, 'games', data, () => {
-                  res.write('enrol success!');
-                  db.close();
-                  res.end();
+                mongoUtil.enrol(db, 'games', data, err => {
+                  if (err) {
+                    const errMsg: server.errMsg = {
+                      status: errorCode.errCode.enrolError,
+                      msg: err,
+                    }
+                    db.close();
+                    res.end(JSON.stringify(errMsg));
+                  } else {
+                    db.close();
+                    res.end('Enrol Success!' + new Date().toLocaleString());
+                  }
                 });
               }
             })
@@ -184,6 +192,66 @@ export namespace server {
       logger.error(e);
     }
   })
+
+  export type cancelEnrolData = {
+    gameId: string,
+    openid: string
+  };
+
+  app.post('/cancelenrol', (req, res) => {
+    let data = req.body as cancelEnrolData;
+    logger.debug(req.body);
+    MongoClient.connect(DB_CONN_STR, (err, db) => {
+      if (err) {
+        logger.error(err);
+        return;
+      }
+      mongoUtil.cancelEnrol(db, 'games', data, err => {
+        if (err) {
+          const errMsg: server.errMsg = {
+            status: errorCode.errCode.cancelError,
+            msg: err,
+          }
+          db.close();
+          res.end(JSON.stringify(errMsg));
+        } else {
+          db.close();
+          res.end('Cancel Success!' + new Date().toLocaleString());
+        }
+      })
+    })
+  });
+
+  app.post('/updateenrol', (req, res, next) => {
+    const data = req.body as enrolReq;
+    if (data) { 
+      MongoClient.connect(DB_CONN_STR, (err, db) => {
+        if (err) {
+          logger.error(err);
+          return;
+        }
+        try {
+          mongoUtil.enrolUpdate(db, 'games', data, err => {
+            if (err) {
+              const errMsg: server.errMsg = {
+                status: errorCode.errCode.enrolUpdateError,
+                msg: err,
+              }
+              db.close();
+              res.end(JSON.stringify(errMsg));
+            } else {
+              db.close();
+              res.end('Cansole Success!' + new Date().toLocaleString());
+            }
+          });
+        } catch(e) {
+          logger.error(e);
+        }
+      })
+    } else {
+      logger.error('No update data!');
+    }
+  });
 
   app.use((req, res, next) => {
     res.write('Response from express, ' + new Date());

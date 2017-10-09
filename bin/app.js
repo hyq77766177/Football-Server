@@ -120,7 +120,7 @@ var server;
                             var resl = result[0];
                             logger.debug('find result: ', resl);
                             logger.debug('find result.referees: ', resl['referees']);
-                            var exists = resl.referees && resl['referees'].some(function (r) { return r.refereeName === data_2.refereeName; });
+                            var exists = resl.referees && resl['referees'].some(function (r) { return r.openid === data_2.openid; });
                             if (exists) {
                                 logger.debug('exists：', exists);
                                 var errMsg = {
@@ -132,10 +132,19 @@ var server;
                                 db.close();
                             }
                             else {
-                                mongolib_1.mongoUtil.enrol(db, 'games', data_2, function () {
-                                    res.write('enrol success!');
-                                    db.close();
-                                    res.end();
+                                mongolib_1.mongoUtil.enrol(db, 'games', data_2, function (err) {
+                                    if (err) {
+                                        var errMsg = {
+                                            status: errorCode_1.errorCode.errCode.enrolError,
+                                            msg: err,
+                                        };
+                                        db.close();
+                                        res.end(JSON.stringify(errMsg));
+                                    }
+                                    else {
+                                        db.close();
+                                        res.end('Enrol Success!' + new Date().toLocaleString());
+                                    }
                                 });
                             }
                         });
@@ -151,6 +160,63 @@ var server;
         }
         catch (e) {
             logger.error(e);
+        }
+    });
+    app.post('/cancelenrol', function (req, res) {
+        var data = req.body;
+        logger.debug(req.body);
+        MongoClient.connect(DB_CONN_STR, function (err, db) {
+            if (err) {
+                logger.error(err);
+                return;
+            }
+            mongolib_1.mongoUtil.cancelEnrol(db, 'games', data, function (err) {
+                if (err) {
+                    var errMsg = {
+                        status: errorCode_1.errorCode.errCode.cancelError,
+                        msg: err,
+                    };
+                    db.close();
+                    res.end(JSON.stringify(errMsg));
+                }
+                else {
+                    db.close();
+                    res.end('Cancel Success!' + new Date().toLocaleString());
+                }
+            });
+        });
+    });
+    app.post('/updateenrol', function (req, res, next) {
+        var data = req.body;
+        if (data) {
+            MongoClient.connect(DB_CONN_STR, function (err, db) {
+                if (err) {
+                    logger.error(err);
+                    return;
+                }
+                try {
+                    mongolib_1.mongoUtil.enrolUpdate(db, 'games', data, function (err) {
+                        if (err) {
+                            var errMsg = {
+                                status: errorCode_1.errorCode.errCode.enrolUpdateError,
+                                msg: err,
+                            };
+                            db.close();
+                            res.end(JSON.stringify(errMsg));
+                        }
+                        else {
+                            db.close();
+                            res.end('Cansole Success!' + new Date().toLocaleString());
+                        }
+                    });
+                }
+                catch (e) {
+                    logger.error(e);
+                }
+            });
+        }
+        else {
+            logger.error('No update data!');
         }
     });
     app.use(function (req, res, next) {

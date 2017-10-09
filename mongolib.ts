@@ -87,7 +87,49 @@ export namespace mongoUtil {
             upsert: true
         }).catch(e => {
             logger.error('update error:' , e);
+            callback(e);
         });
-        callback();
+    }
+
+    export function enrolUpdate(db: mongodb.Db, col: string, data: server.enrolReq, callback: Function) {
+        logger.debug('mongoUtil.enrol has invoked');
+        const collection = db.collection(col);
+        const id = new mongodb.ObjectId(data.gameId);
+        const document = collection.find({ "_id": id });
+        collection.update({
+            "_id": new mongodb.ObjectId(id),
+        }, {
+            "$pull": { 
+                "referees": {
+                    openid: data.openid,
+                }
+            },
+            "$push": { "referees": data }
+        }, {
+            upsert: true
+        }).catch(e => {
+            logger.error('update error:' , e);
+            callback(e);
+        });
+        
+    }
+
+    export function cancelEnrol(db: mongodb.Db, col: string, data: server.cancelEnrolData, callback: Function) {
+        logger.debug('mongoUtil.cancelEnrol has been invoked');
+        const id = new mongodb.ObjectId(data.gameId);
+        const collection = db.collection(col);
+        collection.update({
+            "_id": id,
+        }, {
+            "$pull": { 
+                "referees": {
+                    openid: data.openid,
+                }
+            },
+        }).catch(e => {
+            logger.error('cancel error:', e);
+            callback(e);
+        });
+        
     }
 }

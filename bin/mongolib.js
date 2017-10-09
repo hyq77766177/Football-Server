@@ -84,9 +84,49 @@ var mongoUtil;
             upsert: true
         }).catch(function (e) {
             logger.error('update error:', e);
+            callback(e);
         });
-        callback();
     }
     mongoUtil.enrol = enrol;
+    function enrolUpdate(db, col, data, callback) {
+        logger.debug('mongoUtil.enrol has invoked');
+        var collection = db.collection(col);
+        var id = new mongodb.ObjectId(data.gameId);
+        var document = collection.find({ "_id": id });
+        collection.update({
+            "_id": new mongodb.ObjectId(id),
+        }, {
+            "$pull": {
+                "referees": {
+                    openid: data.openid,
+                }
+            },
+            "$push": { "referees": data }
+        }, {
+            upsert: true
+        }).catch(function (e) {
+            logger.error('update error:', e);
+            callback(e);
+        });
+    }
+    mongoUtil.enrolUpdate = enrolUpdate;
+    function cancelEnrol(db, col, data, callback) {
+        logger.debug('mongoUtil.cancelEnrol has been invoked');
+        var id = new mongodb.ObjectId(data.gameId);
+        var collection = db.collection(col);
+        collection.update({
+            "_id": id,
+        }, {
+            "$pull": {
+                "referees": {
+                    openid: data.openid,
+                }
+            },
+        }).catch(function (e) {
+            logger.error('cancel error:', e);
+            callback(e);
+        });
+    }
+    mongoUtil.cancelEnrol = cancelEnrol;
 })(mongoUtil = exports.mongoUtil || (exports.mongoUtil = {}));
 //# sourceMappingURL=mongolib.js.map
