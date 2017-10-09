@@ -99,19 +99,15 @@ export namespace mongoUtil {
         collection.updateOne({
             "_id": id,
         }, {
-            "$pull": { 
+            "$set": { 
                 "referees": {
-                    openid: data.openid,
+                    "refereeName": data.refereeName,
+                    "startRefTime": data.startRefTime,
+                    "endRefTime": data.endRefTime,
                 }
             },
-        }).then((result) => {
-           collection.updateOne({
-               "_id": id,
-           }, {
-               "$push": { "referees": data }
-           })
         }).catch(e => {
-            logger.error('update error:', e);
+            logger.error('update pull error:', e);
             callback(e);
         });
         callback(null);

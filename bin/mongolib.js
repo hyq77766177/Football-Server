@@ -96,19 +96,15 @@ var mongoUtil;
         collection.updateOne({
             "_id": id,
         }, {
-            "$pull": {
+            "$set": {
                 "referees": {
-                    openid: data.openid,
+                    "refereeName": data.refereeName,
+                    "startRefTime": data.startRefTime,
+                    "endRefTime": data.endRefTime,
                 }
             },
-        }).then(function (result) {
-            collection.updateOne({
-                "_id": id,
-            }, {
-                "$push": { "referees": data }
-            });
         }).catch(function (e) {
-            logger.error('update error:', e);
+            logger.error('update pull error:', e);
             callback(e);
         });
         callback(null);
