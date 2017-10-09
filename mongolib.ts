@@ -80,7 +80,7 @@ export namespace mongoUtil {
         const id = new mongodb.ObjectId(data.gameId);
         const document = collection.find({ "_id": id });
         collection.update({
-            "_id": new mongodb.ObjectId(id)
+            "_id": id,
         }, {
             "$push": { "referees": data }
         }, {
@@ -97,7 +97,7 @@ export namespace mongoUtil {
         const collection = db.collection(col);
         const id = new mongodb.ObjectId(data.gameId);
         collection.update({
-            "_id": new mongodb.ObjectId(id),
+            "_id": id,
         }, {
             "$pull": { 
                 "referees": {
@@ -105,8 +105,9 @@ export namespace mongoUtil {
                 }
             },
         }).then((res) => {
+            
             collection.update({
-                "_id": new mongodb.ObjectId(id),
+                "_id": id,
             }, {
                 "$push": { "referees": data }
             })

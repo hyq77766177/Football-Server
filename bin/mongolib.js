@@ -77,7 +77,7 @@ var mongoUtil;
         var id = new mongodb.ObjectId(data.gameId);
         var document = collection.find({ "_id": id });
         collection.update({
-            "_id": new mongodb.ObjectId(id)
+            "_id": id,
         }, {
             "$push": { "referees": data }
         }, {
@@ -94,7 +94,7 @@ var mongoUtil;
         var collection = db.collection(col);
         var id = new mongodb.ObjectId(data.gameId);
         collection.update({
-            "_id": new mongodb.ObjectId(id),
+            "_id": id,
         }, {
             "$pull": {
                 "referees": {
@@ -103,7 +103,7 @@ var mongoUtil;
             },
         }).then(function (res) {
             collection.update({
-                "_id": new mongodb.ObjectId(id),
+                "_id": id,
             }, {
                 "$push": { "referees": data }
             });
