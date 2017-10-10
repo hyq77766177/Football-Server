@@ -134,4 +134,22 @@ export namespace mongoUtil {
         });
         callback(null);        
     }
+
+    export function assign(db: mongodb.Db, col: string, data: server.assignData, callback: Function) {
+        logger.debug('mongoUtil.assign has been invoked, data: ', data);
+        const id = new mongodb.ObjectId(data.gameId);
+        const collection = db.collection(col);
+        collection.updateOne({
+            "_id": id,
+            "referees": {
+                openid: data.openid,
+            }
+        }, {
+            "$set": { "referees.$.assigned": data.assign },
+        }).catch(e => {
+            logger.error('cancel error:', e);
+            callback(e);
+        });
+        callback(null); 
+    }
 }

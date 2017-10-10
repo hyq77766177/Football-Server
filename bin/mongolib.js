@@ -132,5 +132,23 @@ var mongoUtil;
         callback(null);
     }
     mongoUtil.cancelEnrol = cancelEnrol;
+    function assign(db, col, data, callback) {
+        logger.debug('mongoUtil.assign has been invoked, data: ', data);
+        var id = new mongodb.ObjectId(data.gameId);
+        var collection = db.collection(col);
+        collection.updateOne({
+            "_id": id,
+            "referees": {
+                openid: data.openid,
+            }
+        }, {
+            "$set": { "referees.$.assigned": data.assign },
+        }).catch(function (e) {
+            logger.error('cancel error:', e);
+            callback(e);
+        });
+        callback(null);
+    }
+    mongoUtil.assign = assign;
 })(mongoUtil = exports.mongoUtil || (exports.mongoUtil = {}));
 //# sourceMappingURL=mongolib.js.map

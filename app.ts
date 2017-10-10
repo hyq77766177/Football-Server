@@ -79,7 +79,11 @@ export namespace server {
         })
         hres.on('end', () => {
           logger.debug('parsedData: ', data);
-          res.write(data);
+          let dataObj = JSON.parse(data);
+          if (dataObj.session_key) {
+            delete dataObj.session_key;
+          }
+          res.write(JSON.stringify(dataObj));
           res.end();
         })
       })
@@ -117,6 +121,37 @@ export namespace server {
             res.end();
           })
         })
+      })
+    })
+  })
+
+  export type assignData = {
+    openid: string,
+    gameId: string,
+    assign: boolean,
+  };
+
+  app.post('/assign', (req, res, next) => {
+    let reqData = req.body as assignData;
+    logger.debug('assign incoming data: ', req.body);
+    MongoClient.connect(DB_CONN_STR, (e, db) => {
+      if (e) {
+        logger.error(e);
+        return;
+      }
+      mongoUtil.assign(db, 'games', reqData, err => {
+        if (err) {
+          res.status(400);          
+          const errMsg: server.errMsg = {
+            status: errorCode.errCode.assignError,
+            msg: err,
+          }
+          db.close();
+          res.end(JSON.stringify(errMsg));
+        } else {
+          db.close();
+          res.end('assign Success!' + new Date().toLocaleString());
+        }
       })
     })
   })

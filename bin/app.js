@@ -54,7 +54,11 @@ var server;
                 });
                 hres.on('end', function () {
                     logger.debug('parsedData: ', data_1);
-                    res.write(data_1);
+                    var dataObj = JSON.parse(data_1);
+                    if (dataObj.session_key) {
+                        delete dataObj.session_key;
+                    }
+                    res.write(JSON.stringify(dataObj));
                     res.end();
                 });
             });
@@ -91,6 +95,31 @@ var server;
                         res.end();
                     });
                 });
+            });
+        });
+    });
+    app.post('/assign', function (req, res, next) {
+        var reqData = req.body;
+        logger.debug('assign incoming data: ', req.body);
+        MongoClient.connect(DB_CONN_STR, function (e, db) {
+            if (e) {
+                logger.error(e);
+                return;
+            }
+            mongolib_1.mongoUtil.assign(db, 'games', reqData, function (err) {
+                if (err) {
+                    res.status(400);
+                    var errMsg = {
+                        status: errorCode_1.errorCode.errCode.assignError,
+                        msg: err,
+                    };
+                    db.close();
+                    res.end(JSON.stringify(errMsg));
+                }
+                else {
+                    db.close();
+                    res.end('assign Success!' + new Date().toLocaleString());
+                }
             });
         });
     });

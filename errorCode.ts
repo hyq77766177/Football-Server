@@ -5,5 +5,6 @@ export namespace errorCode {
     cancelError,
     enrolUpdateError,
     enrolError,
+    assignError,
   }
 }
