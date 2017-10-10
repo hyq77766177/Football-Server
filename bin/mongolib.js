@@ -136,11 +136,9 @@ var mongoUtil;
         logger.debug('mongoUtil.assign has been invoked, data: ', data);
         var id = new mongodb.ObjectId(data.gameId);
         var collection = db.collection(col);
-        collection.updateOne({
+        collection.update({
             "_id": id,
-            "referees": {
-                openid: data.openid,
-            }
+            "referees.openid": data.openid,
         }, {
             "$set": { "referees.$.assigned": data.assign },
         }).catch(function (e) {

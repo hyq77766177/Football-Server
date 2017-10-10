@@ -139,11 +139,9 @@ export namespace mongoUtil {
         logger.debug('mongoUtil.assign has been invoked, data: ', data);
         const id = new mongodb.ObjectId(data.gameId);
         const collection = db.collection(col);
-        collection.updateOne({
+        collection.update({
             "_id": id,
-            "referees": {
-                openid: data.openid,
-            }
+            "referees.openid": data.openid,
         }, {
             "$set": { "referees.$.assigned": data.assign },
         }).catch(e => {
