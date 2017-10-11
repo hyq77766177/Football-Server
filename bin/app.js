@@ -65,6 +65,7 @@ var server;
         }
     });
     app.post('/all', function (req, res, next) {
+        logger.debug("incoming all data: ", req.body);
         MongoClient.connect(DB_CONN_STR, function (err, db) {
             logger.debug('mongo show all');
             var openid = req.body.openid;

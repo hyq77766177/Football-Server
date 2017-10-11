@@ -91,6 +91,7 @@ export namespace server {
   })
 
   app.post('/all', (req, res, next) => {
+    logger.debug("incoming all data: ", req.body);
     MongoClient.connect(DB_CONN_STR, (err, db) => {
       logger.debug('mongo show all');
       const openid = req.body.openid;
