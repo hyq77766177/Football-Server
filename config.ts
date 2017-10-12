@@ -1,3 +1,4 @@
+import * as log4js from 'log4js'
 export namespace config {
 
   export const port = 8012;
@@ -13,19 +14,34 @@ export namespace config {
     return `https://api.weixin.qq.com/sns/jscode2session?appId=${config.appId}&secret=${config.appSecret}&js_code=${code}&grant_type=authorization_code`;
   }
 
-  export const log4js_conf = {
+  export const log4js_conf: log4js.Configuration = {
     appenders: {
       app: {
         type: 'console',
+      },
+      appLogger: {
+        type: 'file',
+        filename: 'wechat_log',
       }
     },
     categories: {
       default: {
-        appenders: [ 'app' ],
+        appenders: [ 'app', 'appLogger' ],
         level: 'debug'
       },
     },
     pm2: true,
   };
 
+  export class Log4jsConf implements log4js.Configuration {
+    
+    constructor() {
+
+    }
+
+    appenders;
+    categories;
+
+
+  }
 }
