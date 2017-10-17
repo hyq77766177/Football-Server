@@ -20,8 +20,8 @@
     "@types/express": "^4.0.37",
     "@types/fs-extra-promise": "^1.0.2",
     "@types/mongodb": "^2.2.13",
-    "@types/node": "^8.0.34",
+    "@types/node": "^8.0.41",
     "async": "^2.5.0",
-    "log4js": "^2.3.5"
+    "log4js": "^2.3.7"
   }
 }

@@ -25,15 +25,15 @@ export namespace server {
   }
 
   export type gameData = {
-    "_id" : mongoDb.ObjectId,
-    "gameName" : string,
-    "gameDate" : string,
-    "gameTime" : string,
-    "gameEndTime" : string,
-    "refereeNumber" : number,
-    "openid" : string,
-    "referees" : enrolReq[],
-  }
+    "_id": mongoDb.ObjectId,
+    "gameName": string,
+    "gameDate": string,
+    "gameTime": string,
+    "gameEndTime": string,
+    "refereeNumber": number,
+    "openid": string,
+    "referees": enrolReq[],
+  };
 
   const MongoClient = mongoDb.MongoClient;
   const DB_CONN_STR = mongoUtil.mongoUrl;
@@ -53,7 +53,7 @@ export namespace server {
       logger.debug('document: ', document);
       MongoClient.connect(DB_CONN_STR, (err, db) => {
         if (err) {
-          logger.error(err);
+          logger.error('[createGame] mongo connect error!', err);
         }
         logger.debug("mongo insert");
         mongoUtil.insertData(db, 'games', document, result => {
@@ -62,7 +62,7 @@ export namespace server {
           next();
         })
       })
-    } catch(e) {
+    } catch (e) {
       logger.error(e);
     }
   })
@@ -137,12 +137,12 @@ export namespace server {
     logger.debug('assign incoming data: ', req.body);
     MongoClient.connect(DB_CONN_STR, (e, db) => {
       if (e) {
-        logger.error(e);
+        logger.error('[assign] mongo connect error! ', e);
         return;
       }
       mongoUtil.assign(db, 'games', reqData, err => {
         if (err) {
-          res.status(400);          
+          res.status(400);
           const errMsg: server.errMsg = {
             status: errorCode.errCode.assignError,
             msg: err,
@@ -189,7 +189,7 @@ export namespace server {
       if (data) {
         MongoClient.connect(DB_CONN_STR, (err, db) => {
           if (err) {
-            logger.error(err);
+            logger.error('[enrol] mongo connect error!', err);
             return;
           }
           try {
@@ -223,14 +223,14 @@ export namespace server {
                 });
               }
             })
-          } catch(e) {
+          } catch (e) {
             logger.error(e);
           }
         })
       } else {
         logger.error('no enrol data!');
       }
-    } catch(e) {
+    } catch (e) {
       logger.error(e);
     }
   })
@@ -245,12 +245,12 @@ export namespace server {
     logger.debug(req.body);
     MongoClient.connect(DB_CONN_STR, (err, db) => {
       if (err) {
-        logger.error(err);
+        logger.error('[cancel enrol] mongo connect error!', err);
         return;
       }
       mongoUtil.cancelEnrol(db, 'games', data, err => {
         if (err) {
-          res.status(400);          
+          res.status(400);
           const errMsg: server.errMsg = {
             status: errorCode.errCode.cancelError,
             msg: err,
@@ -267,10 +267,10 @@ export namespace server {
 
   app.post('/updateenrol', (req, res, next) => {
     const data = req.body.data as enrolReq;
-    if (data) { 
+    if (data) {
       MongoClient.connect(DB_CONN_STR, (err, db) => {
         if (err) {
-          logger.error(err);
+          logger.error('[update enrol] mongo connect error!', err);
           return;
         }
         try {
@@ -288,7 +288,7 @@ export namespace server {
               res.end('update enrol Success!' + new Date().toLocaleString());
             }
           });
-        } catch(e) {
+        } catch (e) {
           logger.error(e);
         }
       })
