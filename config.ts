@@ -19,22 +19,19 @@ export namespace config {
       app: {
         type: 'console',
       },
-      appLogger: {
-        type: 'file',
-        filename: 'wechat_log',
-      }
     },
     categories: {
       default: {
-        appenders: [ 'app', 'appLogger' ],
+        appenders: ['app'],
         level: 'debug'
       },
     },
     pm2: true,
+    pm2InstanceVar: "football",
   };
 
   export class Log4jsConf implements log4js.Configuration {
-    
+
     constructor() {
 
     }

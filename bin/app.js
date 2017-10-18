@@ -28,7 +28,7 @@ var server;
             logger.debug('document: ', document_1);
             MongoClient.connect(DB_CONN_STR, function (err, db) {
                 if (err) {
-                    logger.error(err);
+                    logger.error('[createGame] mongo connect error!', err);
                 }
                 logger.debug("mongo insert");
                 mongolib_1.mongoUtil.insertData(db, 'games', document_1, function (result) {
@@ -104,7 +104,7 @@ var server;
         logger.debug('assign incoming data: ', req.body);
         MongoClient.connect(DB_CONN_STR, function (e, db) {
             if (e) {
-                logger.error(e);
+                logger.error('[assign] mongo connect error! ', e);
                 return;
             }
             mongolib_1.mongoUtil.assign(db, 'games', reqData, function (err) {
@@ -148,7 +148,7 @@ var server;
             if (data_2) {
                 MongoClient.connect(DB_CONN_STR, function (err, db) {
                     if (err) {
-                        logger.error(err);
+                        logger.error('[enrol] mongo connect error!', err);
                         return;
                     }
                     try {
@@ -203,7 +203,7 @@ var server;
         logger.debug(req.body);
         MongoClient.connect(DB_CONN_STR, function (err, db) {
             if (err) {
-                logger.error(err);
+                logger.error('[cancel enrol] mongo connect error!', err);
                 return;
             }
             mongolib_1.mongoUtil.cancelEnrol(db, 'games', data, function (err) {
@@ -228,7 +228,7 @@ var server;
         if (data) {
             MongoClient.connect(DB_CONN_STR, function (err, db) {
                 if (err) {
-                    logger.error(err);
+                    logger.error('[update enrol] mongo connect error!', err);
                     return;
                 }
                 try {
