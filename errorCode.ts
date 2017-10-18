@@ -6,5 +6,6 @@ export namespace errorCode {
     enrolUpdateError,
     enrolError,
     assignError,
+    deleteGameError,
   }
 }

@@ -10,6 +10,7 @@ var errorCode;
         errCode[errCode["enrolUpdateError"] = 103] = "enrolUpdateError";
         errCode[errCode["enrolError"] = 104] = "enrolError";
         errCode[errCode["assignError"] = 105] = "assignError";
+        errCode[errCode["deleteGameError"] = 106] = "deleteGameError";
     })(errCode = errorCode.errCode || (errorCode.errCode = {}));
 })(errorCode = exports.errorCode || (exports.errorCode = {}));
 //# sourceMappingURL=errorCode.js.map

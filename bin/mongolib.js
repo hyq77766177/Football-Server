@@ -64,16 +64,17 @@ var mongoUtil;
         });
     }
     mongoUtil.allGames = allGames;
+    /** callback 参数是一个比赛 */
     function queryGameById(db, col, id, callback) {
         var collection = db.collection(col);
         var objId = new mongodb.ObjectId(id);
         var queryData = { "_id": objId };
         collection.find(queryData).toArray(function (err, result) {
             if (err) {
-                logger.error('Error: ', err);
+                logger.error('Query by id Error: ', err);
                 return;
             }
-            callback(result);
+            callback(result[0]);
         });
     }
     mongoUtil.queryGameById = queryGameById;
@@ -106,7 +107,8 @@ var mongoUtil;
             "$set": {
                 "referees.$": data,
             },
-        }).catch(function (e) {
+        })
+            .catch(function (e) {
             logger.error('update pull error:', e);
             callback(e);
         });
@@ -141,12 +143,27 @@ var mongoUtil;
             "referees.openid": data.openid,
         }, {
             "$set": { "referees.$.assigned": data.assign },
-        }).catch(function (e) {
+        })
+            .catch(function (e) {
             logger.error('cancel error:', e);
             callback(e);
         });
         callback(null);
     }
     mongoUtil.assign = assign;
+    ;
+    function deleteGame(db, col, data, callback) {
+        logger.debug('mongo deleteGame has been invoked, data: ', data);
+        var id = new mongodb.ObjectId(data.gameId);
+        var collection = db.collection(col);
+        collection.remove({
+            "_id": id,
+        }).catch(function (e) {
+            logger.error('delete game error: ', e);
+            callback(e);
+        });
+        callback(null);
+    }
+    mongoUtil.deleteGame = deleteGame;
 })(mongoUtil = exports.mongoUtil || (exports.mongoUtil = {}));
 //# sourceMappingURL=mongolib.js.map

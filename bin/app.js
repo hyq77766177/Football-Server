@@ -130,7 +130,6 @@ var server;
                 logger.debug('mongo query by id connected, request: ', req.body);
                 mongolib_1.mongoUtil.queryGameById(db, 'games', req.body.colId, function (result) {
                     logger.debug(result);
-                    result = result[0];
                     res.write(JSON.stringify(result));
                     db.close();
                     res.end();
@@ -153,7 +152,7 @@ var server;
                     }
                     try {
                         mongolib_1.mongoUtil.queryGameById(db, 'games', data_2.gameId, function (result) {
-                            var resl = result[0];
+                            var resl = result;
                             logger.debug('find result: ', resl);
                             logger.debug('find result.referees: ', resl['referees']);
                             var exists = resl.referees && resl['referees'].some(function (r) { return r.openid === data_2.openid; });
@@ -256,6 +255,43 @@ var server;
         else {
             logger.error('No update data!');
         }
+    });
+    app.post('/deletegame', function (req, res, next) {
+        logger.debug('incoming delete game data: ', req.body);
+        MongoClient.connect(DB_CONN_STR, function (e, db) {
+            if (e) {
+                logger.error('delete game connect error: ', e);
+                return;
+            }
+            mongolib_1.mongoUtil.queryGameById(db, 'games', req.body.gameId, function (game) {
+                if (game.openid !== req.body.openid) {
+                    res.status(400);
+                    var errMsg = {
+                        status: errorCode_1.errorCode.errCode.deleteGameError,
+                        msg: '不能删除非自己发布的比赛！',
+                    };
+                    db.close();
+                    res.end(JSON.stringify(errMsg));
+                }
+                else {
+                    mongolib_1.mongoUtil.deleteGame(db, 'games', req.body, function (err) {
+                        if (err) {
+                            res.status(400);
+                            var errMsg = {
+                                status: errorCode_1.errorCode.errCode.deleteGameError,
+                                msg: err,
+                            };
+                            db.close();
+                            res.end(JSON.stringify(errMsg));
+                        }
+                        else {
+                            db.close();
+                            res.end('delete game success!' + new Date().toLocaleString());
+                        }
+                    });
+                }
+            });
+        });
     });
     app.use(function (req, res, next) {
         res.write('Response from express, ' + new Date());

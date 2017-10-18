@@ -34,49 +34,50 @@ export namespace mongoUtil {
     export function myCreatedGames(db: mongodb.Db, col: string, openid: string, callback: Function) {
         const collection = db.collection(col);
         collection.find({ "openid": openid })
-        .toArray((err, result) => {
-            if (err) {
-                logger.error('Error: ', err);
-                return;
-            }
-            callback(result);
-        })
+            .toArray((err, result) => {
+                if (err) {
+                    logger.error('Error: ', err);
+                    return;
+                }
+                callback(result);
+            })
     }
-    
+
     export function myEnroledGames(db: mongodb.Db, col: string, openid: string, callback: Function) {
         const collection = db.collection(col);
         collection.find({ "referees.openid": openid })
-        .toArray((err, result) => {
-            if (err) {
-                logger.error('Error: ', err);
-                return;
-            }
-            callback(result);
-        })
+            .toArray((err, result) => {
+                if (err) {
+                    logger.error('Error: ', err);
+                    return;
+                }
+                callback(result);
+            })
     }
 
     export function allGames(db: mongodb.Db, col: string, callback: Function) {
         const collection = db.collection(col);
         collection.find()
-        .toArray((err, result) => {
-            if (err) {
-                logger.error('Error: ', err);
-                return;
-            }
-            callback(result);
-        })
+            .toArray((err, result) => {
+                if (err) {
+                    logger.error('Error: ', err);
+                    return;
+                }
+                callback(result);
+            })
     }
 
+    /** callback 参数是一个比赛 */
     export function queryGameById(db: mongodb.Db, col: string, id: string, callback: Function) {
         const collection = db.collection(col);
         const objId = new mongodb.ObjectId(id);
         const queryData = { "_id": objId };
         collection.find(queryData).toArray((err, result) => {
             if (err) {
-                logger.error('Error: ', err);
+                logger.error('Query by id Error: ', err);
                 return;
             }
-            callback(result);
+            callback(result[0]);
         });
     }
 
@@ -88,14 +89,14 @@ export namespace mongoUtil {
         collection.update({
             "_id": id,
         }, {
-            "$push": { "referees": data }
-        }, {
-            upsert: true
-        }).catch(e => {
-            logger.error('update error:' , e);
-            callback(e);
-        });
-        callback(null);        
+                "$push": { "referees": data }
+            }, {
+                upsert: true
+            }).catch(e => {
+                logger.error('update error:', e);
+                callback(e);
+            });
+        callback(null);
     }
 
     export function enrolUpdate(db: mongodb.Db, col: string, data: server.enrolReq, callback: Function) {
@@ -105,14 +106,16 @@ export namespace mongoUtil {
         collection.updateOne({
             "_id": id,
             "referees.openid": data.openid,
-        }, {
-            "$set": { 
-                "referees.$": data,
-            },
-        }).catch(e => {
-            logger.error('update pull error:', e);
-            callback(e);
-        });
+        },
+            {
+                "$set": {
+                    "referees.$": data,
+                },
+            })
+            .catch(e => {
+                logger.error('update pull error:', e);
+                callback(e);
+            });
         callback(null);
     }
 
@@ -123,16 +126,16 @@ export namespace mongoUtil {
         collection.update({
             "_id": id,
         }, {
-            "$pull": { 
-                "referees": {
-                    openid: data.openid,
-                }
-            },
-        }).catch(e => {
-            logger.error('cancel error:', e);
-            callback(e);
-        });
-        callback(null);        
+                "$pull": {
+                    "referees": {
+                        openid: data.openid,
+                    }
+                },
+            }).catch(e => {
+                logger.error('cancel error:', e);
+                callback(e);
+            });
+        callback(null);
     }
 
     export function assign(db: mongodb.Db, col: string, data: server.assignData, callback: Function) {
@@ -142,12 +145,27 @@ export namespace mongoUtil {
         collection.update({
             "_id": id,
             "referees.openid": data.openid,
-        }, {
-            "$set": { "referees.$.assigned": data.assign },
+        },
+            {
+                "$set": { "referees.$.assigned": data.assign },
+            })
+            .catch(e => {
+                logger.error('cancel error:', e);
+                callback(e);
+            });
+        callback(null);
+    };
+
+    export function deleteGame(db: mongodb.Db, col: string, data: server.deleteGameData, callback: Function) {
+        logger.debug('mongo deleteGame has been invoked, data: ', data);
+        const id = new mongodb.ObjectId(data.gameId);
+        const collection = db.collection(col);
+        collection.remove({
+            "_id": id,
         }).catch(e => {
-            logger.error('cancel error:', e);
+            logger.error('delete game error: ', e);
             callback(e);
         });
-        callback(null); 
+        callback(null);
     }
 }

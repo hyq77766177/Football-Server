@@ -8,6 +8,7 @@ import * as _ from 'lodash';
 import * as mongoDb from 'mongodb';
 import * as log4js from 'log4js';
 import * as bodyParser from 'body-parser';
+import * as assert from 'assert';
 
 import { config } from './config';
 import { mongoUtil } from './mongolib';
@@ -163,7 +164,6 @@ export namespace server {
         logger.debug('mongo query by id connected, request: ', req.body);
         mongoUtil.queryGameById(db, 'games', req.body.colId, result => {
           logger.debug(result);
-          result = result[0];
           res.write(JSON.stringify(result));
           db.close();
           res.end();
@@ -194,7 +194,7 @@ export namespace server {
           }
           try {
             mongoUtil.queryGameById(db, 'games', data.gameId, result => {
-              const resl = result[0] as gameData;
+              const resl = result as gameData;
               logger.debug('find result: ', resl);
               logger.debug('find result.referees: ', resl['referees']);
               let exists = resl.referees && resl['referees'].some(r => r.openid === data.openid);
@@ -296,6 +296,47 @@ export namespace server {
       logger.error('No update data!');
     }
   });
+
+  export type deleteGameData = {
+    openid: string,
+    gameId: string,
+  };
+
+  app.post('/deletegame', (req, res, next) => {
+    logger.debug('incoming delete game data: ', req.body);
+    MongoClient.connect(DB_CONN_STR, (e, db) => {
+      if (e) {
+        logger.error('delete game connect error: ', e);
+        return;
+      }
+      mongoUtil.queryGameById(db, 'games', req.body.gameId, (game) => {
+        if (game.openid !== req.body.openid) {
+          res.status(400);
+          const errMsg: server.errMsg = {
+            status: errorCode.errCode.deleteGameError,
+            msg: '不能删除非自己发布的比赛！',
+          }
+          db.close();
+          res.end(JSON.stringify(errMsg));
+        } else {
+          mongoUtil.deleteGame(db, 'games', req.body, (err) => {
+            if (err) {
+              res.status(400);
+              const errMsg: server.errMsg = {
+                status: errorCode.errCode.deleteGameError,
+                msg: err,
+              }
+              db.close();
+              res.end(JSON.stringify(errMsg));
+            } else {
+              db.close();
+              res.end('delete game success!' + new Date().toLocaleString());
+            }
+          });
+        }
+      })
+    })
+  })
 
   app.use((req, res, next) => {
     res.write('Response from express, ' + new Date());
