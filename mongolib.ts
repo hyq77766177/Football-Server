@@ -147,7 +147,7 @@ export namespace mongoUtil {
             "referees.openid": data.openid,
         },
             {
-                "$set": { "referees.$.assigned": data.assign },
+                "$set": { "referees.$.assigned": !data.assign },
             })
             .catch(e => {
                 logger.error('cancel error:', e);

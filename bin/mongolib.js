@@ -142,7 +142,7 @@ var mongoUtil;
             "_id": id,
             "referees.openid": data.openid,
         }, {
-            "$set": { "referees.$.assigned": data.assign },
+            "$set": { "referees.$.assigned": !data.assign },
         })
             .catch(function (e) {
             logger.error('cancel error:', e);
