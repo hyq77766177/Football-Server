@@ -29,11 +29,5 @@ var config;
         pm2: true,
         pm2InstanceVar: "football",
     };
-    var Log4jsConf = (function () {
-        function Log4jsConf() {
-        }
-        return Log4jsConf;
-    }());
-    config.Log4jsConf = Log4jsConf;
 })(config = exports.config || (exports.config = {}));
 //# sourceMappingURL=config.js.map

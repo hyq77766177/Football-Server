@@ -29,16 +29,4 @@ export namespace config {
     pm2: true,
     pm2InstanceVar: "football",
   };
-
-  export class Log4jsConf implements log4js.Configuration {
-
-    constructor() {
-
-    }
-
-    appenders;
-    categories;
-
-
-  }
 }
