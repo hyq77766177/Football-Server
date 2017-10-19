@@ -3,7 +3,8 @@
 import * as log4js from 'log4js';
 import * as mongodb from 'mongodb'
 import { config } from './config';
-import { server } from './app'
+import { server } from './app';
+import * as assert from 'assert';
 
 log4js.configure(config.log4js_conf);
 const logger = log4js.getLogger('mongoUtil.js');
@@ -12,22 +13,15 @@ export namespace mongoUtil {
 
     export const mongoUrl = `mongodb://${config.mongoUser}:${config.mongoPass}@${config.mongoHost}:${config.mongoPort}/${config.mongoDb}`;
 
-    /**
-     * insert data to db.col
-     * @param {mongodb.Db} db
-     * @param {string} col collection
-     * @param {any} data data to be inserted
-     * @param {function} callback
-     */
-    export function insertData(db: mongodb.Db, col: string, data, callback: Function) {
+    export function insertData(db: mongodb.Db, col: string, data: server.createGameData, callback: Function) {
         //连接到表 games
         const collection = db.collection(col);
         collection.insert(data, (err, result) => {
             if (err) {
-                logger.error('Error:', err)
+                logger.error('Error:', err);
                 return
             }
-            callback(result)
+            callback(result);
         })
     }
 
@@ -101,11 +95,11 @@ export namespace mongoUtil {
 
     export function enrolUpdate(db: mongodb.Db, col: string, data: server.enrolReq, callback: Function) {
         logger.debug('mongoUtil.enrolUpdate has been invoked, data: ', data);
-        const id = new mongodb.ObjectId(data.gameId);
+        const id = new mongodb.ObjectId(server.getValue(data, "gameId"));
         const collection = db.collection(col);
         collection.updateOne({
             "_id": id,
-            "referees.openid": data.openid,
+            "referees.openid": server.getValue(data, "openid"),
         },
             {
                 "$set": {
@@ -121,14 +115,14 @@ export namespace mongoUtil {
 
     export function cancelEnrol(db: mongodb.Db, col: string, data: server.cancelEnrolData, callback: Function) {
         logger.debug('mongoUtil.cancelEnrol has been invoked, data: ', data);
-        const id = new mongodb.ObjectId(data.gameId);
+        const id = new mongodb.ObjectId(server.getValue(data, "gameId"));
         const collection = db.collection(col);
         collection.update({
             "_id": id,
         }, {
                 "$pull": {
                     "referees": {
-                        openid: data.openid,
+                        openid: server.getValue(data, "openid"),
                     }
                 },
             }).catch(e => {
@@ -140,14 +134,14 @@ export namespace mongoUtil {
 
     export function assign(db: mongodb.Db, col: string, data: server.assignData, callback: Function) {
         logger.debug('mongoUtil.assign has been invoked, data: ', data);
-        const id = new mongodb.ObjectId(data.gameId);
+        const id = new mongodb.ObjectId(server.getValue(data, "gameId"));
         const collection = db.collection(col);
         collection.update({
             "_id": id,
-            "referees.openid": data.openid,
+            "referees.openid": server.getValue(data, 'openid'),
         },
             {
-                "$set": { "referees.$.assigned": !data.assign },
+                "$set": { "referees.$.assigned": !server.getValue(data, 'assign') },
             })
             .catch(e => {
                 logger.error('cancel error:', e);
@@ -158,7 +152,7 @@ export namespace mongoUtil {
 
     export function deleteGame(db: mongodb.Db, col: string, data: server.deleteGameData, callback: Function) {
         logger.debug('mongo deleteGame has been invoked, data: ', data);
-        const id = new mongodb.ObjectId(data.gameId);
+        const id = new mongodb.ObjectId(server.getValue(data, "gameId"));
         const collection = db.collection(col);
         collection.remove({
             "_id": id,

@@ -3,9 +3,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var express = require("express");
 var https = require("https");
+var _ = require("lodash");
 var mongoDb = require("mongodb");
 var log4js = require("log4js");
 var bodyParser = require("body-parser");
+var assert = require("assert");
 var config_1 = require("./config");
 var mongolib_1 = require("./mongolib");
 var errorCode_1 = require("./errorCode");
@@ -13,6 +15,24 @@ log4js.configure(config_1.config.log4js_conf);
 var logger = log4js.getLogger('app.js');
 var server;
 (function (server) {
+    function getValue(request) {
+        var arg = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            arg[_i - 1] = arguments[_i];
+        }
+        var result = _.get(request, arg);
+        if (!result) {
+            assert(false, "bad request data!");
+            var errMsg = {
+                status: errorCode_1.errorCode.errCode.badData,
+                msg: "bad request data!",
+            };
+            return errMsg;
+        }
+        else
+            return result;
+    }
+    server.getValue = getValue;
     var MongoClient = mongoDb.MongoClient;
     var DB_CONN_STR = mongolib_1.mongoUtil.mongoUrl;
     var app = express();
@@ -44,7 +64,8 @@ var server;
     });
     app.post('/openid', function (req, res, next) {
         logger.debug('req_body: ', req.body);
-        var code = req.body.code;
+        var data = req.body;
+        var code = getValue(data, "code");
         if (code) {
             var url = config_1.config.getWXOpenIdUrl(code);
             var data_1 = '';
@@ -65,19 +86,11 @@ var server;
         }
     });
     app.post('/all', function (req, res, next) {
-        logger.debug("incoming all data: ", req.body);
+        var reqData = req.body;
+        logger.debug("incoming all data: ", reqData);
         MongoClient.connect(DB_CONN_STR, function (err, db) {
             logger.debug('mongo show all');
-            var openid = req.body.openid;
-            if (!openid) {
-                var errMsg = {
-                    status: errorCode_1.errorCode.errCode.noOpenId,
-                    msg: '没有openid',
-                };
-                res.status(400);
-                res.end(JSON.stringify(errMsg));
-                return;
-            }
+            var openid = getValue(reqData, "openid");
             mongolib_1.mongoUtil.allGames(db, 'games', function (resAll) {
                 logger.debug('allGames:', resAll);
                 mongolib_1.mongoUtil.myCreatedGames(db, 'games', openid, function (resultC) {

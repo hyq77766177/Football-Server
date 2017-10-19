@@ -4,6 +4,7 @@ var errorCode;
 (function (errorCode) {
     var errCode;
     (function (errCode) {
+        errCode[errCode["badData"] = -1] = "badData";
         errCode[errCode["enrolExist"] = 100] = "enrolExist";
         errCode[errCode["noOpenId"] = 101] = "noOpenId";
         errCode[errCode["cancelError"] = 102] = "cancelError";

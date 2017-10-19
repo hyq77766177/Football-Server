@@ -20,6 +20,22 @@ const logger = log4js.getLogger('app.js');
 
 export namespace server {
 
+  // getValue 相关 >>>
+  export function getValue<T, K1 extends keyof T>(request: T, key1: K1): T[K1]
+  export function getValue<T, K1 extends keyof T, K2 extends keyof T[K1]>(request: T, key1: K1, key2?: K2): T[K1][K2]
+  export function getValue(request: any, ...arg) {
+    let result = _.get(request, arg);
+    if (!result) {
+      assert(false, "bad request data!");
+      const errMsg: server.errMsg = {
+        status: errorCode.errCode.badData,
+        msg: "bad request data!",
+      }
+      return errMsg;
+    } else return result;
+  }
+  // <<<
+
   export type errMsg = {
     status: number,
     msg: string,
@@ -33,7 +49,7 @@ export namespace server {
     "gameEndTime": string,
     "refereeNumber": number,
     "openid": string,
-    "referees": enrolReq[],
+    "referees"?: enrolReq[],
   };
 
   const MongoClient = mongoDb.MongoClient;
@@ -46,11 +62,20 @@ export namespace server {
     extended: true
   }));
 
+  export type createGameData = {
+    gameName: string,
+    gameDate: string,
+    gameEndTime: string,
+    gameTime: string,
+    refereeNumber: string,
+    openid: string,
+  };
+
   app.post('/creategame', (req, res, next) => {
     logger.debug(req.body);
     let formData = req.body.formData;
     try {
-      let document = formData;
+      let document: createGameData = formData;
       logger.debug('document: ', document);
       MongoClient.connect(DB_CONN_STR, (err, db) => {
         if (err) {
@@ -68,9 +93,14 @@ export namespace server {
     }
   })
 
+  export type openidData = {
+    code: string,
+  };
+
   app.post('/openid', (req, res, next) => {
     logger.debug('req_body: ', req.body);
-    let code = req.body.code;
+    const data: openidData = req.body;
+    let code = getValue(data, "code");
     if (code) {
       let url = config.getWXOpenIdUrl(code);
       let data = '';
@@ -91,20 +121,16 @@ export namespace server {
     }
   })
 
+  export type allData = {
+    openid: string,
+  };
+
   app.post('/all', (req, res, next) => {
-    logger.debug("incoming all data: ", req.body);
+    let reqData: allData = req.body;
+    logger.debug("incoming all data: ", reqData);
     MongoClient.connect(DB_CONN_STR, (err, db) => {
       logger.debug('mongo show all');
-      const openid = req.body.openid;
-      if (!openid) {
-        const errMsg: server.errMsg = {
-          status: errorCode.errCode.noOpenId,
-          msg: '没有openid',
-        }
-        res.status(400);
-        res.end(JSON.stringify(errMsg));
-        return;
-      }
+      const openid = getValue(reqData, "openid");
       mongoUtil.allGames(db, 'games', resAll => {
         logger.debug('allGames:', resAll);
         mongoUtil.myCreatedGames(db, 'games', openid, resultC => {

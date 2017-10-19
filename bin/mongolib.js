@@ -4,18 +4,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var log4js = require("log4js");
 var mongodb = require("mongodb");
 var config_1 = require("./config");
+var app_1 = require("./app");
 log4js.configure(config_1.config.log4js_conf);
 var logger = log4js.getLogger('mongoUtil.js');
 var mongoUtil;
 (function (mongoUtil) {
     mongoUtil.mongoUrl = "mongodb://" + config_1.config.mongoUser + ":" + config_1.config.mongoPass + "@" + config_1.config.mongoHost + ":" + config_1.config.mongoPort + "/" + config_1.config.mongoDb;
-    /**
-     * insert data to db.col
-     * @param {mongodb.Db} db
-     * @param {string} col collection
-     * @param {any} data data to be inserted
-     * @param {function} callback
-     */
     function insertData(db, col, data, callback) {
         //连接到表 games
         var collection = db.collection(col);
@@ -98,11 +92,11 @@ var mongoUtil;
     mongoUtil.enrol = enrol;
     function enrolUpdate(db, col, data, callback) {
         logger.debug('mongoUtil.enrolUpdate has been invoked, data: ', data);
-        var id = new mongodb.ObjectId(data.gameId);
+        var id = new mongodb.ObjectId(app_1.server.getValue(data, "gameId"));
         var collection = db.collection(col);
         collection.updateOne({
             "_id": id,
-            "referees.openid": data.openid,
+            "referees.openid": app_1.server.getValue(data, "openid"),
         }, {
             "$set": {
                 "referees.$": data,
@@ -117,14 +111,14 @@ var mongoUtil;
     mongoUtil.enrolUpdate = enrolUpdate;
     function cancelEnrol(db, col, data, callback) {
         logger.debug('mongoUtil.cancelEnrol has been invoked, data: ', data);
-        var id = new mongodb.ObjectId(data.gameId);
+        var id = new mongodb.ObjectId(app_1.server.getValue(data, "gameId"));
         var collection = db.collection(col);
         collection.update({
             "_id": id,
         }, {
             "$pull": {
                 "referees": {
-                    openid: data.openid,
+                    openid: app_1.server.getValue(data, "openid"),
                 }
             },
         }).catch(function (e) {
@@ -136,13 +130,13 @@ var mongoUtil;
     mongoUtil.cancelEnrol = cancelEnrol;
     function assign(db, col, data, callback) {
         logger.debug('mongoUtil.assign has been invoked, data: ', data);
-        var id = new mongodb.ObjectId(data.gameId);
+        var id = new mongodb.ObjectId(app_1.server.getValue(data, "gameId"));
         var collection = db.collection(col);
         collection.update({
             "_id": id,
-            "referees.openid": data.openid,
+            "referees.openid": app_1.server.getValue(data, 'openid'),
         }, {
-            "$set": { "referees.$.assigned": !data.assign },
+            "$set": { "referees.$.assigned": !app_1.server.getValue(data, 'assign') },
         })
             .catch(function (e) {
             logger.error('cancel error:', e);
@@ -154,7 +148,7 @@ var mongoUtil;
     ;
     function deleteGame(db, col, data, callback) {
         logger.debug('mongo deleteGame has been invoked, data: ', data);
-        var id = new mongodb.ObjectId(data.gameId);
+        var id = new mongodb.ObjectId(app_1.server.getValue(data, "gameId"));
         var collection = db.collection(col);
         collection.remove({
             "_id": id,
