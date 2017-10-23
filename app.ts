@@ -55,7 +55,7 @@ export namespace server {
   const MongoClient = mongoDb.MongoClient;
   const DB_CONN_STR = mongoUtil.mongoUrl;
 
-  let app = express();
+  export const app = express();
 
   app.use(bodyParser.json({ limit: '1mb' }));
   app.use(bodyParser.urlencoded({

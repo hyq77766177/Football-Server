@@ -4,25 +4,31 @@
   "author": "SoraYama",
   "dependencies": {
     "body-parser": "^1.18.2",
+    "chai": "^4.1.2",
     "connect-mongo": "^2.0.0",
     "express": "^4.16.2",
     "express-session": "^1.15.6",
     "fs-extra-promise": "^1.0.1",
     "lodash": "^4.17.4",
     "typescript": "^2.5.3",
-    "wafer-node-session": "^1.0.10"
+    "wafer-node-session": "^1.0.10",
+    "log4js": "^2.3.7"
   },
   "private": true,
   "license": "ISC",
   "devDependencies": {
+    "supertest": "^3.0.0",
+    "mocha": "^4.0.1",
     "@types/async": "^2.0.44",
     "@types/body-parser": "^1.16.5",
+    "@types/chai": "^4.0.4",
     "@types/express": "^4.0.37",
     "@types/fs-extra-promise": "^1.0.2",
-    "@types/lodash": "^4.14.77",
-    "@types/mongodb": "^2.2.13",
-    "@types/node": "^8.0.41",
-    "async": "^2.5.0",
-    "log4js": "^2.3.7"
+    "@types/lodash": "^4.14.78",
+    "@types/mocha": "^2.2.43",
+    "@types/mongodb": "^2.2.14",
+    "@types/node": "^8.0.46",
+    "@types/supertest": "^2.0.3",
+    "async": "^2.5.0"
   }
 }

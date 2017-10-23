@@ -35,12 +35,12 @@ var server;
     server.getValue = getValue;
     var MongoClient = mongoDb.MongoClient;
     var DB_CONN_STR = mongolib_1.mongoUtil.mongoUrl;
-    var app = express();
-    app.use(bodyParser.json({ limit: '1mb' }));
-    app.use(bodyParser.urlencoded({
+    server.app = express();
+    server.app.use(bodyParser.json({ limit: '1mb' }));
+    server.app.use(bodyParser.urlencoded({
         extended: true
     }));
-    app.post('/creategame', function (req, res, next) {
+    server.app.post('/creategame', function (req, res, next) {
         logger.debug(req.body);
         var formData = req.body.formData;
         try {
@@ -62,7 +62,7 @@ var server;
             logger.error(e);
         }
     });
-    app.post('/openid', function (req, res, next) {
+    server.app.post('/openid', function (req, res, next) {
         logger.debug('req_body: ', req.body);
         var data = req.body;
         var code = getValue(data, "code");
@@ -85,7 +85,7 @@ var server;
             });
         }
     });
-    app.post('/all', function (req, res, next) {
+    server.app.post('/all', function (req, res, next) {
         var reqData = req.body;
         logger.debug("incoming all data: ", reqData);
         MongoClient.connect(DB_CONN_STR, function (err, db) {
@@ -112,7 +112,7 @@ var server;
             });
         });
     });
-    app.post('/assign', function (req, res, next) {
+    server.app.post('/assign', function (req, res, next) {
         var reqData = req.body;
         logger.debug('assign incoming data: ', req.body);
         MongoClient.connect(DB_CONN_STR, function (e, db) {
@@ -137,7 +137,7 @@ var server;
             });
         });
     });
-    app.post('/gamebyid', function (req, res, next) {
+    server.app.post('/gamebyid', function (req, res, next) {
         try {
             MongoClient.connect(DB_CONN_STR, function (err, db) {
                 logger.debug('mongo query by id connected, request: ', req.body);
@@ -153,7 +153,7 @@ var server;
             logger.error(e);
         }
     });
-    app.post('/enrol', function (req, res, next) {
+    server.app.post('/enrol', function (req, res, next) {
         logger.debug('enrol data: ', req.body);
         try {
             var data_2 = req.body.data;
@@ -210,7 +210,7 @@ var server;
             logger.error(e);
         }
     });
-    app.post('/cancelenrol', function (req, res) {
+    server.app.post('/cancelenrol', function (req, res) {
         var data = req.body;
         logger.debug(req.body);
         MongoClient.connect(DB_CONN_STR, function (err, db) {
@@ -235,7 +235,7 @@ var server;
             });
         });
     });
-    app.post('/updateenrol', function (req, res, next) {
+    server.app.post('/updateenrol', function (req, res, next) {
         var data = req.body.data;
         if (data) {
             MongoClient.connect(DB_CONN_STR, function (err, db) {
@@ -269,7 +269,7 @@ var server;
             logger.error('No update data!');
         }
     });
-    app.post('/deletegame', function (req, res, next) {
+    server.app.post('/deletegame', function (req, res, next) {
         logger.debug('incoming delete game data: ', req.body);
         MongoClient.connect(DB_CONN_STR, function (e, db) {
             if (e) {
@@ -306,11 +306,11 @@ var server;
             });
         });
     });
-    app.use(function (req, res, next) {
+    server.app.use(function (req, res, next) {
         res.write('Response from express, ' + new Date());
         res.end();
     });
-    app.listen(config_1.config.port);
+    server.app.listen(config_1.config.port);
     logger.info("server listening at 127.0.0.1: " + config_1.config.port);
 })(server = exports.server || (exports.server = {}));
 //# sourceMappingURL=app.js.map
