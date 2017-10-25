@@ -21,16 +21,8 @@ var server;
             arg[_i - 1] = arguments[_i];
         }
         var result = _.get(request, arg);
-        if (!result) {
-            assert(false, "bad request data!");
-            var errMsg = {
-                status: errorCode_1.errorCode.errCode.badData,
-                msg: "bad request data!",
-            };
-            return errMsg;
-        }
-        else
-            return result;
+        assert(!!result, "bad request data, the key is missed or wrong written from path: " + arg.join("=>"));
+        return result;
     }
     server.getValue = getValue;
     var MongoClient = mongoDb.MongoClient;
