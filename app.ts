@@ -25,14 +25,8 @@ export namespace server {
   export function getValue<T, K1 extends keyof T, K2 extends keyof T[K1]>(request: T, key1: K1, key2?: K2): T[K1][K2]
   export function getValue(request: any, ...arg) {
     let result = _.get(request, arg);
-    if (!result) {
-      assert(false, "bad request data!");
-      const errMsg: server.errMsg = {
-        status: errorCode.errCode.badData,
-        msg: "bad request data!",
-      }
-      return errMsg;
-    } else return result;
+    assert(!!result, `bad request data, the key is missed or wrong written from path: ${arg.join("=>")}`);
+    return result;
   }
   // <<<
 
