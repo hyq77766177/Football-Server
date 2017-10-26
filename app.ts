@@ -184,7 +184,7 @@ export namespace server {
         const update = {
           "$set": { "referees.$.assigned": !server.getValue(reqData, 'assign') },
         }
-        return mongoUtil.update(db, 'games', reqData, filter, update);
+        return mongoUtil.update(db, 'games', filter, update);
       })
       .then(writeRes => {
         logger.info("assign success");
@@ -223,19 +223,19 @@ export namespace server {
   })
 
   app.post('/gamebyid', (req, res, next) => {
-    try {
-      MongoClient.connect(DB_CONN_STR, (err, db) => {
+    let gamebyid_db: mongoDb.Db = null;
+    MongoClient.connect(DB_CONN_STR)
+      .then(db => {
+        gamebyid_db = db;
         logger.info('mongo query by id connected, request: ', req.body);
-        mongoUtil.queryGameById(db, 'games', req.body.colId, result => {
-          logger.info(result);
-          res.write(JSON.stringify(result));
-          db.close();
-          res.end();
-        })
+        return mongoUtil.queryGameById(db, 'games', req.body.colId)
       })
-    } catch (e) {
-      logger.error(e);
-    }
+      .then(game => {
+        logger.info("query game by id success, game: ", game);
+        res.write(JSON.stringify(game));
+        gamebyid_db.close();
+        next();
+      })
   });
 
   export type enrolReq = {
@@ -248,56 +248,81 @@ export namespace server {
 
   app.post('/enrol', (req, res, next) => {
     logger.info('incoming enrol data: ', req.body);
-    try {
-      let data = req.body.data as enrolReq;
-      if (data) {
-        MongoClient.connect(DB_CONN_STR, (err, db) => {
-          if (err) {
-            logger.error('[enrol] mongo connect error!', err);
-            return;
+    const data = req.body.data as enrolReq;
+    let this_db: mongoDb.Db = null;
+    MongoClient.connect(DB_CONN_STR)
+      .then(db => {
+        this_db = db;
+        logger.info("enrol mongo connected");
+        return mongoUtil.queryGameById(db, 'games', getValue(data, "gameId"));
+      })
+      .then(game => {
+        const exists = game.referees && game['referees'].some(r => r.openid === getValue(data, "openid"));
+        if (exists) {
+          logger.debug('exists：', exists);
+          const errMsg: server.errMsg = {
+            status: errorCode.errCode.enrolExist,
+            msg: '不能重复报名！',
           }
-          try {
-            mongoUtil.queryGameById(db, 'games', data.gameId, result => {
-              const resl = result as gameData;
-              logger.debug('find result: ', resl);
-              logger.debug('find result.referees: ', resl['referees']);
-              let exists = resl.referees && resl['referees'].some(r => r.openid === data.openid);
-              if (exists) {
-                logger.debug('exists：', exists);
-                const errMsg: server.errMsg = {
-                  status: errorCode.errCode.enrolExist,
-                  msg: '不能重复报名！',
-                }
-                res.status(400); // errorCode.errCode.enrolExist);
-                res.end(JSON.stringify(errMsg));
-                db.close();
-              } else {
-                mongoUtil.enrol(db, 'games', data, err => {
-                  if (err) {
-                    const errMsg: server.errMsg = {
-                      status: errorCode.errCode.enrolError,
-                      msg: err,
-                    }
-                    db.close();
-                    res.end(JSON.stringify(errMsg));
-                  } else {
-                    db.close();
-                    res.end('Enrol Success!' + new Date().toLocaleString());
-                  }
-                });
-              }
-            })
-          } catch (e) {
-            logger.error(e);
-          }
-        })
-      } else {
-        logger.error('no enrol data!');
-      }
-    } catch (e) {
-      logger.error(e);
-    }
-  })
+          res.status(400);
+          res.end(JSON.stringify(errMsg));
+          this_db.close();
+        } else {
+          const filter = { "_id": new mongoDb.ObjectId(getValue(data, "gameId")), };
+          const update = { "$pull": { "referees": { openid: server.getValue(data, "openid"), } } }
+          return mongoUtil.update(this_db, 'games', filter, update, { upsert: true });
+        }
+      })
+      .then(r => {
+        this_db.close();
+        res.write('Enrol Success!');
+        next();
+      })
+      .catch(err => {
+        logger.error("enrol failed, error: ", err);
+      })
+
+    //           , result => {
+    //           const resl = result as gameData;
+    //           logger.debug('find result: ', resl);
+    //           logger.debug('find result.referees: ', resl['referees']);
+    //           let exists = resl.referees && resl['referees'].some(r => r.openid === data.openid);
+    //           if (exists) {
+    //             logger.debug('exists：', exists);
+    //             const errMsg: server.errMsg = {
+    //               status: errorCode.errCode.enrolExist,
+    //               msg: '不能重复报名！',
+    //             }
+    //             res.status(400); // errorCode.errCode.enrolExist);
+    //             res.end(JSON.stringify(errMsg));
+    //             db.close();
+    //           } else {
+    //             mongoUtil.enrol(db, 'games', data, err => {
+    //               if (err) {
+    //                 const errMsg: server.errMsg = {
+    //                   status: errorCode.errCode.enrolError,
+    //                   msg: err,
+    //                 }
+    //                 db.close();
+    //                 res.end(JSON.stringify(errMsg));
+    //               } else {
+    //                 db.close();
+    //                 res.end('Enrol Success!' + new Date().toLocaleString());
+    //               }
+    //             });
+    //           }
+    //         })
+    //       } catch (e) {
+    //         logger.error(e);
+    //       }
+    //     })
+    //   } else {
+    //     logger.error('no enrol data!');
+    //   }
+    // } catch (e) {
+    //   logger.error(e);
+    // }
+  });
 
   export type cancelEnrolData = {
     gameId: string,
@@ -368,38 +393,45 @@ export namespace server {
 
   app.post('/deletegame', (req, res, next) => {
     logger.info('incoming delete game data: ', req.body);
-    MongoClient.connect(DB_CONN_STR, (e, db) => {
-      if (e) {
-        logger.error('delete game connect error: ', e);
-        return;
-      }
-      mongoUtil.queryGameById(db, 'games', req.body.gameId, (game) => {
+    let this_db: mongoDb.Db = null;
+    const reqData = req.body as deleteGameData;
+    MongoClient.connect(DB_CONN_STR)
+      .then(db => {
+        logger.info("delete game mongo connected");
+        this_db = db;
+        return mongoUtil.queryGameById(db, 'games', req.body.gameId);
+      })
+      .then(game => {
+        if (!game) throw new Error("no such game!");
         if (game.openid !== req.body.openid) {
           res.status(400);
           const errMsg: server.errMsg = {
             status: errorCode.errCode.deleteGameError,
             msg: '不能删除非自己发布的比赛！',
           }
-          db.close();
+          this_db.close();
           res.end(JSON.stringify(errMsg));
         } else {
-          mongoUtil.deleteGame(db, 'games', req.body, (err) => {
-            if (err) {
-              res.status(400);
-              const errMsg: server.errMsg = {
-                status: errorCode.errCode.deleteGameError,
-                msg: err,
-              }
-              db.close();
-              res.end(JSON.stringify(errMsg));
-            } else {
-              db.close();
-              res.end('delete game success!' + new Date().toLocaleString());
-            }
-          });
+          const id = new mongoDb.ObjectId(getValue(reqData, "gameId"))
+          return mongoUtil.deleteGameById(this_db, 'games', id);
         }
       })
-    })
+      .then(mongoRes => {
+        logger.info('delete game succeed');
+        this_db.close();
+        res.write('delete game success!');
+        next();
+      })
+      .catch(e => {
+        logger.error("delete game failed, error", e);
+        res.status(400);
+        const errMsg: server.errMsg = {
+          status: errorCode.errCode.deleteGameError,
+          msg: e,
+        }
+        this_db.close();
+        res.end(JSON.stringify(errMsg));
+      })
   })
 
   app.use((req, res, next) => {

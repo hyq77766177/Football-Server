@@ -18,40 +18,16 @@ export namespace mongoUtil {
         return collection.insertOne(data);
     }
 
-    // export function myCreatedGames(db: mongodb.Db, col: string, openid: string, callback: Function) {
-    //     const collection = db.collection(col);
-    //     collection.find({ "openid": openid })
-    //         .toArray((err, result) => {
-    //             if (err) {
-    //                 logger.error('Error: ', err);
-    //                 return;
-    //             }
-    //             callback(result);
-    //         })
-    // }
-
     export function queryGames(db: mongodb.Db, col: string, query: Object) {
         const collection = db.collection(col);
         return collection.find<server.gameData>(query).toArray(); //{ "referees.openid": openid })
     }
 
-    // export function allGames(db: mongodb.Db, col: string) {
-    //     const collection = db.collection(col);
-    //     return collection.find().toArray();
-    // }
-
-    /** callback 参数是一个比赛 */
-    export function queryGameById(db: mongodb.Db, col: string, id: string, callback: Function) {
+    export function queryGameById(db: mongodb.Db, col: string, id: string) {
         const collection = db.collection(col);
         const objId = new mongodb.ObjectId(id);
         const queryData = { "_id": objId };
-        collection.find(queryData).toArray((err, result) => {
-            if (err) {
-                logger.error('Query by id Error: ', err);
-                return;
-            }
-            callback(result[0]);
-        });
+        return collection.findOne<server.gameData>(queryData);
     }
 
     export function enrol(db: mongodb.Db, col: string, data: server.enrolReq, callback: Function) {
@@ -92,6 +68,12 @@ export namespace mongoUtil {
         callback(null);
     }
 
+    export function update(db: mongodb.Db, col: string, filter: object, update: object, options?: mongodb.ReplaceOneOptions & { multi?: boolean }) {
+        logger.info('mongoUtil.update has been invoked');
+        const collection = db.collection(col);
+        return collection.update(filter, update, options);
+    };
+
     export function cancelEnrol(db: mongodb.Db, col: string, data: server.cancelEnrolData, callback: Function) {
         logger.debug('mongoUtil.cancelEnrol has been invoked, data: ', data);
         const id = new mongodb.ObjectId(server.getValue(data, "gameId"));
@@ -111,22 +93,9 @@ export namespace mongoUtil {
         callback(null);
     }
 
-    export function update(db: mongodb.Db, col: string, data: server.assignData, filter: object, update: object) {
-        logger.info('mongoUtil.assign has been invoked, data: ', data);
+    export function deleteGameById(db: mongodb.Db, col: string, id: mongodb.ObjectId) {
+        logger.debug('mongo deleteGame has been invoked');
         const collection = db.collection(col);
-        return collection.update(filter, update);
-    };
-
-    export function deleteGame(db: mongodb.Db, col: string, data: server.deleteGameData, callback: Function) {
-        logger.debug('mongo deleteGame has been invoked, data: ', data);
-        const id = new mongodb.ObjectId(server.getValue(data, "gameId"));
-        const collection = db.collection(col);
-        collection.remove({
-            "_id": id,
-        }).catch(e => {
-            logger.error('delete game error: ', e);
-            callback(e);
-        });
-        callback(null);
+        return collection.remove({ "_id": id })
     }
 }

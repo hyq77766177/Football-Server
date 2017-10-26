@@ -133,7 +133,7 @@ var server;
             var update = {
                 "$set": { "referees.$.assigned": !server.getValue(reqData, 'assign') },
             };
-            return mongolib_1.mongoUtil.update(db, 'games', reqData, filter, update);
+            return mongolib_1.mongoUtil.update(db, 'games', filter, update);
         })
             .then(function (writeRes) {
             logger.info("assign success");
@@ -170,77 +170,96 @@ var server;
         // })
     });
     server.app.post('/gamebyid', function (req, res, next) {
-        try {
-            MongoClient.connect(DB_CONN_STR, function (err, db) {
-                logger.info('mongo query by id connected, request: ', req.body);
-                mongolib_1.mongoUtil.queryGameById(db, 'games', req.body.colId, function (result) {
-                    logger.info(result);
-                    res.write(JSON.stringify(result));
-                    db.close();
-                    res.end();
-                });
-            });
-        }
-        catch (e) {
-            logger.error(e);
-        }
+        var gamebyid_db = null;
+        MongoClient.connect(DB_CONN_STR)
+            .then(function (db) {
+            gamebyid_db = db;
+            logger.info('mongo query by id connected, request: ', req.body);
+            return mongolib_1.mongoUtil.queryGameById(db, 'games', req.body.colId);
+        })
+            .then(function (game) {
+            logger.info("query game by id success, game: ", game);
+            res.write(JSON.stringify(game));
+            gamebyid_db.close();
+            next();
+        });
     });
     server.app.post('/enrol', function (req, res, next) {
         logger.info('incoming enrol data: ', req.body);
-        try {
-            var data_2 = req.body.data;
-            if (data_2) {
-                MongoClient.connect(DB_CONN_STR, function (err, db) {
-                    if (err) {
-                        logger.error('[enrol] mongo connect error!', err);
-                        return;
-                    }
-                    try {
-                        mongolib_1.mongoUtil.queryGameById(db, 'games', data_2.gameId, function (result) {
-                            var resl = result;
-                            logger.debug('find result: ', resl);
-                            logger.debug('find result.referees: ', resl['referees']);
-                            var exists = resl.referees && resl['referees'].some(function (r) { return r.openid === data_2.openid; });
-                            if (exists) {
-                                logger.debug('exists：', exists);
-                                var errMsg = {
-                                    status: errorCode_1.errorCode.errCode.enrolExist,
-                                    msg: '不能重复报名！',
-                                };
-                                res.status(400); // errorCode.errCode.enrolExist);
-                                res.end(JSON.stringify(errMsg));
-                                db.close();
-                            }
-                            else {
-                                mongolib_1.mongoUtil.enrol(db, 'games', data_2, function (err) {
-                                    if (err) {
-                                        var errMsg = {
-                                            status: errorCode_1.errorCode.errCode.enrolError,
-                                            msg: err,
-                                        };
-                                        db.close();
-                                        res.end(JSON.stringify(errMsg));
-                                    }
-                                    else {
-                                        db.close();
-                                        res.end('Enrol Success!' + new Date().toLocaleString());
-                                    }
-                                });
-                            }
-                        });
-                    }
-                    catch (e) {
-                        logger.error(e);
-                    }
-                });
+        var data = req.body.data;
+        var this_db = null;
+        MongoClient.connect(DB_CONN_STR)
+            .then(function (db) {
+            this_db = db;
+            logger.info("enrol mongo connected");
+            return mongolib_1.mongoUtil.queryGameById(db, 'games', getValue(data, "gameId"));
+        })
+            .then(function (game) {
+            var exists = game.referees && game['referees'].some(function (r) { return r.openid === getValue(data, "openid"); });
+            if (exists) {
+                logger.debug('exists：', exists);
+                var errMsg = {
+                    status: errorCode_1.errorCode.errCode.enrolExist,
+                    msg: '不能重复报名！',
+                };
+                res.status(400);
+                res.end(JSON.stringify(errMsg));
+                this_db.close();
             }
             else {
-                logger.error('no enrol data!');
+                var filter = { "_id": new mongoDb.ObjectId(getValue(data, "gameId")), };
+                var update = { "$pull": { "referees": { openid: server.getValue(data, "openid"), } } };
+                return mongolib_1.mongoUtil.update(this_db, 'games', filter, update, { upsert: true });
             }
-        }
-        catch (e) {
-            logger.error(e);
-        }
+        })
+            .then(function (r) {
+            this_db.close();
+            res.write('Enrol Success!');
+            next();
+        })
+            .catch(function (err) {
+            logger.error("enrol failed, error: ", err);
+        });
+        //           , result => {
+        //           const resl = result as gameData;
+        //           logger.debug('find result: ', resl);
+        //           logger.debug('find result.referees: ', resl['referees']);
+        //           let exists = resl.referees && resl['referees'].some(r => r.openid === data.openid);
+        //           if (exists) {
+        //             logger.debug('exists：', exists);
+        //             const errMsg: server.errMsg = {
+        //               status: errorCode.errCode.enrolExist,
+        //               msg: '不能重复报名！',
+        //             }
+        //             res.status(400); // errorCode.errCode.enrolExist);
+        //             res.end(JSON.stringify(errMsg));
+        //             db.close();
+        //           } else {
+        //             mongoUtil.enrol(db, 'games', data, err => {
+        //               if (err) {
+        //                 const errMsg: server.errMsg = {
+        //                   status: errorCode.errCode.enrolError,
+        //                   msg: err,
+        //                 }
+        //                 db.close();
+        //                 res.end(JSON.stringify(errMsg));
+        //               } else {
+        //                 db.close();
+        //                 res.end('Enrol Success!' + new Date().toLocaleString());
+        //               }
+        //             });
+        //           }
+        //         })
+        //       } catch (e) {
+        //         logger.error(e);
+        //       }
+        //     })
+        //   } else {
+        //     logger.error('no enrol data!');
+        //   }
+        // } catch (e) {
+        //   logger.error(e);
+        // }
     });
     server.app.post('/cancelenrol', function (req, res) {
         var data = req.body;
@@ -303,39 +322,46 @@ var server;
     });
     server.app.post('/deletegame', function (req, res, next) {
         logger.info('incoming delete game data: ', req.body);
-        MongoClient.connect(DB_CONN_STR, function (e, db) {
-            if (e) {
-                logger.error('delete game connect error: ', e);
-                return;
+        var this_db = null;
+        var reqData = req.body;
+        MongoClient.connect(DB_CONN_STR)
+            .then(function (db) {
+            logger.info("delete game mongo connected");
+            this_db = db;
+            return mongolib_1.mongoUtil.queryGameById(db, 'games', req.body.gameId);
+        })
+            .then(function (game) {
+            if (!game)
+                throw new Error("no such game!");
+            if (game.openid !== req.body.openid) {
+                res.status(400);
+                var errMsg = {
+                    status: errorCode_1.errorCode.errCode.deleteGameError,
+                    msg: '不能删除非自己发布的比赛！',
+                };
+                this_db.close();
+                res.end(JSON.stringify(errMsg));
             }
-            mongolib_1.mongoUtil.queryGameById(db, 'games', req.body.gameId, function (game) {
-                if (game.openid !== req.body.openid) {
-                    res.status(400);
-                    var errMsg = {
-                        status: errorCode_1.errorCode.errCode.deleteGameError,
-                        msg: '不能删除非自己发布的比赛！',
-                    };
-                    db.close();
-                    res.end(JSON.stringify(errMsg));
-                }
-                else {
-                    mongolib_1.mongoUtil.deleteGame(db, 'games', req.body, function (err) {
-                        if (err) {
-                            res.status(400);
-                            var errMsg = {
-                                status: errorCode_1.errorCode.errCode.deleteGameError,
-                                msg: err,
-                            };
-                            db.close();
-                            res.end(JSON.stringify(errMsg));
-                        }
-                        else {
-                            db.close();
-                            res.end('delete game success!' + new Date().toLocaleString());
-                        }
-                    });
-                }
-            });
+            else {
+                var id = new mongoDb.ObjectId(getValue(reqData, "gameId"));
+                return mongolib_1.mongoUtil.deleteGameById(this_db, 'games', id);
+            }
+        })
+            .then(function (mongoRes) {
+            logger.info('delete game succeed');
+            this_db.close();
+            res.write('delete game success!');
+            next();
+        })
+            .catch(function (e) {
+            logger.error("delete game failed, error", e);
+            res.status(400);
+            var errMsg = {
+                status: errorCode_1.errorCode.errCode.deleteGameError,
+                msg: e,
+            };
+            this_db.close();
+            res.end(JSON.stringify(errMsg));
         });
     });
     server.app.use(function (req, res, next) {

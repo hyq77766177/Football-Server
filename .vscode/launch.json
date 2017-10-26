@@ -12,6 +12,19 @@
       ],
       "preLaunchTask": "typescript",
       "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "name": "html mocha",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceRoot}/node_modules/.bin/mocha",
+      "args": [
+        "--reporter",
+        "mochawesome",
+        "${workspaceRoot}/bin/app.test.js"
+      ],
+      "preLaunchTask": "typescript",
+      "internalConsoleOptions": "openOnSessionStart"
     }
   ]
 }

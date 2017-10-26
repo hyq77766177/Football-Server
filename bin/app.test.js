@@ -49,7 +49,7 @@ describe("获取openid", function () {
             code: "6651818s1ad8f1",
         })
             .expect(200, function (err, res) {
-            logger.info('openid是：', res);
+            logger.info('openid是：', res.text);
             done();
         });
     });
@@ -62,6 +62,39 @@ describe('选派裁判', function () {
             openid: "o7TkA0Xr2Kz-xGFxkFU3c56lpmQY",
             gameId: "59d18bcb7c41dd20b8026dae",
             assign: false,
+        })
+            .expect(200, function (err, res) {
+            expect(err).to.be.equal(null);
+            done();
+        });
+    });
+});
+describe('删除比赛', function () {
+    it('应该删除成功', function (done) {
+        request(app)
+            .post('/deletegame')
+            .send({
+            openid: "65489784941",
+            gameId: "59f1ed174527fa801a26c809",
+        })
+            .expect(200, function (err, res) {
+            expect(err).to.be.equal(null);
+            done();
+        });
+    });
+});
+describe('报名', function () {
+    it('应该报名成功', function (done) {
+        request(app)
+            .post('/enrol')
+            .send({
+            data: {
+                gameId: "59f1f00109e27d81f67844dd",
+                openid: "65489784941",
+                startRefTime: "00:15",
+                endRefTime: "02:15",
+                refereeName: "HYQ",
+            }
         })
             .expect(200, function (err, res) {
             expect(err).to.be.equal(null);

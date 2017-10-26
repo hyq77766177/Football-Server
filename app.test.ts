@@ -73,3 +73,38 @@ describe('选派裁判', () => {
       });
   });
 });
+
+describe('删除比赛', () => {
+  it('应该删除成功', done => {
+    request(app)
+      .post('/deletegame')
+      .send({
+        openid: "65489784941",
+        gameId: "59f1ed174527fa801a26c809",
+      })
+      .expect(200, (err, res) => {
+        expect(err).to.be.equal(null);
+        done();
+      });
+  });
+});
+
+describe('报名', () => {
+  it('应该报名成功', done => {
+    request(app)
+      .post('/enrol')
+      .send({
+        data: {
+          gameId: "59f1f00109e27d81f67844dd",
+          openid: "65489784941",
+          startRefTime: "00:15",
+          endRefTime: "02:15",
+          refereeName: "HYQ",
+        }
+      })
+      .expect(200, (err, res) => {
+        expect(err).to.be.equal(null);
+        done();
+      });
+  });
+});

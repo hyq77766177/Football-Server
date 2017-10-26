@@ -15,38 +15,16 @@ var mongoUtil;
         return collection.insertOne(data);
     }
     mongoUtil.insertData = insertData;
-    // export function myCreatedGames(db: mongodb.Db, col: string, openid: string, callback: Function) {
-    //     const collection = db.collection(col);
-    //     collection.find({ "openid": openid })
-    //         .toArray((err, result) => {
-    //             if (err) {
-    //                 logger.error('Error: ', err);
-    //                 return;
-    //             }
-    //             callback(result);
-    //         })
-    // }
     function queryGames(db, col, query) {
         var collection = db.collection(col);
         return collection.find(query).toArray(); //{ "referees.openid": openid })
     }
     mongoUtil.queryGames = queryGames;
-    // export function allGames(db: mongodb.Db, col: string) {
-    //     const collection = db.collection(col);
-    //     return collection.find().toArray();
-    // }
-    /** callback 参数是一个比赛 */
-    function queryGameById(db, col, id, callback) {
+    function queryGameById(db, col, id) {
         var collection = db.collection(col);
         var objId = new mongodb.ObjectId(id);
         var queryData = { "_id": objId };
-        collection.find(queryData).toArray(function (err, result) {
-            if (err) {
-                logger.error('Query by id Error: ', err);
-                return;
-            }
-            callback(result[0]);
-        });
+        return collection.findOne(queryData);
     }
     mongoUtil.queryGameById = queryGameById;
     function enrol(db, col, data, callback) {
@@ -86,6 +64,13 @@ var mongoUtil;
         callback(null);
     }
     mongoUtil.enrolUpdate = enrolUpdate;
+    function update(db, col, filter, update, options) {
+        logger.info('mongoUtil.update has been invoked');
+        var collection = db.collection(col);
+        return collection.update(filter, update, options);
+    }
+    mongoUtil.update = update;
+    ;
     function cancelEnrol(db, col, data, callback) {
         logger.debug('mongoUtil.cancelEnrol has been invoked, data: ', data);
         var id = new mongodb.ObjectId(app_1.server.getValue(data, "gameId"));
@@ -105,25 +90,11 @@ var mongoUtil;
         callback(null);
     }
     mongoUtil.cancelEnrol = cancelEnrol;
-    function update(db, col, data, filter, update) {
-        logger.info('mongoUtil.assign has been invoked, data: ', data);
+    function deleteGameById(db, col, id) {
+        logger.debug('mongo deleteGame has been invoked');
         var collection = db.collection(col);
-        return collection.update(filter, update);
+        return collection.remove({ "_id": id });
     }
-    mongoUtil.update = update;
-    ;
-    function deleteGame(db, col, data, callback) {
-        logger.debug('mongo deleteGame has been invoked, data: ', data);
-        var id = new mongodb.ObjectId(app_1.server.getValue(data, "gameId"));
-        var collection = db.collection(col);
-        collection.remove({
-            "_id": id,
-        }).catch(function (e) {
-            logger.error('delete game error: ', e);
-            callback(e);
-        });
-        callback(null);
-    }
-    mongoUtil.deleteGame = deleteGame;
+    mongoUtil.deleteGameById = deleteGameById;
 })(mongoUtil = exports.mongoUtil || (exports.mongoUtil = {}));
 //# sourceMappingURL=mongolib.js.map
