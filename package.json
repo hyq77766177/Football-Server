@@ -17,8 +17,6 @@
   "private": true,
   "license": "ISC",
   "devDependencies": {
-    "supertest": "^3.0.0",
-    "mocha": "^4.0.1",
     "@types/async": "^2.0.44",
     "@types/body-parser": "^1.16.5",
     "@types/chai": "^4.0.4",
@@ -29,6 +27,9 @@
     "@types/mongodb": "^2.2.14",
     "@types/node": "^8.0.46",
     "@types/supertest": "^2.0.3",
-    "async": "^2.5.0"
+    "async": "^2.5.0",
+    "mocha": "^4.0.1",
+    "mochawesome": "^2.3.1",
+    "supertest": "^3.0.0"
   }
 }

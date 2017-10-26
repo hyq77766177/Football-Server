@@ -7,7 +7,6 @@ var _ = require("lodash");
 var mongoDb = require("mongodb");
 var log4js = require("log4js");
 var bodyParser = require("body-parser");
-var assert = require("assert");
 var config_1 = require("./config");
 var mongolib_1 = require("./mongolib");
 var errorCode_1 = require("./errorCode");
@@ -21,7 +20,8 @@ var server;
             arg[_i - 1] = arguments[_i];
         }
         var result = _.get(request, arg);
-        assert(!!result, "bad request data, the key is missed or wrong written from path: " + arg.join("=>"));
+        result === null && logger.fatal("bad request data, the key is missed or wrong written from path: " + arg.join("=>"));
+        // assert(!!result, `bad request data, the key is missed or wrong written from path: ${arg.join("=>")}`);
         return result;
     }
     server.getValue = getValue;
@@ -33,29 +33,24 @@ var server;
         extended: true
     }));
     server.app.post('/creategame', function (req, res, next) {
-        logger.debug(req.body);
-        var formData = req.body.formData;
-        try {
-            var document_1 = formData;
-            logger.debug('document: ', document_1);
-            MongoClient.connect(DB_CONN_STR, function (err, db) {
-                if (err) {
-                    logger.error('[createGame] mongo connect error!', err);
-                }
-                logger.debug("mongo insert");
-                mongolib_1.mongoUtil.insertData(db, 'games', document_1, function (result) {
-                    logger.debug(result);
-                    db.close();
-                    next();
-                });
-            });
-        }
-        catch (e) {
-            logger.error(e);
-        }
+        logger.info("incoming createData: ", req.body);
+        var document = req.body.formData;
+        logger.debug('document: ', document);
+        MongoClient.connect(DB_CONN_STR)
+            .then(function (db) {
+            logger.info("mongo connect success");
+            mongolib_1.mongoUtil.insertData(db, 'games', document);
+            return db;
+        })
+            .then(function (db) {
+            logger.info("insert success");
+            db.close();
+            next();
+        })
+            .catch(function (err) { return logger.error(config_1.config.loggerErrString.mongoConnectErr + ', createGame: ', err); });
     });
     server.app.post('/openid', function (req, res, next) {
-        logger.debug('req_body: ', req.body);
+        logger.info('incoming openid data: ', req.body);
         var data = req.body;
         var code = getValue(data, "code");
         if (code) {
@@ -79,62 +74,107 @@ var server;
     });
     server.app.post('/all', function (req, res, next) {
         var reqData = req.body;
-        logger.debug("incoming all data: ", reqData);
-        MongoClient.connect(DB_CONN_STR, function (err, db) {
-            logger.debug('mongo show all');
-            var openid = getValue(reqData, "openid");
-            mongolib_1.mongoUtil.allGames(db, 'games', function (resAll) {
-                logger.debug('allGames:', resAll);
-                mongolib_1.mongoUtil.myCreatedGames(db, 'games', openid, function (resultC) {
-                    logger.debug('myCreatedGames:', resultC);
-                    mongolib_1.mongoUtil.myEnroledGames(db, 'games', openid, function (resultE) {
-                        logger.debug('myEnroledGames:', resultE);
-                        var availableGames = resAll.filter(function (r) { return !resultC.some(function (c) { return c._id.toHexString() === r._id.toHexString(); }) && !resultE.some(function (e) { return e._id.toHexString() === r._id.toHexString(); }); });
-                        logger.debug('availableGames: ', availableGames);
-                        var responseData = {
-                            availableGames: availableGames,
-                            myCreatedGames: resultC,
-                            myEnroledGames: resultE,
-                        };
-                        res.write(JSON.stringify(responseData));
-                        db.close();
-                        res.end();
-                    });
-                });
-            });
+        logger.info("incoming all data: ", reqData);
+        var all_db;
+        var resultGameData = {
+            myCreatedGames: null,
+            myEnroledGames: null,
+            availableGames: null,
+        };
+        var openid = getValue(reqData, "openid");
+        MongoClient.connect(DB_CONN_STR)
+            .then(function (db) {
+            logger.info("query all games mongo connected");
+            all_db = db;
+            return mongolib_1.mongoUtil.queryGames(all_db, 'games', { "openid": openid });
+        })
+            .then(function (myCreatedGames) {
+            logger.info('myCreatedGames:', myCreatedGames);
+            resultGameData.myCreatedGames = myCreatedGames;
+            return mongolib_1.mongoUtil.queryGames(all_db, 'games', { "referees.openid": openid });
+        })
+            .then(function (myEnroledGames) {
+            logger.info('myEnroledGames:', myEnroledGames);
+            resultGameData.myEnroledGames = myEnroledGames;
+            return mongolib_1.mongoUtil.queryGames(all_db, 'games', null);
+        })
+            .then(function (allGames) {
+            logger.info('allGames: ', allGames);
+            var availableGames = allGames.filter(function (r) { return !resultGameData.myEnroledGames.some(function (c) { return c._id.toHexString() === r._id.toHexString(); }) && !resultGameData.myCreatedGames.some(function (e) { return e._id.toHexString() === r._id.toHexString(); }); });
+            resultGameData.availableGames = availableGames;
+            res.write(JSON.stringify(resultGameData));
+            all_db.close();
+            res.end();
+        })
+            .catch(function (e) {
+            logger.error("query all games failed, error: ", e);
+            res.status(400);
+            var errMsg = {
+                status: errorCode_1.errorCode.errCode.queryGameError,
+                msg: e
+            };
+            res.end(JSON.stringify(errMsg));
+            all_db.close();
         });
     });
     server.app.post('/assign', function (req, res, next) {
         var reqData = req.body;
-        logger.debug('assign incoming data: ', req.body);
-        MongoClient.connect(DB_CONN_STR, function (e, db) {
-            if (e) {
-                logger.error('[assign] mongo connect error! ', e);
-                return;
-            }
-            mongolib_1.mongoUtil.assign(db, 'games', reqData, function (err) {
-                if (err) {
-                    res.status(400);
-                    var errMsg = {
-                        status: errorCode_1.errorCode.errCode.assignError,
-                        msg: err,
-                    };
-                    db.close();
-                    res.end(JSON.stringify(errMsg));
-                }
-                else {
-                    db.close();
-                    res.end('assign Success!' + new Date().toLocaleString());
-                }
-            });
+        logger.info('incoming assign data: ', req.body);
+        var assign_db = null;
+        MongoClient.connect(DB_CONN_STR)
+            .then(function (db) {
+            assign_db = db;
+            logger.info("assign mongo connected");
+            var id = new mongoDb.ObjectId(server.getValue(reqData, "gameId"));
+            var filter = {
+                "_id": id,
+                "referees.openid": server.getValue(reqData, 'openid'),
+            };
+            var update = {
+                "$set": { "referees.$.assigned": !server.getValue(reqData, 'assign') },
+            };
+            return mongolib_1.mongoUtil.update(db, 'games', reqData, filter, update);
+        })
+            .then(function (writeRes) {
+            logger.info("assign success");
+            assign_db.close();
+            res.write('assign Success!');
+            next();
+        })
+            .catch(function (e) {
+            res.status(400);
+            var errMsg = {
+                status: errorCode_1.errorCode.errCode.assignError,
+                msg: e
+            };
+            res.end(JSON.stringify(errMsg));
+            assign_db.close();
         });
+        //   , (e, db) => {
+        //   if (e) {
+        //     logger.error('[assign] mongo connect error! ', e);
+        //     return;
+        //   }
+        //   mongoUtil.assign(db, 'games', reqData, err => {
+        //     if (err) {
+        //       res.status(400);
+        //       const errMsg: server.errMsg = {
+        //         status: errorCode.errCode.assignError,
+        //         msg: err,
+        //       }
+        //       db.close();
+        //       res.end(JSON.stringify(errMsg));
+        //     } else {
+        //     }
+        //   })
+        // })
     });
     server.app.post('/gamebyid', function (req, res, next) {
         try {
             MongoClient.connect(DB_CONN_STR, function (err, db) {
-                logger.debug('mongo query by id connected, request: ', req.body);
+                logger.info('mongo query by id connected, request: ', req.body);
                 mongolib_1.mongoUtil.queryGameById(db, 'games', req.body.colId, function (result) {
-                    logger.debug(result);
+                    logger.info(result);
                     res.write(JSON.stringify(result));
                     db.close();
                     res.end();
@@ -146,7 +186,7 @@ var server;
         }
     });
     server.app.post('/enrol', function (req, res, next) {
-        logger.debug('enrol data: ', req.body);
+        logger.info('incoming enrol data: ', req.body);
         try {
             var data_2 = req.body.data;
             if (data_2) {
@@ -204,7 +244,7 @@ var server;
     });
     server.app.post('/cancelenrol', function (req, res) {
         var data = req.body;
-        logger.debug(req.body);
+        logger.info("incoming cancel enrol data: ", req.body);
         MongoClient.connect(DB_CONN_STR, function (err, db) {
             if (err) {
                 logger.error('[cancel enrol] mongo connect error!', err);
@@ -262,7 +302,7 @@ var server;
         }
     });
     server.app.post('/deletegame', function (req, res, next) {
-        logger.debug('incoming delete game data: ', req.body);
+        logger.info('incoming delete game data: ', req.body);
         MongoClient.connect(DB_CONN_STR, function (e, db) {
             if (e) {
                 logger.error('delete game connect error: ', e);

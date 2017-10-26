@@ -13,53 +13,32 @@ export namespace mongoUtil {
 
     export const mongoUrl = `mongodb://${config.mongoUser}:${config.mongoPass}@${config.mongoHost}:${config.mongoPort}/${config.mongoDb}`;
 
-    export function insertData(db: mongodb.Db, col: string, data: server.createGameData, callback: Function) {
-        //连接到表 games
+    export function insertData(db: mongodb.Db, col: string, data: server.createGameData) {
         const collection = db.collection(col);
-        collection.insert(data, (err, result) => {
-            if (err) {
-                logger.error('Error:', err);
-                return
-            }
-            callback(result);
-        })
+        return collection.insertOne(data);
     }
 
-    export function myCreatedGames(db: mongodb.Db, col: string, openid: string, callback: Function) {
+    // export function myCreatedGames(db: mongodb.Db, col: string, openid: string, callback: Function) {
+    //     const collection = db.collection(col);
+    //     collection.find({ "openid": openid })
+    //         .toArray((err, result) => {
+    //             if (err) {
+    //                 logger.error('Error: ', err);
+    //                 return;
+    //             }
+    //             callback(result);
+    //         })
+    // }
+
+    export function queryGames(db: mongodb.Db, col: string, query: Object) {
         const collection = db.collection(col);
-        collection.find({ "openid": openid })
-            .toArray((err, result) => {
-                if (err) {
-                    logger.error('Error: ', err);
-                    return;
-                }
-                callback(result);
-            })
+        return collection.find<server.gameData>(query).toArray(); //{ "referees.openid": openid })
     }
 
-    export function myEnroledGames(db: mongodb.Db, col: string, openid: string, callback: Function) {
-        const collection = db.collection(col);
-        collection.find({ "referees.openid": openid })
-            .toArray((err, result) => {
-                if (err) {
-                    logger.error('Error: ', err);
-                    return;
-                }
-                callback(result);
-            })
-    }
-
-    export function allGames(db: mongodb.Db, col: string, callback: Function) {
-        const collection = db.collection(col);
-        collection.find()
-            .toArray((err, result) => {
-                if (err) {
-                    logger.error('Error: ', err);
-                    return;
-                }
-                callback(result);
-            })
-    }
+    // export function allGames(db: mongodb.Db, col: string) {
+    //     const collection = db.collection(col);
+    //     return collection.find().toArray();
+    // }
 
     /** callback 参数是一个比赛 */
     export function queryGameById(db: mongodb.Db, col: string, id: string, callback: Function) {
@@ -132,22 +111,10 @@ export namespace mongoUtil {
         callback(null);
     }
 
-    export function assign(db: mongodb.Db, col: string, data: server.assignData, callback: Function) {
-        logger.debug('mongoUtil.assign has been invoked, data: ', data);
-        const id = new mongodb.ObjectId(server.getValue(data, "gameId"));
+    export function update(db: mongodb.Db, col: string, data: server.assignData, filter: object, update: object) {
+        logger.info('mongoUtil.assign has been invoked, data: ', data);
         const collection = db.collection(col);
-        collection.update({
-            "_id": id,
-            "referees.openid": server.getValue(data, 'openid'),
-        },
-            {
-                "$set": { "referees.$.assigned": !server.getValue(data, 'assign') },
-            })
-            .catch(e => {
-                logger.error('cancel error:', e);
-                callback(e);
-            });
-        callback(null);
+        return collection.update(filter, update);
     };
 
     export function deleteGame(db: mongodb.Db, col: string, data: server.deleteGameData, callback: Function) {

@@ -9,7 +9,7 @@ const expect = chai.expect;
 const logger = log4js.getLogger("test");
 
 describe("创建比赛", () => {
-  it("创建比赛成功", (done) => {
+  it("应该创建比赛成功", (done) => {
     request(app)
       .post('/creategame')
       .send({
@@ -29,16 +29,47 @@ describe("创建比赛", () => {
   })
 })
 
+describe("查询比赛数据", () => {
+  it("应该成功查询到数据", (done) => {
+    request(app)
+      .post('/all')
+      .send({
+        openid: "o7TkA0Xr2Kz-xGFxkFU3c56lpmQY",
+      })
+      .expect(200, (err, res) => {
+        logger.info("返回结果是：", res.text);
+        expect(err).to.be.equal(null);
+        done();
+      })
+  })
+})
+
 describe("获取openid", () => {
   it("获取到openid", done => {
     request(app)
-      .post('openid')
+      .post('/openid')
       .send({
         code: "6651818s1ad8f1",
       })
       .expect(200, (err, res) => {
-        logger.debug('openid是：', res);
+        logger.info('openid是：', res.text);
         done();
       });
   })
-})
+});
+
+describe('选派裁判', () => {
+  it('应该选派成功', done => {
+    request(app)
+      .post('/assign')
+      .send({
+        openid: "o7TkA0Xr2Kz-xGFxkFU3c56lpmQY",
+        gameId: "59d18bcb7c41dd20b8026dae",
+        assign: false,
+      })
+      .expect(200, (err, res) => {
+        expect(err).to.be.equal(null);
+        done();
+      });
+  });
+});

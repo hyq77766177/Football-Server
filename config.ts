@@ -10,6 +10,10 @@ export namespace config {
   export const mongoPass = 'sorayama';
   export const mongoDb = 'football';
 
+  export const loggerErrString = {
+    mongoConnectErr: "mongo connect error",
+  }
+
   export function getWXOpenIdUrl(code: string) {
     return `https://api.weixin.qq.com/sns/jscode2session?appId=${config.appId}&secret=${config.appSecret}&js_code=${code}&grant_type=authorization_code`;
   }

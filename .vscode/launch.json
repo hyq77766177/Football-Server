@@ -2,16 +2,16 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Run mocha",
       "type": "node",
       "request": "launch",
-      "name": "Mocha Tests",
-      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+      "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
       "args": [
         "--colors",
-        "${workspaceFolder}/bin/app.test.js"
+        "${workspaceRoot}/bin/app.test.js"
       ],
-      "internalConsoleOptions": "openOnSessionStart",
-      "preLaunchTask": "typescript"
+      "preLaunchTask": "typescript",
+      "internalConsoleOptions": "openOnSessionStart"
     }
   ]
 }

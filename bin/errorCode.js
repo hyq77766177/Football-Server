@@ -6,12 +6,13 @@ var errorCode;
     (function (errCode) {
         errCode[errCode["badData"] = -1] = "badData";
         errCode[errCode["enrolExist"] = 100] = "enrolExist";
-        errCode[errCode["noOpenId"] = 101] = "noOpenId";
-        errCode[errCode["cancelError"] = 102] = "cancelError";
-        errCode[errCode["enrolUpdateError"] = 103] = "enrolUpdateError";
-        errCode[errCode["enrolError"] = 104] = "enrolError";
-        errCode[errCode["assignError"] = 105] = "assignError";
-        errCode[errCode["deleteGameError"] = 106] = "deleteGameError";
+        errCode[errCode["queryGameError"] = 101] = "queryGameError";
+        errCode[errCode["noOpenId"] = 102] = "noOpenId";
+        errCode[errCode["cancelError"] = 103] = "cancelError";
+        errCode[errCode["enrolUpdateError"] = 104] = "enrolUpdateError";
+        errCode[errCode["enrolError"] = 105] = "enrolError";
+        errCode[errCode["assignError"] = 106] = "assignError";
+        errCode[errCode["deleteGameError"] = 107] = "deleteGameError";
     })(errCode = errorCode.errCode || (errorCode.errCode = {}));
 })(errorCode = exports.errorCode || (exports.errorCode = {}));
 //# sourceMappingURL=errorCode.js.map

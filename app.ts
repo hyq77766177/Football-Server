@@ -25,7 +25,8 @@ export namespace server {
   export function getValue<T, K1 extends keyof T, K2 extends keyof T[K1]>(request: T, key1: K1, key2?: K2): T[K1][K2]
   export function getValue(request: any, ...arg) {
     let result = _.get(request, arg);
-    assert(!!result, `bad request data, the key is missed or wrong written from path: ${arg.join("=>")}`);
+    result === null && logger.fatal(`bad request data, the key is missed or wrong written from path: ${arg.join("=>")}`);
+    // assert(!!result, `bad request data, the key is missed or wrong written from path: ${arg.join("=>")}`);
     return result;
   }
   // <<<
@@ -66,25 +67,21 @@ export namespace server {
   };
 
   app.post('/creategame', (req, res, next) => {
-    logger.debug(req.body);
-    let formData = req.body.formData;
-    try {
-      let document: createGameData = formData;
-      logger.debug('document: ', document);
-      MongoClient.connect(DB_CONN_STR, (err, db) => {
-        if (err) {
-          logger.error('[createGame] mongo connect error!', err);
-        }
-        logger.debug("mongo insert");
-        mongoUtil.insertData(db, 'games', document, result => {
-          logger.debug(result)
-          db.close();
-          next();
-        })
+    logger.info("incoming createData: ", req.body);
+    let document: createGameData = req.body.formData;
+    logger.debug('document: ', document);
+    MongoClient.connect(DB_CONN_STR)
+      .then(db => {
+        logger.info("mongo connect success");
+        mongoUtil.insertData(db, 'games', document);
+        return db;
       })
-    } catch (e) {
-      logger.error(e);
-    }
+      .then(db => {
+        logger.info("insert success");
+        db.close();
+        next();
+      })
+      .catch(err => logger.error(config.loggerErrString.mongoConnectErr + ', createGame: ', err));
   })
 
   export type openidData = {
@@ -92,7 +89,7 @@ export namespace server {
   };
 
   app.post('/openid', (req, res, next) => {
-    logger.debug('req_body: ', req.body);
+    logger.info('incoming openid data: ', req.body);
     const data: openidData = req.body;
     let code = getValue(data, "code");
     if (code) {
@@ -120,31 +117,49 @@ export namespace server {
   };
 
   app.post('/all', (req, res, next) => {
-    let reqData: allData = req.body;
-    logger.debug("incoming all data: ", reqData);
-    MongoClient.connect(DB_CONN_STR, (err, db) => {
-      logger.debug('mongo show all');
-      const openid = getValue(reqData, "openid");
-      mongoUtil.allGames(db, 'games', resAll => {
-        logger.debug('allGames:', resAll);
-        mongoUtil.myCreatedGames(db, 'games', openid, resultC => {
-          logger.debug('myCreatedGames:', resultC);
-          mongoUtil.myEnroledGames(db, 'games', openid, resultE => {
-            logger.debug('myEnroledGames:', resultE);
-            let availableGames = resAll.filter(r => !resultC.some(c => c._id.toHexString() === r._id.toHexString()) && !resultE.some(e => e._id.toHexString() === r._id.toHexString()));
-            logger.debug('availableGames: ', availableGames);
-            let responseData = {
-              availableGames: availableGames,
-              myCreatedGames: resultC,
-              myEnroledGames: resultE,
-            }
-            res.write(JSON.stringify(responseData));
-            db.close();
-            res.end();
-          })
-        })
+    const reqData: allData = req.body;
+    logger.info("incoming all data: ", reqData);
+    let all_db: mongoDb.Db;
+    let resultGameData = {
+      myCreatedGames: null,
+      myEnroledGames: null,
+      availableGames: null,
+    };
+    const openid = getValue(reqData, "openid");
+    MongoClient.connect(DB_CONN_STR)
+      .then(db => {
+        logger.info("query all games mongo connected");
+        all_db = db;
+        return mongoUtil.queryGames(all_db, 'games', { "openid": openid });
       })
-    })
+      .then(myCreatedGames => {
+        logger.info('myCreatedGames:', myCreatedGames);
+        resultGameData.myCreatedGames = myCreatedGames;
+        return mongoUtil.queryGames(all_db, 'games', { "referees.openid": openid });
+      })
+      .then(myEnroledGames => {
+        logger.info('myEnroledGames:', myEnroledGames);
+        resultGameData.myEnroledGames = myEnroledGames;
+        return mongoUtil.queryGames(all_db, 'games', null);
+      })
+      .then(allGames => {
+        logger.info('allGames: ', allGames);
+        let availableGames = allGames.filter(r => !resultGameData.myEnroledGames.some(c => c._id.toHexString() === r._id.toHexString()) && !resultGameData.myCreatedGames.some(e => e._id.toHexString() === r._id.toHexString()));
+        resultGameData.availableGames = availableGames;
+        res.write(JSON.stringify(resultGameData));
+        all_db.close();
+        res.end();
+      })
+      .catch(e => {
+        logger.error("query all games failed, error: ", e);
+        res.status(400);
+        const errMsg: server.errMsg = {
+          status: errorCode.errCode.queryGameError,
+          msg: e
+        }
+        res.end(JSON.stringify(errMsg));
+        all_db.close();
+      })
   })
 
   export type assignData = {
@@ -155,35 +170,64 @@ export namespace server {
 
   app.post('/assign', (req, res, next) => {
     let reqData = req.body as assignData;
-    logger.debug('assign incoming data: ', req.body);
-    MongoClient.connect(DB_CONN_STR, (e, db) => {
-      if (e) {
-        logger.error('[assign] mongo connect error! ', e);
-        return;
-      }
-      mongoUtil.assign(db, 'games', reqData, err => {
-        if (err) {
-          res.status(400);
-          const errMsg: server.errMsg = {
-            status: errorCode.errCode.assignError,
-            msg: err,
-          }
-          db.close();
-          res.end(JSON.stringify(errMsg));
-        } else {
-          db.close();
-          res.end('assign Success!' + new Date().toLocaleString());
+    logger.info('incoming assign data: ', req.body);
+    let assign_db: mongoDb.Db = null;
+    MongoClient.connect(DB_CONN_STR)
+      .then(db => {
+        assign_db = db;
+        logger.info("assign mongo connected");
+        const id = new mongoDb.ObjectId(server.getValue(reqData, "gameId"));
+        const filter = {
+          "_id": id,
+          "referees.openid": server.getValue(reqData, 'openid'),
+        };
+        const update = {
+          "$set": { "referees.$.assigned": !server.getValue(reqData, 'assign') },
         }
+        return mongoUtil.update(db, 'games', reqData, filter, update);
       })
-    })
+      .then(writeRes => {
+        logger.info("assign success");
+        assign_db.close();
+        res.write('assign Success!');
+        next();
+      })
+      .catch(e => {
+        res.status(400);
+        const errMsg: server.errMsg = {
+          status: errorCode.errCode.assignError,
+          msg: e
+        }
+        res.end(JSON.stringify(errMsg));
+        assign_db.close();
+      })
+    //   , (e, db) => {
+    //   if (e) {
+    //     logger.error('[assign] mongo connect error! ', e);
+    //     return;
+    //   }
+    //   mongoUtil.assign(db, 'games', reqData, err => {
+    //     if (err) {
+    //       res.status(400);
+    //       const errMsg: server.errMsg = {
+    //         status: errorCode.errCode.assignError,
+    //         msg: err,
+    //       }
+    //       db.close();
+    //       res.end(JSON.stringify(errMsg));
+    //     } else {
+
+    //     }
+    //   })
+    // })
   })
 
   app.post('/gamebyid', (req, res, next) => {
     try {
       MongoClient.connect(DB_CONN_STR, (err, db) => {
-        logger.debug('mongo query by id connected, request: ', req.body);
+        logger.info('mongo query by id connected, request: ', req.body);
         mongoUtil.queryGameById(db, 'games', req.body.colId, result => {
-          logger.debug(result);
+          logger.info(result);
           res.write(JSON.stringify(result));
           db.close();
           res.end();
@@ -203,7 +247,7 @@ export namespace server {
   };
 
   app.post('/enrol', (req, res, next) => {
-    logger.debug('enrol data: ', req.body);
+    logger.info('incoming enrol data: ', req.body);
     try {
       let data = req.body.data as enrolReq;
       if (data) {
@@ -262,7 +306,7 @@ export namespace server {
 
   app.post('/cancelenrol', (req, res) => {
     let data = req.body as cancelEnrolData;
-    logger.debug(req.body);
+    logger.info("incoming cancel enrol data: ", req.body);
     MongoClient.connect(DB_CONN_STR, (err, db) => {
       if (err) {
         logger.error('[cancel enrol] mongo connect error!', err);
@@ -323,7 +367,7 @@ export namespace server {
   };
 
   app.post('/deletegame', (req, res, next) => {
-    logger.debug('incoming delete game data: ', req.body);
+    logger.info('incoming delete game data: ', req.body);
     MongoClient.connect(DB_CONN_STR, (e, db) => {
       if (e) {
         logger.error('delete game connect error: ', e);
