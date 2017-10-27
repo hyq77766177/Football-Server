@@ -20,8 +20,10 @@ var server;
             arg[_i - 1] = arguments[_i];
         }
         var result = _.get(request, arg);
-        result === null && logger.fatal("bad request data, the key is missed or wrong written from path: " + arg.join("=>"));
-        // assert(!!result, `bad request data, the key is missed or wrong written from path: ${arg.join("=>")}`);
+        if (result === null || result === undefined) {
+            logger.fatal("bad request data, the key is missed or wrong written from path: " + arg.join("=>"));
+            throw new Error("bad request data, the key is missed or wrong written from path: " + arg.join("=>"));
+        }
         return result;
     }
     server.getValue = getValue;
@@ -141,8 +143,9 @@ var server;
                 "_id": id,
                 "referees.openid": server.getValue(reqData, 'openid'),
             };
+            var assign = server.getValue(reqData, 'assign');
             var update = {
-                "$set": { "referees.$.assigned": !server.getValue(reqData, 'assign') },
+                "$set": { "referees.$.assigned": !assign },
             };
             return mongolib_1.mongoUtil.update(db, config_1.config.gameCollection, filter, update);
         })
@@ -261,7 +264,7 @@ var server;
             logger.error('cancel enrol failed, error: ', err);
             res.status(400);
             var errMsg = {
-                status: errorCode_1.errorCode.errCode.assignError,
+                status: errorCode_1.errorCode.errCode.cancelError,
                 msg: err
             };
             res.end(JSON.stringify(errMsg));
