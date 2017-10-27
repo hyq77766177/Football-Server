@@ -10,13 +10,11 @@ var config;
     config.mongoUser = 'sorayama';
     config.mongoPass = 'sorayama';
     config.mongoDb = 'football';
-    config.loggerErrString = {
-        mongoConnectErr: "mongo connect error",
-    };
     function getWXOpenIdUrl(code) {
         return "https://api.weixin.qq.com/sns/jscode2session?appId=" + config.appId + "&secret=" + config.appSecret + "&js_code=" + code + "&grant_type=authorization_code";
     }
     config.getWXOpenIdUrl = getWXOpenIdUrl;
+    config.gameCollection = "games";
     config.log4js_conf = {
         appenders: {
             app: {

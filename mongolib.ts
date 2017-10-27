@@ -30,68 +30,11 @@ export namespace mongoUtil {
         return collection.findOne<server.gameData>(queryData);
     }
 
-    export function enrol(db: mongodb.Db, col: string, data: server.enrolReq, callback: Function) {
-        logger.debug('mongoUtil.enrol has invoked');
-        const collection = db.collection(col);
-        const id = new mongodb.ObjectId(data.gameId);
-        const document = collection.find({ "_id": id });
-        collection.update({
-            "_id": id,
-        }, {
-                "$push": { "referees": data }
-            }, {
-                upsert: true
-            }).catch(e => {
-                logger.error('update error:', e);
-                callback(e);
-            });
-        callback(null);
-    }
-
-    export function enrolUpdate(db: mongodb.Db, col: string, data: server.enrolReq, callback: Function) {
-        logger.debug('mongoUtil.enrolUpdate has been invoked, data: ', data);
-        const id = new mongodb.ObjectId(server.getValue(data, "gameId"));
-        const collection = db.collection(col);
-        collection.updateOne({
-            "_id": id,
-            "referees.openid": server.getValue(data, "openid"),
-        },
-            {
-                "$set": {
-                    "referees.$": data,
-                },
-            })
-            .catch(e => {
-                logger.error('update pull error:', e);
-                callback(e);
-            });
-        callback(null);
-    }
-
     export function update(db: mongodb.Db, col: string, filter: object, update: object, options?: mongodb.ReplaceOneOptions & { multi?: boolean }) {
         logger.info('mongoUtil.update has been invoked');
         const collection = db.collection(col);
         return collection.update(filter, update, options);
     };
-
-    export function cancelEnrol(db: mongodb.Db, col: string, data: server.cancelEnrolData, callback: Function) {
-        logger.debug('mongoUtil.cancelEnrol has been invoked, data: ', data);
-        const id = new mongodb.ObjectId(server.getValue(data, "gameId"));
-        const collection = db.collection(col);
-        collection.update({
-            "_id": id,
-        }, {
-                "$pull": {
-                    "referees": {
-                        openid: server.getValue(data, "openid"),
-                    }
-                },
-            }).catch(e => {
-                logger.error('cancel error:', e);
-                callback(e);
-            });
-        callback(null);
-    }
 
     export function deleteGameById(db: mongodb.Db, col: string, id: mongodb.ObjectId) {
         logger.debug('mongo deleteGame has been invoked');

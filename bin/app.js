@@ -36,18 +36,29 @@ var server;
         logger.info("incoming createData: ", req.body);
         var document = req.body.formData;
         logger.debug('document: ', document);
+        var this_db = null;
         MongoClient.connect(DB_CONN_STR)
             .then(function (db) {
             logger.info("mongo connect success");
-            mongolib_1.mongoUtil.insertData(db, 'games', document);
-            return db;
+            this_db = db;
+            return mongolib_1.mongoUtil.insertData(db, config_1.config.gameCollection, document);
         })
-            .then(function (db) {
+            .then(function (writeRes) {
             logger.info("insert success");
-            db.close();
+            this_db.close();
+            res.write("create game success");
             next();
         })
-            .catch(function (err) { return logger.error(config_1.config.loggerErrString.mongoConnectErr + ', createGame: ', err); });
+            .catch(function (err) {
+            logger.error("create game failed, error: ", err);
+            res.status(400);
+            var errMsg = {
+                status: errorCode_1.errorCode.errCode.queryGameError,
+                msg: err
+            };
+            res.end(JSON.stringify(errMsg));
+            this_db.close();
+        });
     });
     server.app.post('/openid', function (req, res, next) {
         logger.info('incoming openid data: ', req.body);
@@ -86,17 +97,17 @@ var server;
             .then(function (db) {
             logger.info("query all games mongo connected");
             all_db = db;
-            return mongolib_1.mongoUtil.queryGames(all_db, 'games', { "openid": openid });
+            return mongolib_1.mongoUtil.queryGames(all_db, config_1.config.gameCollection, { "openid": openid });
         })
             .then(function (myCreatedGames) {
             logger.info('myCreatedGames:', myCreatedGames);
             resultGameData.myCreatedGames = myCreatedGames;
-            return mongolib_1.mongoUtil.queryGames(all_db, 'games', { "referees.openid": openid });
+            return mongolib_1.mongoUtil.queryGames(all_db, config_1.config.gameCollection, { "referees.openid": openid });
         })
             .then(function (myEnroledGames) {
             logger.info('myEnroledGames:', myEnroledGames);
             resultGameData.myEnroledGames = myEnroledGames;
-            return mongolib_1.mongoUtil.queryGames(all_db, 'games', null);
+            return mongolib_1.mongoUtil.queryGames(all_db, config_1.config.gameCollection, null);
         })
             .then(function (allGames) {
             logger.info('allGames: ', allGames);
@@ -133,7 +144,7 @@ var server;
             var update = {
                 "$set": { "referees.$.assigned": !server.getValue(reqData, 'assign') },
             };
-            return mongolib_1.mongoUtil.update(db, 'games', filter, update);
+            return mongolib_1.mongoUtil.update(db, config_1.config.gameCollection, filter, update);
         })
             .then(function (writeRes) {
             logger.info("assign success");
@@ -150,38 +161,30 @@ var server;
             res.end(JSON.stringify(errMsg));
             assign_db.close();
         });
-        //   , (e, db) => {
-        //   if (e) {
-        //     logger.error('[assign] mongo connect error! ', e);
-        //     return;
-        //   }
-        //   mongoUtil.assign(db, 'games', reqData, err => {
-        //     if (err) {
-        //       res.status(400);
-        //       const errMsg: server.errMsg = {
-        //         status: errorCode.errCode.assignError,
-        //         msg: err,
-        //       }
-        //       db.close();
-        //       res.end(JSON.stringify(errMsg));
-        //     } else {
-        //     }
-        //   })
-        // })
     });
     server.app.post('/gamebyid', function (req, res, next) {
-        var gamebyid_db = null;
+        var this_db = null;
         MongoClient.connect(DB_CONN_STR)
             .then(function (db) {
-            gamebyid_db = db;
+            this_db = db;
             logger.info('mongo query by id connected, request: ', req.body);
-            return mongolib_1.mongoUtil.queryGameById(db, 'games', req.body.colId);
+            return mongolib_1.mongoUtil.queryGameById(db, config_1.config.gameCollection, req.body.colId);
         })
             .then(function (game) {
             logger.info("query game by id success, game: ", game);
             res.write(JSON.stringify(game));
-            gamebyid_db.close();
+            this_db.close();
             next();
+        })
+            .catch(function (err) {
+            logger.error('query game by id failed, error: ', err);
+            res.status(400);
+            var errMsg = {
+                status: errorCode_1.errorCode.errCode.assignError,
+                msg: err
+            };
+            res.end(JSON.stringify(errMsg));
+            this_db.close();
         });
     });
     server.app.post('/enrol', function (req, res, next) {
@@ -192,10 +195,11 @@ var server;
             .then(function (db) {
             this_db = db;
             logger.info("enrol mongo connected");
-            return mongolib_1.mongoUtil.queryGameById(db, 'games', getValue(data, "gameId"));
+            var gameId = getValue(data, "gameId");
+            return mongolib_1.mongoUtil.queryGameById(db, config_1.config.gameCollection, gameId);
         })
             .then(function (game) {
-            var exists = game.referees && game['referees'].some(function (r) { return r.openid === getValue(data, "openid"); });
+            var exists = game.referees && game.referees.some(function (r) { return r.openid === getValue(data, "openid"); });
             if (exists) {
                 logger.debug('exists：', exists);
                 var errMsg = {
@@ -209,7 +213,7 @@ var server;
             else {
                 var filter = { "_id": new mongoDb.ObjectId(getValue(data, "gameId")), };
                 var update = { "$pull": { "referees": { openid: server.getValue(data, "openid"), } } };
-                return mongolib_1.mongoUtil.update(this_db, 'games', filter, update, { upsert: true });
+                return mongolib_1.mongoUtil.update(this_db, config_1.config.gameCollection, filter, update, { upsert: true });
             }
         })
             .then(function (r) {
@@ -220,105 +224,76 @@ var server;
             .catch(function (err) {
             logger.error("enrol failed, error: ", err);
         });
-        //           , result => {
-        //           const resl = result as gameData;
-        //           logger.debug('find result: ', resl);
-        //           logger.debug('find result.referees: ', resl['referees']);
-        //           let exists = resl.referees && resl['referees'].some(r => r.openid === data.openid);
-        //           if (exists) {
-        //             logger.debug('exists：', exists);
-        //             const errMsg: server.errMsg = {
-        //               status: errorCode.errCode.enrolExist,
-        //               msg: '不能重复报名！',
-        //             }
-        //             res.status(400); // errorCode.errCode.enrolExist);
-        //             res.end(JSON.stringify(errMsg));
-        //             db.close();
-        //           } else {
-        //             mongoUtil.enrol(db, 'games', data, err => {
-        //               if (err) {
-        //                 const errMsg: server.errMsg = {
-        //                   status: errorCode.errCode.enrolError,
-        //                   msg: err,
-        //                 }
-        //                 db.close();
-        //                 res.end(JSON.stringify(errMsg));
-        //               } else {
-        //                 db.close();
-        //                 res.end('Enrol Success!' + new Date().toLocaleString());
-        //               }
-        //             });
-        //           }
-        //         })
-        //       } catch (e) {
-        //         logger.error(e);
-        //       }
-        //     })
-        //   } else {
-        //     logger.error('no enrol data!');
-        //   }
-        // } catch (e) {
-        //   logger.error(e);
-        // }
     });
-    server.app.post('/cancelenrol', function (req, res) {
+    server.app.post('/cancelenrol', function (req, res, next) {
         var data = req.body;
+        var this_db = null;
         logger.info("incoming cancel enrol data: ", req.body);
-        MongoClient.connect(DB_CONN_STR, function (err, db) {
-            if (err) {
-                logger.error('[cancel enrol] mongo connect error!', err);
-                return;
-            }
-            mongolib_1.mongoUtil.cancelEnrol(db, 'games', data, function (err) {
-                if (err) {
-                    res.status(400);
-                    var errMsg = {
-                        status: errorCode_1.errorCode.errCode.cancelError,
-                        msg: err,
-                    };
-                    db.close();
-                    res.end(JSON.stringify(errMsg));
-                }
-                else {
-                    db.close();
-                    res.end('Cancel Success!' + new Date().toLocaleString());
-                }
-            });
+        MongoClient.connect(DB_CONN_STR)
+            .then(function (db) {
+            this_db = db;
+            var filter = {
+                "_id": new mongoDb.ObjectId(getValue(data, "gameId")),
+            };
+            var update = {
+                "$pull": {
+                    "referees": {
+                        openid: server.getValue(data, "openid"),
+                    }
+                },
+            };
+            return mongolib_1.mongoUtil.update(this_db, config_1.config.gameCollection, filter, update);
+        })
+            .then(function (updateRes) {
+            this_db.close();
+            res.write('Cancel Success');
+            next();
+        })
+            .catch(function (err) {
+            logger.error('cancel enrol failed, error: ', err);
+            res.status(400);
+            var errMsg = {
+                status: errorCode_1.errorCode.errCode.assignError,
+                msg: err
+            };
+            res.end(JSON.stringify(errMsg));
+            this_db.close();
         });
     });
     server.app.post('/updateenrol', function (req, res, next) {
         var data = req.body.data;
-        if (data) {
-            MongoClient.connect(DB_CONN_STR, function (err, db) {
-                if (err) {
-                    logger.error('[update enrol] mongo connect error!', err);
-                    return;
-                }
-                try {
-                    mongolib_1.mongoUtil.enrolUpdate(db, 'games', data, function (err) {
-                        if (err) {
-                            res.status(400);
-                            var errMsg = {
-                                status: errorCode_1.errorCode.errCode.enrolUpdateError,
-                                msg: err,
-                            };
-                            db.close();
-                            res.end(JSON.stringify(errMsg));
-                        }
-                        else {
-                            db.close();
-                            res.end('update enrol Success!' + new Date().toLocaleString());
-                        }
-                    });
-                }
-                catch (e) {
-                    logger.error(e);
-                }
-            });
-        }
-        else {
-            logger.error('No update data!');
-        }
+        var this_db = null;
+        MongoClient.connect(DB_CONN_STR)
+            .then(function (db) {
+            logger.info('update enrol mongo connected');
+            this_db = db;
+            var filter = {
+                "_id": new mongoDb.ObjectId(getValue(data, "gameId")),
+                "referees.openid": server.getValue(data, "openid"),
+            };
+            var update = {
+                "$set": {
+                    "referees.$": data,
+                },
+            };
+            return mongolib_1.mongoUtil.update(this_db, config_1.config.gameCollection, filter, update);
+        })
+            .then(function (writeRes) {
+            logger.info("update enrol success");
+            this_db.close();
+            res.write('update enrol Success!');
+            next();
+        })
+            .catch(function (err) {
+            logger.error("update enrol failed, error: ", err);
+            res.status(400);
+            var errMsg = {
+                status: errorCode_1.errorCode.errCode.enrolUpdateError,
+                msg: err,
+            };
+            this_db.close();
+            res.end(JSON.stringify(errMsg));
+        });
     });
     server.app.post('/deletegame', function (req, res, next) {
         logger.info('incoming delete game data: ', req.body);
@@ -328,7 +303,7 @@ var server;
             .then(function (db) {
             logger.info("delete game mongo connected");
             this_db = db;
-            return mongolib_1.mongoUtil.queryGameById(db, 'games', req.body.gameId);
+            return mongolib_1.mongoUtil.queryGameById(db, config_1.config.gameCollection, req.body.gameId);
         })
             .then(function (game) {
             if (!game)
@@ -344,7 +319,7 @@ var server;
             }
             else {
                 var id = new mongoDb.ObjectId(getValue(reqData, "gameId"));
-                return mongolib_1.mongoUtil.deleteGameById(this_db, 'games', id);
+                return mongolib_1.mongoUtil.deleteGameById(this_db, config_1.config.gameCollection, id);
             }
         })
             .then(function (mongoRes) {
