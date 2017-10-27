@@ -11,6 +11,16 @@ const logger = log4js.getLogger("test");
 const openid = "123456789";
 let gameId = "";
 
+const gameDataObj: server.gameData = {
+  _id: null,
+  gameName: "",
+  gameDate: "",
+  gameEndTime: "",
+  gameTime: "",
+  refereeNumber: 3,
+  openid: "",
+}
+
 describe("获取openid", () => {
   it("获取到openid", done => {
     request(app)
@@ -58,10 +68,26 @@ describe("查询比赛数据", () => {
         logger.debug("gameId是：", gameId);
         logger.info("返回结果是：", res.text);
         expect(err).to.be.equal(null);
+        expect(JSON.parse(res.text)).to.have.all.keys("myCreatedGames", "myEnroledGames", "availableGames");
         done();
       })
   })
 })
+
+describe('按照Id查找比赛信息', () => {
+  it('应该查找成功', done => {
+    request(app)
+      .post('/gamebyid')
+      .send({
+        colId: gameId,
+      })
+      .expect(200, (err, res) => {
+        expect(err).to.be.equal(null);
+        expect(JSON.parse(res.text)).to.have.all.keys(Object.keys(gameDataObj));
+        done();
+      });
+  });
+});
 
 describe('报名', () => {
   it('应该报名成功', done => {

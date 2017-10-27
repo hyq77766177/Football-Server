@@ -53,14 +53,14 @@ var server;
             logger.error("create game failed, error: ", err);
             res.status(400);
             var errMsg = {
-                status: errorCode_1.errorCode.errCode.queryGameError,
+                status: errorCode_1.errorCode.errCode.createGameError,
                 msg: err
             };
             res.end(JSON.stringify(errMsg));
             this_db.close();
         });
     });
-    server.app.post('/openid', function (req, res, next) {
+    server.app.post('/openid', function (req, res) {
         logger.info('incoming openid data: ', req.body);
         var data = req.body;
         var code = getValue(data, "code");
@@ -83,7 +83,7 @@ var server;
             });
         }
     });
-    server.app.post('/all', function (req, res, next) {
+    server.app.post('/all', function (req, res) {
         var reqData = req.body;
         logger.info("incoming all data: ", reqData);
         var all_db;
@@ -162,25 +162,26 @@ var server;
             assign_db.close();
         });
     });
-    server.app.post('/gamebyid', function (req, res, next) {
+    server.app.post('/gamebyid', function (req, res) {
+        var data = req.body;
         var this_db = null;
         MongoClient.connect(DB_CONN_STR)
             .then(function (db) {
             this_db = db;
-            logger.info('mongo query by id connected, request: ', req.body);
-            return mongolib_1.mongoUtil.queryGameById(db, config_1.config.gameCollection, req.body.colId);
+            logger.info('mongo query by id connected, request: ', data);
+            var id = getValue(data, "colId");
+            return mongolib_1.mongoUtil.queryGameById(db, config_1.config.gameCollection, id);
         })
             .then(function (game) {
             logger.info("query game by id success, game: ", game);
-            res.write(JSON.stringify(game));
+            res.end(JSON.stringify(game));
             this_db.close();
-            next();
         })
             .catch(function (err) {
             logger.error('query game by id failed, error: ', err);
             res.status(400);
             var errMsg = {
-                status: errorCode_1.errorCode.errCode.assignError,
+                status: errorCode_1.errorCode.errCode.queryGameError,
                 msg: err
             };
             res.end(JSON.stringify(errMsg));
@@ -223,6 +224,13 @@ var server;
         })
             .catch(function (err) {
             logger.error("enrol failed, error: ", err);
+            res.status(400);
+            var errMsg = {
+                status: errorCode_1.errorCode.errCode.enrolError,
+                msg: err
+            };
+            res.end(JSON.stringify(errMsg));
+            this_db.close();
         });
     });
     server.app.post('/cancelenrol', function (req, res, next) {

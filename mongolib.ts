@@ -14,16 +14,19 @@ export namespace mongoUtil {
     export const mongoUrl = `mongodb://${config.mongoUser}:${config.mongoPass}@${config.mongoHost}:${config.mongoPort}/${config.mongoDb}`;
 
     export function insertData(db: mongodb.Db, col: string, data: server.createGameData) {
+        logger.info('mongo insert data has been invoked');
         const collection = db.collection(col);
         return collection.insertOne(data);
     }
 
     export function queryGames(db: mongodb.Db, col: string, query: Object) {
+        logger.info('mongo query games has been invoked');
         const collection = db.collection(col);
         return collection.find<server.gameData>(query).toArray(); //{ "referees.openid": openid })
     }
 
     export function queryGameById(db: mongodb.Db, col: string, id: string) {
+        logger.info('mongo query by id has been invoked');
         const collection = db.collection(col);
         const objId = new mongodb.ObjectId(id);
         const queryData = { "_id": objId };
@@ -37,7 +40,7 @@ export namespace mongoUtil {
     };
 
     export function deleteGameById(db: mongodb.Db, col: string, id: mongodb.ObjectId) {
-        logger.debug('mongo deleteGame has been invoked');
+        logger.info('mongo deleteGame has been invoked');
         const collection = db.collection(col);
         return collection.remove({ "_id": id })
     }

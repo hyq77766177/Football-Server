@@ -9,6 +9,15 @@ var expect = chai.expect;
 var logger = log4js.getLogger("test");
 var openid = "123456789";
 var gameId = "";
+var gameDataObj = {
+    _id: null,
+    gameName: "",
+    gameDate: "",
+    gameEndTime: "",
+    gameTime: "",
+    refereeNumber: 3,
+    openid: "",
+};
 describe("获取openid", function () {
     it("获取到openid", function (done) {
         request(app)
@@ -54,6 +63,21 @@ describe("查询比赛数据", function () {
             logger.debug("gameId是：", gameId);
             logger.info("返回结果是：", res.text);
             expect(err).to.be.equal(null);
+            expect(JSON.parse(res.text)).to.have.all.keys("myCreatedGames", "myEnroledGames", "availableGames");
+            done();
+        });
+    });
+});
+describe('按照Id查找比赛信息', function () {
+    it('应该查找成功', function (done) {
+        request(app)
+            .post('/gamebyid')
+            .send({
+            colId: gameId,
+        })
+            .expect(200, function (err, res) {
+            expect(err).to.be.equal(null);
+            expect(JSON.parse(res.text)).to.have.all.keys(Object.keys(gameDataObj));
             done();
         });
     });

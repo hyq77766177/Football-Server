@@ -87,7 +87,7 @@ export namespace server {
         logger.error("create game failed, error: ", err);
         res.status(400);
         const errMsg: server.errMsg = {
-          status: errorCode.errCode.queryGameError,
+          status: errorCode.errCode.createGameError,
           msg: err
         }
         res.end(JSON.stringify(errMsg));
@@ -99,7 +99,7 @@ export namespace server {
     code: string,
   };
 
-  app.post('/openid', (req, res, next) => {
+  app.post('/openid', (req, res) => {
     logger.info('incoming openid data: ', req.body);
     const data: openidData = req.body;
     let code = getValue(data, "code");
@@ -127,7 +127,7 @@ export namespace server {
     openid: string,
   };
 
-  app.post('/all', (req, res, next) => {
+  app.post('/all', (req, res) => {
     const reqData: allData = req.body;
     logger.info("incoming all data: ", reqData);
     let all_db: mongoDb.Db;
@@ -214,25 +214,30 @@ export namespace server {
       })
   })
 
-  app.post('/gamebyid', (req, res, next) => {
+  export type gameByIdReqData = {
+    colId: string,
+  };
+
+  app.post('/gamebyid', (req, res) => {
+    const data = req.body as gameByIdReqData;
     let this_db: mongoDb.Db = null;
     MongoClient.connect(DB_CONN_STR)
       .then(db => {
         this_db = db;
-        logger.info('mongo query by id connected, request: ', req.body);
-        return mongoUtil.queryGameById(db, config.gameCollection, req.body.colId)
+        logger.info('mongo query by id connected, request: ', data);
+        const id = getValue(data, "colId");
+        return mongoUtil.queryGameById(db, config.gameCollection, id);
       })
       .then(game => {
         logger.info("query game by id success, game: ", game);
-        res.write(JSON.stringify(game));
+        res.end(JSON.stringify(game));
         this_db.close();
-        next();
       })
       .catch(err => {
         logger.error('query game by id failed, error: ', err);
         res.status(400);
         const errMsg: server.errMsg = {
-          status: errorCode.errCode.assignError,
+          status: errorCode.errCode.queryGameError,
           msg: err
         }
         res.end(JSON.stringify(errMsg));
@@ -283,6 +288,13 @@ export namespace server {
       })
       .catch(err => {
         logger.error("enrol failed, error: ", err);
+        res.status(400);
+        const errMsg: server.errMsg = {
+          status: errorCode.errCode.enrolError,
+          msg: err
+        }
+        res.end(JSON.stringify(errMsg));
+        this_db.close();
       })
   });
 

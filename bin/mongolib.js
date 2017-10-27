@@ -10,16 +10,19 @@ var mongoUtil;
 (function (mongoUtil) {
     mongoUtil.mongoUrl = "mongodb://" + config_1.config.mongoUser + ":" + config_1.config.mongoPass + "@" + config_1.config.mongoHost + ":" + config_1.config.mongoPort + "/" + config_1.config.mongoDb;
     function insertData(db, col, data) {
+        logger.info('mongo insert data has been invoked');
         var collection = db.collection(col);
         return collection.insertOne(data);
     }
     mongoUtil.insertData = insertData;
     function queryGames(db, col, query) {
+        logger.info('mongo query games has been invoked');
         var collection = db.collection(col);
         return collection.find(query).toArray(); //{ "referees.openid": openid })
     }
     mongoUtil.queryGames = queryGames;
     function queryGameById(db, col, id) {
+        logger.info('mongo query by id has been invoked');
         var collection = db.collection(col);
         var objId = new mongodb.ObjectId(id);
         var queryData = { "_id": objId };
@@ -34,7 +37,7 @@ var mongoUtil;
     mongoUtil.update = update;
     ;
     function deleteGameById(db, col, id) {
-        logger.debug('mongo deleteGame has been invoked');
+        logger.info('mongo deleteGame has been invoked');
         var collection = db.collection(col);
         return collection.remove({ "_id": id });
     }
