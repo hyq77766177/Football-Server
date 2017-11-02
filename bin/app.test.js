@@ -1,4 +1,5 @@
 "use strict";
+/// <reference path="./app.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
 var chai = require("chai");
 var request = require("supertest");

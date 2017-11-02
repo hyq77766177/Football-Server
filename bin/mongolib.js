@@ -18,7 +18,7 @@ var mongoUtil;
     function queryGames(db, col, query) {
         logger.info('mongo query games has been invoked');
         var collection = db.collection(col);
-        return collection.find(query).toArray(); //{ "referees.openid": openid })
+        return collection.find(query).toArray();
     }
     mongoUtil.queryGames = queryGames;
     function queryGameById(db, col, id) {

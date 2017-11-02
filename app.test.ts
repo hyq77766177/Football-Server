@@ -1,8 +1,12 @@
+/// <reference path="./app.ts" />
+
 import * as chai from 'chai';
 import * as request from 'supertest';
 import * as express from 'express';
 import * as log4js from 'log4js';
+
 import { server } from './app';
+import { types } from './types';
 
 const app = server.app;
 const expect = chai.expect;
@@ -11,7 +15,7 @@ const logger = log4js.getLogger("test");
 const openid = "123456789";
 let gameId = "";
 
-const gameDataObj: server.gameData = {
+const gameDataObj: types.gameData = {
   _id: null,
   gameName: "",
   gameDate: "",

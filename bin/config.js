@@ -10,6 +10,7 @@ var config;
     config.mongoUser = 'sorayama';
     config.mongoPass = 'sorayama';
     config.mongoDb = 'football';
+    /** 微信openid的url获取方法 */
     function getWXOpenIdUrl(code) {
         return "https://api.weixin.qq.com/sns/jscode2session?appId=" + config.appId + "&secret=" + config.appSecret + "&js_code=" + code + "&grant_type=authorization_code";
     }
