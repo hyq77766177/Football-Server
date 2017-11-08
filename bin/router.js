@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var log4js = require("log4js");
 var bodyParser = require("body-parser");
 var game_1 = require("./game");
+var referee_1 = require("./referee");
 var config_1 = require("./config");
 var logger = log4js.getLogger('router.ts');
 var Routers = /** @class */ (function () {
@@ -24,6 +25,7 @@ var Routers = /** @class */ (function () {
         app.post('/openid', game_1.game.openid);
         /** 获取所有比赛信息 */
         app.post('/all', game_1.game.getAllGameData);
+        /** 根据比赛ID查询 */
         app.post('/gamebyid', game_1.game.queryGameById);
         /** 选派和撤销 */
         app.post('/assign', game_1.game.assign);
@@ -35,6 +37,8 @@ var Routers = /** @class */ (function () {
         app.post('/updateenrol', game_1.game.updateEnrolInfo);
         /** 删除比赛 */
         app.post('/deletegame', game_1.game.deleteGame);
+        /** 裁判信息注册 */
+        app.post('/registinfo', referee_1.Referee.regist);
         /** 统一处理的中间件 */
         app.use(function (req, res, next) {
             res.write('Response from express, ' + new Date());

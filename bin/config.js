@@ -16,6 +16,7 @@ var config;
     }
     config.getWXOpenIdUrl = getWXOpenIdUrl;
     config.gameCollection = "games";
+    config.refereeCollection = "referees";
     config.log4js_conf = {
         appenders: {
             app: {

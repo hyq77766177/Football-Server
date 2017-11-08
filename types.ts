@@ -73,4 +73,18 @@ export namespace types {
     gameId: string,
   };
 
+  /** 裁判员注册信息请求数据 */
+  export type refereeData = {
+    refereeName: string,
+    refereeHeight: string,
+    refereeWeight: string,
+    refereePhoneNumber: string,
+    refereeIdNumber: string,
+    refereeScholarId: string,
+    refereeBankNumber: string,
+    refereeCardNumber: string,
+    refereeClass: string,
+    openid: string,
+  }
+
 }

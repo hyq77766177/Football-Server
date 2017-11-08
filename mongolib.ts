@@ -15,7 +15,7 @@ export namespace mongoUtil {
 
     export const mongoUrl = `mongodb://${config.mongoUser}:${config.mongoPass}@${config.mongoHost}:${config.mongoPort}/${config.mongoDb}`;
 
-    export function insertData(db: mongodb.Db, col: string, data: types.createGameData) {
+    export function insertData<T>(db: mongodb.Db, col: string, data: T) {
         logger.info('mongo insert data has been invoked');
         const collection = db.collection(col);
         return collection.insertOne(data);

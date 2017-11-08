@@ -178,3 +178,26 @@ describe('删除比赛', () => {
       });
   });
 });
+
+describe('裁判注册', () => {
+  it('应该注册成功', done => {
+    request(app)
+      .post('/registinfo')
+      .send({
+        refereeName: "2",
+        refereeHeight: "3",
+        refereeWeight: "4",
+        refereePhoneNumber: "6",
+        refereeScholarId: "1",
+        refereeIdNumber: "5",
+        refereeBankNumber: "7",
+        refereeCardNumber: "8",
+        refereeClass: "9",
+        openid: "10",
+      })
+      .expect(200, (err, res) => {
+        expect(err).to.be.equal(null);
+        done();
+      });
+  });
+});

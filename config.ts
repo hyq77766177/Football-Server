@@ -16,6 +16,7 @@ export namespace config {
   }
 
   export const gameCollection = "games";
+  export const refereeCollection = "referees";
 
   export const log4js_conf: log4js.Configuration = {
     appenders: {

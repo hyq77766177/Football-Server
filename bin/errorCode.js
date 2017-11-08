@@ -14,6 +14,7 @@ var errorCode;
         errCode[errCode["enrolError"] = 106] = "enrolError";
         errCode[errCode["assignError"] = 107] = "assignError";
         errCode[errCode["deleteGameError"] = 108] = "deleteGameError";
+        errCode[errCode["refereeRegistError"] = 109] = "refereeRegistError";
     })(errCode = errorCode.errCode || (errorCode.errCode = {}));
 })(errorCode = exports.errorCode || (exports.errorCode = {}));
 //# sourceMappingURL=errorCode.js.map

@@ -52,7 +52,7 @@ export namespace game {
       .then(db => {
         logger.info("mongo connect success");
         this_db = db;
-        return mongoUtil.insertData(db, config.gameCollection, document);
+        return mongoUtil.insertData<types.createGameData>(db, config.gameCollection, document);
       })
       .then(writeRes => {
         logger.info("insert success");

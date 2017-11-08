@@ -10,5 +10,7 @@ export namespace errorCode {
     enrolError,
     assignError,
     deleteGameError,
+
+    refereeRegistError,
   }
 }

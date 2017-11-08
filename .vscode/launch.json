@@ -8,6 +8,8 @@
       "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
       "args": [
         "--colors",
+        "-t",
+        "5000",
         "${workspaceRoot}/bin/app.test.js"
       ],
       "preLaunchTask": "typescript",

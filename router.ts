@@ -6,6 +6,7 @@ import * as bodyParser from 'body-parser';
 
 import { server } from './app';
 import { game } from './game';
+import { Referee } from './referee';
 import { config } from './config';
 
 const logger = log4js.getLogger('router.ts');
@@ -34,7 +35,7 @@ export class Routers {
     app.post('/openid', game.openid);
     /** 获取所有比赛信息 */
     app.post('/all', game.getAllGameData);
-
+    /** 根据比赛ID查询 */
     app.post('/gamebyid', game.queryGameById);
     /** 选派和撤销 */
     app.post('/assign', game.assign);
@@ -46,6 +47,9 @@ export class Routers {
     app.post('/updateenrol', game.updateEnrolInfo);
     /** 删除比赛 */
     app.post('/deletegame', game.deleteGame);
+
+    /** 裁判信息注册 */
+    app.post('/registinfo', Referee.regist);
 
     /** 统一处理的中间件 */
     app.use((req, res, next) => {
