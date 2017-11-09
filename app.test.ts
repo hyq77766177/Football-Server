@@ -223,3 +223,33 @@ describe('裁判查询', () => {
       });
   });
 });
+
+const refereeData = {
+  refereeName: "2",
+  refereeHeight: "3",
+  refereeWeight: "4",
+  refereePhoneNumber: "6",
+  refereeScholarId: "1",
+  refereeIdNumber: "5",
+  refereeBankNumber: "7",
+  refereeCardNumber: "8",
+  refereeClass: "9",
+  openid: "",
+  _id: "",
+}
+
+describe('根据id的裁判查询', () => {
+  it('应该查询成功', done => {
+    request(app)
+      .post('/refereebyid')
+      .send({
+        refereeId: "5a0427ccf97dda464b0aafcc",
+      })
+      .expect(200, (err, res) => {
+        logger.debug("根据id裁判查询得到数据：", res.text);
+        expect(JSON.parse(res.text)).to.have.keys(Object.keys(refereeData));
+        expect(err).to.be.equal(null);
+        done();
+      });
+  });
+});

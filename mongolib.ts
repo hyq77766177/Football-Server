@@ -27,12 +27,12 @@ export namespace mongoUtil {
         return collection.find<T>(query).toArray();
     }
 
-    export function queryById(db: mongodb.Db, col: string, id: string) {
+    export function queryById<T>(db: mongodb.Db, col: string, id: string) {
         logger.info('mongo query by id has been invoked');
         const collection = db.collection(col);
         const objId = new mongodb.ObjectId(id);
         const queryData = { "_id": objId };
-        return collection.findOne<types.gameData>(queryData);
+        return collection.findOne<T>(queryData);
     }
 
     export function queryByOpenId(db: mongodb.Db, col: string, openid: string) {

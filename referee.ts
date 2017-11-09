@@ -113,4 +113,33 @@ export class Referee {
         this_db.close()
       });
   }
+
+  public static queryRefereeById(req: express.Request, res: express.Response) {
+    logger.info("incoming query referee data: ", req.body);
+    let data = req.body as types.refereeQueryData;
+    let this_db: mongoDb.Db = null
+    let response = {};
+    MongoClient.connect(DB_CONN_STR)
+      .then(db => {
+        logger.info("referee query mongo connect success");
+        this_db = db;
+        return mongoUtil.queryById<types.refereeData>(db, config.refereeCollection, data.refereeId);
+      })
+      .then(refereeRes => {
+        logger.info("referee query success");
+        this_db.close();
+        response = refereeRes;
+        res.send(response);
+      })
+      .catch(err => {
+        logger.error("referee query failed, error: ", err);
+        res.status(400);
+        const errMsg: types.errMsg = {
+          status: errorCode.errCode.refereeShowError,
+          msg: err
+        }
+        res.end(JSON.stringify(errMsg));
+        this_db.close()
+      });
+  }
 }

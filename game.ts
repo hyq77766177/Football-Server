@@ -219,7 +219,7 @@ export namespace game {
         this_db = db;
         logger.info("enrol mongo connected");
         const gameId = util.getValue(data, "gameId");
-        return mongoUtil.queryById(db, config.gameCollection, gameId);
+        return mongoUtil.queryById<types.gameData>(db, config.gameCollection, gameId);
       })
       .then(game => {
         const exists = game.referees && game.referees.some(r => r.openid === util.getValue(data, "openid"));
@@ -339,7 +339,7 @@ export namespace game {
       .then(db => {
         logger.info("delete game mongo connected");
         this_db = db;
-        return mongoUtil.queryById(db, config.gameCollection, req.body.gameId);
+        return mongoUtil.queryById<types.gameData>(db, config.gameCollection, req.body.gameId);
       })
       .then(game => {
         if (!game) throw new Error("no such game!");

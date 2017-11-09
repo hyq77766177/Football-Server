@@ -41,6 +41,8 @@ var Routers = /** @class */ (function () {
         app.post('/registinfo', referee_1.Referee.regist);
         /** 载入裁判信息 */
         app.post('/showreferee', referee_1.Referee.showReferee);
+        /** 根据Id查询裁判信息 */
+        app.post('/refereebyid', referee_1.Referee.queryRefereeById);
         /** 统一处理的中间件 */
         app.use(function (req, res, next) {
             res.write('Response from express, ' + new Date());

@@ -52,6 +52,8 @@ export class Routers {
     app.post('/registinfo', Referee.regist);
     /** 载入裁判信息 */
     app.post('/showreferee', Referee.showReferee);
+    /** 根据Id查询裁判信息 */
+    app.post('/refereebyid', Referee.queryRefereeById);
 
     /** 统一处理的中间件 */
     app.use((req, res, next) => {

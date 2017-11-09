@@ -84,6 +84,34 @@ var Referee = /** @class */ (function () {
             this_db.close();
         });
     };
+    Referee.queryRefereeById = function (req, res) {
+        logger.info("incoming query referee data: ", req.body);
+        var data = req.body;
+        var this_db = null;
+        var response = {};
+        MongoClient.connect(DB_CONN_STR)
+            .then(function (db) {
+            logger.info("referee query mongo connect success");
+            this_db = db;
+            return mongolib_1.mongoUtil.queryById(db, config_1.config.refereeCollection, data.refereeId);
+        })
+            .then(function (refereeRes) {
+            logger.info("referee query success");
+            this_db.close();
+            response = refereeRes;
+            res.send(response);
+        })
+            .catch(function (err) {
+            logger.error("referee query failed, error: ", err);
+            res.status(400);
+            var errMsg = {
+                status: errorCode_1.errorCode.errCode.refereeShowError,
+                msg: err
+            };
+            res.end(JSON.stringify(errMsg));
+            this_db.close();
+        });
+    };
     Referee.adminOpenids = ["o7TkA0Xr2Kz-xGFxkFU3c56lpmQY"];
     return Referee;
 }());

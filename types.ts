@@ -91,4 +91,8 @@ export namespace types {
     openid: string,
   }
 
+  export type refereeQueryData = {
+    refereeId: string,
+  }
+
 }

@@ -196,11 +196,39 @@ describe('裁判查询', function () {
         request(app)
             .post('/showreferee')
             .send({
-            openid: "11",
+            openid: "10",
         })
             .expect(200, function (err, res) {
             logger.debug("裁判查询得到数据：", res.text);
             expect(JSON.parse(res.text)).to.have.all.keys(Object.keys(refereeQueryData));
+            expect(err).to.be.equal(null);
+            done();
+        });
+    });
+});
+var refereeData = {
+    refereeName: "2",
+    refereeHeight: "3",
+    refereeWeight: "4",
+    refereePhoneNumber: "6",
+    refereeScholarId: "1",
+    refereeIdNumber: "5",
+    refereeBankNumber: "7",
+    refereeCardNumber: "8",
+    refereeClass: "9",
+    openid: "",
+    _id: "",
+};
+describe('根据id的裁判查询', function () {
+    it('应该查询成功', function (done) {
+        request(app)
+            .post('/refereebyid')
+            .send({
+            refereeId: "5a0427ccf97dda464b0aafcc",
+        })
+            .expect(200, function (err, res) {
+            logger.debug("根据id裁判查询得到数据：", res.text);
+            expect(JSON.parse(res.text)).to.have.keys(Object.keys(refereeData));
             expect(err).to.be.equal(null);
             done();
         });
