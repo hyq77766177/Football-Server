@@ -233,8 +233,9 @@ export namespace game {
           res.end(JSON.stringify(errMsg));
           this_db.close();
         } else {
-          const filter = { "_id": new mongoDb.ObjectId(util.getValue(data, "gameId")), };
-          const update = { "$pull": { "referees": { openid: util.getValue(data, "openid"), } } }
+          const objId = new mongoDb.ObjectId(util.getValue(data, "gameId"));
+          const filter = { "_id": objId, };
+          const update = { "$push": { "referees": data } };
           return mongoUtil.update(this_db, config.gameCollection, filter, update, { upsert: true });
         }
       })

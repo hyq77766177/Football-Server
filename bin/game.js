@@ -213,8 +213,9 @@ var game;
                 this_db.close();
             }
             else {
-                var filter = { "_id": new mongoDb.ObjectId(util_1.util.getValue(data, "gameId")), };
-                var update = { "$pull": { "referees": { openid: util_1.util.getValue(data, "openid"), } } };
+                var objId = new mongoDb.ObjectId(util_1.util.getValue(data, "gameId"));
+                var filter = { "_id": objId, };
+                var update = { "$push": { "referees": data } };
                 return mongolib_1.mongoUtil.update(this_db, config_1.config.gameCollection, filter, update, { upsert: true });
             }
         })
