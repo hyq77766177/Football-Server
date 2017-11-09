@@ -8,7 +8,7 @@ var mongolib_1 = require("./mongolib");
 var errorCode_1 = require("./errorCode");
 var util_1 = require("./util");
 log4js.configure(config_1.config.log4js_conf);
-var logger = log4js.getLogger('game.ts');
+var logger = log4js.getLogger('referee');
 var MongoClient = mongoDb.MongoClient;
 var DB_CONN_STR = mongolib_1.mongoUtil.mongoUrl;
 var Referee = /** @class */ (function () {
@@ -30,7 +30,9 @@ var Referee = /** @class */ (function () {
             .then(function (db) {
             logger.info("referee regist mongo connect success");
             this_db = db;
-            return mongolib_1.mongoUtil.insertData(db, config_1.config.refereeCollection, document);
+            var filter = { "openid": document.openid };
+            var update = document;
+            return mongolib_1.mongoUtil.update(db, config_1.config.refereeCollection, filter, update, { upsert: true, });
         })
             .then(function (writeRes) {
             logger.info("referee regist insert success");
@@ -49,6 +51,40 @@ var Referee = /** @class */ (function () {
             this_db.close();
         });
     };
+    Referee.showReferee = function (req, res) {
+        logger.info("incoming show referee data: ", req.body);
+        var data = req.body;
+        var this_db = null;
+        var response = {};
+        MongoClient.connect(DB_CONN_STR)
+            .then(function (db) {
+            logger.info("referee show mongo connect success");
+            this_db = db;
+            return mongolib_1.mongoUtil.queryByOpenId(db, config_1.config.refereeCollection, data.openid);
+        })
+            .then(function (refereeRes) {
+            response['myInfo'] = refereeRes;
+            return mongolib_1.mongoUtil.queryMany(this_db, config_1.config.refereeCollection, {});
+        })
+            .then(function (manyRes) {
+            logger.info("referee show query success");
+            this_db.close();
+            response['refereesInfo'] = manyRes;
+            response['isAdmin'] = Referee.adminOpenids.indexOf(data.openid) >= 0;
+            res.send(response);
+        })
+            .catch(function (err) {
+            logger.error("referee show failed, error: ", err);
+            res.status(400);
+            var errMsg = {
+                status: errorCode_1.errorCode.errCode.refereeShowError,
+                msg: err
+            };
+            res.end(JSON.stringify(errMsg));
+            this_db.close();
+        });
+    };
+    Referee.adminOpenids = ["o7TkA0Xr2Kz-xGFxkFU3c56lpmQY"];
     return Referee;
 }());
 exports.Referee = Referee;

@@ -15,20 +15,27 @@ var mongoUtil;
         return collection.insertOne(data);
     }
     mongoUtil.insertData = insertData;
-    function queryGames(db, col, query) {
+    function queryMany(db, col, query) {
         logger.info('mongo query games has been invoked');
         var collection = db.collection(col);
         return collection.find(query).toArray();
     }
-    mongoUtil.queryGames = queryGames;
-    function queryGameById(db, col, id) {
+    mongoUtil.queryMany = queryMany;
+    function queryById(db, col, id) {
         logger.info('mongo query by id has been invoked');
         var collection = db.collection(col);
         var objId = new mongodb.ObjectId(id);
         var queryData = { "_id": objId };
         return collection.findOne(queryData);
     }
-    mongoUtil.queryGameById = queryGameById;
+    mongoUtil.queryById = queryById;
+    function queryByOpenId(db, col, openid) {
+        logger.info('mongo query by id has been invoked');
+        var collection = db.collection(col);
+        var queryData = { "openid": openid };
+        return collection.findOne(queryData);
+    }
+    mongoUtil.queryByOpenId = queryByOpenId;
     function update(db, col, filter, update, options) {
         logger.info('mongoUtil.update has been invoked');
         var collection = db.collection(col);
@@ -36,11 +43,11 @@ var mongoUtil;
     }
     mongoUtil.update = update;
     ;
-    function deleteGameById(db, col, id) {
+    function deleteById(db, col, id) {
         logger.info('mongo deleteGame has been invoked');
         var collection = db.collection(col);
         return collection.remove({ "_id": id });
     }
-    mongoUtil.deleteGameById = deleteGameById;
+    mongoUtil.deleteById = deleteById;
 })(mongoUtil = exports.mongoUtil || (exports.mongoUtil = {}));
 //# sourceMappingURL=mongolib.js.map

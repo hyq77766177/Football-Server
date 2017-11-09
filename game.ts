@@ -112,17 +112,17 @@ export namespace game {
       .then(db => {
         logger.info("query all games mongo connected");
         all_db = db;
-        return mongoUtil.queryGames(all_db, config.gameCollection, { "openid": openid });
+        return mongoUtil.queryMany<types.gameData>(all_db, config.gameCollection, { "openid": openid });
       })
       .then(myCreatedGames => {
         logger.info('myCreatedGames:', myCreatedGames);
         resultGameData.myCreatedGames = myCreatedGames;
-        return mongoUtil.queryGames(all_db, config.gameCollection, { "referees.openid": openid });
+        return mongoUtil.queryMany<types.gameData>(all_db, config.gameCollection, { "referees.openid": openid });
       })
       .then(myEnroledGames => {
         logger.info('myEnroledGames:', myEnroledGames);
         resultGameData.myEnroledGames = myEnroledGames;
-        return mongoUtil.queryGames(all_db, config.gameCollection, null);
+        return mongoUtil.queryMany<types.gameData>(all_db, config.gameCollection, null);
       })
       .then(allGames => {
         logger.info('allGames: ', allGames);
@@ -190,7 +190,7 @@ export namespace game {
         this_db = db;
         logger.info('mongo query by id connected, request: ', data);
         const id = util.getValue(data, "colId");
-        return mongoUtil.queryGameById(db, config.gameCollection, id);
+        return mongoUtil.queryById(db, config.gameCollection, id);
       })
       .then(game => {
         logger.info("query game by id success, game: ", game);
@@ -219,7 +219,7 @@ export namespace game {
         this_db = db;
         logger.info("enrol mongo connected");
         const gameId = util.getValue(data, "gameId");
-        return mongoUtil.queryGameById(db, config.gameCollection, gameId);
+        return mongoUtil.queryById(db, config.gameCollection, gameId);
       })
       .then(game => {
         const exists = game.referees && game.referees.some(r => r.openid === util.getValue(data, "openid"));
@@ -339,7 +339,7 @@ export namespace game {
       .then(db => {
         logger.info("delete game mongo connected");
         this_db = db;
-        return mongoUtil.queryGameById(db, config.gameCollection, req.body.gameId);
+        return mongoUtil.queryById(db, config.gameCollection, req.body.gameId);
       })
       .then(game => {
         if (!game) throw new Error("no such game!");
@@ -353,7 +353,7 @@ export namespace game {
           res.end(JSON.stringify(errMsg));
         } else {
           const id = new mongoDb.ObjectId(util.getValue(reqData, "gameId"))
-          return mongoUtil.deleteGameById(this_db, config.gameCollection, id);
+          return mongoUtil.deleteById(this_db, config.gameCollection, id);
         }
       })
       .then(mongoRes => {

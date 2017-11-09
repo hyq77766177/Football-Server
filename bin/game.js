@@ -91,17 +91,17 @@ var game;
             .then(function (db) {
             logger.info("query all games mongo connected");
             all_db = db;
-            return mongolib_1.mongoUtil.queryGames(all_db, config_1.config.gameCollection, { "openid": openid });
+            return mongolib_1.mongoUtil.queryMany(all_db, config_1.config.gameCollection, { "openid": openid });
         })
             .then(function (myCreatedGames) {
             logger.info('myCreatedGames:', myCreatedGames);
             resultGameData.myCreatedGames = myCreatedGames;
-            return mongolib_1.mongoUtil.queryGames(all_db, config_1.config.gameCollection, { "referees.openid": openid });
+            return mongolib_1.mongoUtil.queryMany(all_db, config_1.config.gameCollection, { "referees.openid": openid });
         })
             .then(function (myEnroledGames) {
             logger.info('myEnroledGames:', myEnroledGames);
             resultGameData.myEnroledGames = myEnroledGames;
-            return mongolib_1.mongoUtil.queryGames(all_db, config_1.config.gameCollection, null);
+            return mongolib_1.mongoUtil.queryMany(all_db, config_1.config.gameCollection, null);
         })
             .then(function (allGames) {
             logger.info('allGames: ', allGames);
@@ -169,7 +169,7 @@ var game;
             this_db = db;
             logger.info('mongo query by id connected, request: ', data);
             var id = util_1.util.getValue(data, "colId");
-            return mongolib_1.mongoUtil.queryGameById(db, config_1.config.gameCollection, id);
+            return mongolib_1.mongoUtil.queryById(db, config_1.config.gameCollection, id);
         })
             .then(function (game) {
             logger.info("query game by id success, game: ", game);
@@ -198,7 +198,7 @@ var game;
             this_db = db;
             logger.info("enrol mongo connected");
             var gameId = util_1.util.getValue(data, "gameId");
-            return mongolib_1.mongoUtil.queryGameById(db, config_1.config.gameCollection, gameId);
+            return mongolib_1.mongoUtil.queryById(db, config_1.config.gameCollection, gameId);
         })
             .then(function (game) {
             var exists = game.referees && game.referees.some(function (r) { return r.openid === util_1.util.getValue(data, "openid"); });
@@ -318,7 +318,7 @@ var game;
             .then(function (db) {
             logger.info("delete game mongo connected");
             this_db = db;
-            return mongolib_1.mongoUtil.queryGameById(db, config_1.config.gameCollection, req.body.gameId);
+            return mongolib_1.mongoUtil.queryById(db, config_1.config.gameCollection, req.body.gameId);
         })
             .then(function (game) {
             if (!game)
@@ -334,7 +334,7 @@ var game;
             }
             else {
                 var id = new mongoDb.ObjectId(util_1.util.getValue(reqData, "gameId"));
-                return mongolib_1.mongoUtil.deleteGameById(this_db, config_1.config.gameCollection, id);
+                return mongolib_1.mongoUtil.deleteById(this_db, config_1.config.gameCollection, id);
             }
         })
             .then(function (mongoRes) {

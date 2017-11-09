@@ -186,4 +186,24 @@ describe('裁判注册', function () {
         });
     });
 });
+var refereeQueryData = {
+    myInfo: "",
+    isAdmin: "",
+    refereesInfo: "",
+};
+describe('裁判查询', function () {
+    it('应该查询成功', function (done) {
+        request(app)
+            .post('/showreferee')
+            .send({
+            openid: "11",
+        })
+            .expect(200, function (err, res) {
+            logger.debug("裁判查询得到数据：", res.text);
+            expect(JSON.parse(res.text)).to.have.all.keys(Object.keys(refereeQueryData));
+            expect(err).to.be.equal(null);
+            done();
+        });
+    });
+});
 //# sourceMappingURL=app.test.js.map

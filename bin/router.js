@@ -39,6 +39,8 @@ var Routers = /** @class */ (function () {
         app.post('/deletegame', game_1.game.deleteGame);
         /** 裁判信息注册 */
         app.post('/registinfo', referee_1.Referee.regist);
+        /** 载入裁判信息 */
+        app.post('/showreferee', referee_1.Referee.showReferee);
         /** 统一处理的中间件 */
         app.use(function (req, res, next) {
             res.write('Response from express, ' + new Date());

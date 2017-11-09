@@ -12,5 +12,6 @@ export namespace errorCode {
     deleteGameError,
 
     refereeRegistError,
+    refereeShowError,
   }
 }

@@ -50,6 +50,8 @@ export class Routers {
 
     /** 裁判信息注册 */
     app.post('/registinfo', Referee.regist);
+    /** 载入裁判信息 */
+    app.post('/showreferee', Referee.showReferee);
 
     /** 统一处理的中间件 */
     app.use((req, res, next) => {

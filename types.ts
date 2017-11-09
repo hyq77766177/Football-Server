@@ -87,4 +87,8 @@ export namespace types {
     openid: string,
   }
 
+  export type refereeShowData = {
+    openid: string,
+  }
+
 }

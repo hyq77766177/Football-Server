@@ -201,3 +201,25 @@ describe('裁判注册', () => {
       });
   });
 });
+
+const refereeQueryData = {
+  myInfo: "",
+  isAdmin: "",
+  refereesInfo: "",
+}
+
+describe('裁判查询', () => {
+  it('应该查询成功', done => {
+    request(app)
+      .post('/showreferee')
+      .send({
+        openid: "10",
+      })
+      .expect(200, (err, res) => {
+        logger.debug("裁判查询得到数据：", res.text);
+        expect(JSON.parse(res.text)).to.have.all.keys(Object.keys(refereeQueryData));
+        expect(err).to.be.equal(null);
+        done();
+      });
+  });
+});
