@@ -12,7 +12,7 @@ log4js.configure(config_1.config.log4js_conf);
 var logger = log4js.getLogger('game.ts');
 var MongoClient = mongoDb.MongoClient;
 var DB_CONN_STR = mongolib_1.mongoUtil.mongoUrl;
-var Game = /** @class */ (function () {
+var Game = (function () {
     function Game() {
         // TODO parse data
     }
