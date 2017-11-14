@@ -16,6 +16,7 @@ import { errorCode } from './errorCode';
 import { types } from './types';
 import { server } from './app';
 import { util } from './util';
+import { Referee } from './referee'
 
 log4js.configure(config.log4js_conf);
 
@@ -90,6 +91,7 @@ export namespace game {
           if (dataObj.session_key) {
             delete dataObj.session_key;
           }
+          dataObj["isAdmin"] = Referee.adminOpenids.indexOf(dataObj.openid) >= 0;
           res.write(JSON.stringify(dataObj));
           res.end();
         })

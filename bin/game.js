@@ -8,11 +8,12 @@ var config_1 = require("./config");
 var mongolib_1 = require("./mongolib");
 var errorCode_1 = require("./errorCode");
 var util_1 = require("./util");
+var referee_1 = require("./referee");
 log4js.configure(config_1.config.log4js_conf);
 var logger = log4js.getLogger('game.ts');
 var MongoClient = mongoDb.MongoClient;
 var DB_CONN_STR = mongolib_1.mongoUtil.mongoUrl;
-var Game = (function () {
+var Game = /** @class */ (function () {
     function Game() {
         // TODO parse data
     }
@@ -69,6 +70,7 @@ var game;
                     if (dataObj.session_key) {
                         delete dataObj.session_key;
                     }
+                    dataObj["isAdmin"] = referee_1.Referee.adminOpenids.indexOf(dataObj.openid) >= 0;
                     res.write(JSON.stringify(dataObj));
                     res.end();
                 });

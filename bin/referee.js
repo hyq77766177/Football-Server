@@ -11,7 +11,7 @@ log4js.configure(config_1.config.log4js_conf);
 var logger = log4js.getLogger('referee');
 var MongoClient = mongoDb.MongoClient;
 var DB_CONN_STR = mongolib_1.mongoUtil.mongoUrl;
-var Referee = (function () {
+var Referee = /** @class */ (function () {
     function Referee(data) {
         this.parse(data);
     }
@@ -112,11 +112,11 @@ var Referee = (function () {
             this_db.close();
         });
     };
+    Referee.adminOpenids = [
+        "o7TkA0Xr2Kz-xGFxkFU3c56lpmQY",
+        "o7TkA0eRYomH4r7M7tE9kUY6RRQs",
+    ];
     return Referee;
 }());
-Referee.adminOpenids = [
-    "o7TkA0Xr2Kz-xGFxkFU3c56lpmQY",
-    "o7TkA0eRYomH4r7M7tE9kUY6RRQs",
-];
 exports.Referee = Referee;
 //# sourceMappingURL=referee.js.map
