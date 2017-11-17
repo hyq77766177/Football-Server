@@ -16,6 +16,7 @@ var gameDataObj = {
     gameDate: "",
     gameEndTime: "",
     gameTime: "",
+    gameAvailablePeriod: [],
     refereeNumber: 3,
     openid: "",
 };
@@ -43,6 +44,7 @@ describe("创建比赛", function () {
                 gameEndTime: "23:59",
                 gameTime: "00:18",
                 refereeNumber: "3",
+                gameAvailablePeriod: ["112", "123"],
                 openid: openid,
             }
         })
@@ -91,8 +93,7 @@ describe('报名', function () {
             data: {
                 gameId: gameId,
                 openid: openid,
-                startRefTime: "00:15",
-                endRefTime: "02:15",
+                availableGames: "123",
                 refereeName: "HYQ",
             }
         })
@@ -164,22 +165,23 @@ describe('删除比赛', function () {
         });
     });
 });
+var registData = {
+    refereeName: "2",
+    refereeHeight: "3",
+    refereeWeight: "4",
+    refereePhoneNumber: "6",
+    refereeScholarId: "1",
+    refereeIdNumber: "5",
+    refereeBankNumber: "7",
+    refereeCardNumber: "8",
+    refereeClass: "9",
+    openid: "10",
+};
 describe('裁判注册', function () {
     it('应该注册成功', function (done) {
         request(app)
             .post('/registinfo')
-            .send({
-            refereeName: "2",
-            refereeHeight: "3",
-            refereeWeight: "4",
-            refereePhoneNumber: "6",
-            refereeScholarId: "1",
-            refereeIdNumber: "5",
-            refereeBankNumber: "7",
-            refereeCardNumber: "8",
-            refereeClass: "9",
-            openid: "10",
-        })
+            .send(registData)
             .expect(200, function (err, res) {
             expect(err).to.be.equal(null);
             done();

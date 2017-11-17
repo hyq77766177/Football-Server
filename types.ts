@@ -15,6 +15,7 @@ export namespace types {
     "gameDate": string,
     "gameTime": string,
     "gameEndTime": string,
+    "gameAvailablePeriod": string[],
     "refereeNumber": number,
     "openid": string,
     "referees"?: enrolReqData[],
@@ -56,8 +57,7 @@ export namespace types {
   export type enrolReqData = {
     gameId: string,
     openid: string,
-    startRefTime: string,
-    endRefTime: string,
+    availablePeriod: string,
     refereeName: string,
   };
 

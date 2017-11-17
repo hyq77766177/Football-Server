@@ -21,6 +21,7 @@ const gameDataObj: types.gameData = {
   gameDate: "",
   gameEndTime: "",
   gameTime: "",
+  gameAvailablePeriod: [],
   refereeNumber: 3,
   openid: "",
 }
@@ -50,6 +51,7 @@ describe("创建比赛", () => {
           gameEndTime: "23:59",
           gameTime: "00:18",
           refereeNumber: "3",
+          gameAvailablePeriod: ["112", "123"],
           openid: openid,
         }
       })
@@ -101,8 +103,7 @@ describe('报名', () => {
         data: {
           gameId: gameId,
           openid: openid,
-          startRefTime: "00:15",
-          endRefTime: "02:15",
+          availableGames: "123",
           refereeName: "HYQ",
         }
       })
@@ -179,22 +180,24 @@ describe('删除比赛', () => {
   });
 });
 
+const registData: types.refereeData = {
+  refereeName: "2",
+  refereeHeight: "3",
+  refereeWeight: "4",
+  refereePhoneNumber: "6",
+  refereeScholarId: "1",
+  refereeIdNumber: "5",
+  refereeBankNumber: "7",
+  refereeCardNumber: "8",
+  refereeClass: "9",
+  openid: "10",
+}
+
 describe('裁判注册', () => {
   it('应该注册成功', done => {
     request(app)
       .post('/registinfo')
-      .send({
-        refereeName: "2",
-        refereeHeight: "3",
-        refereeWeight: "4",
-        refereePhoneNumber: "6",
-        refereeScholarId: "1",
-        refereeIdNumber: "5",
-        refereeBankNumber: "7",
-        refereeCardNumber: "8",
-        refereeClass: "9",
-        openid: "10",
-      })
+      .send(registData)
       .expect(200, (err, res) => {
         expect(err).to.be.equal(null);
         done();
