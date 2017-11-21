@@ -7,7 +7,7 @@ var game_1 = require("./game");
 var referee_1 = require("./referee");
 var config_1 = require("./config");
 var logger = log4js.getLogger('router.ts');
-var Routers = /** @class */ (function () {
+var Routers = (function () {
     function Routers(app) {
         if (Routers.RouterMgr !== null) {
             throw new Error('cannot create multy Routers!');
@@ -51,8 +51,8 @@ var Routers = /** @class */ (function () {
         app.listen(config_1.config.port);
         logger.info("server listening at 127.0.0.1: " + config_1.config.port);
     };
-    Routers.RouterMgr = null;
     return Routers;
 }());
+Routers.RouterMgr = null;
 exports.Routers = Routers;
 //# sourceMappingURL=router.js.map

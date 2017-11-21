@@ -13,7 +13,7 @@ log4js.configure(config_1.config.log4js_conf);
 var logger = log4js.getLogger('game.ts');
 var MongoClient = mongoDb.MongoClient;
 var DB_CONN_STR = mongolib_1.mongoUtil.mongoUrl;
-var Game = /** @class */ (function () {
+var Game = (function () {
     function Game() {
         // TODO parse data
     }
@@ -205,7 +205,7 @@ var game;
             .then(function (game) {
             var exists = game.referees && game.referees.some(function (r) { return r.openid === util_1.util.getValue(data, "openid"); });
             if (exists) {
-                logger.debug('exists：', exists);
+                logger.error('Error! enrol exists：', exists);
                 var errMsg = {
                     status: errorCode_1.errorCode.errCode.enrolExist,
                     msg: '不能重复报名！',
@@ -213,6 +213,7 @@ var game;
                 res.status(400);
                 res.end(JSON.stringify(errMsg));
                 this_db.close();
+                throw 'Error! enrol exists';
             }
             else {
                 var objId = new mongoDb.ObjectId(util_1.util.getValue(data, "gameId"));
@@ -278,6 +279,7 @@ var game;
     /** 更新报名信息 */
     function updateEnrolInfo(req, res, next) {
         var data = req.body.data;
+        logger.info('incoming update enrol data: ', data);
         var this_db = null;
         MongoClient.connect(DB_CONN_STR)
             .then(function (db) {
