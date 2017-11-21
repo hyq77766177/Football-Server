@@ -226,7 +226,7 @@ export namespace game {
       .then(game => {
         const exists = game.referees && game.referees.some(r => r.openid === util.getValue(data, "openid"));
         if (exists) {
-          logger.debug('exists：', exists);
+          logger.error('Error! enrol exists：', exists);
           const errMsg: types.errMsg = {
             status: errorCode.errCode.enrolExist,
             msg: '不能重复报名！',
@@ -234,6 +234,7 @@ export namespace game {
           res.status(400);
           res.end(JSON.stringify(errMsg));
           this_db.close();
+          throw 'Error! enrol exists';
         } else {
           const objId = new mongoDb.ObjectId(util.getValue(data, "gameId"));
           const filter = { "_id": objId, };
@@ -299,6 +300,7 @@ export namespace game {
   /** 更新报名信息 */
   export function updateEnrolInfo(req: express.Request, res: express.Response, next: express.NextFunction) {
     const data = req.body.data as types.enrolReqData;
+    logger.info('incoming update enrol data: ', data);
     let this_db: mongoDb.Db = null;
     MongoClient.connect(DB_CONN_STR)
       .then(db => {
