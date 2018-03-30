@@ -50,6 +50,7 @@ export class Referee {
   public static adminOpenids = [
     "o7TkA0Xr2Kz-xGFxkFU3c56lpmQY", // 我
     "o7TkA0eRYomH4r7M7tE9kUY6RRQs", // 王硕
+    "o7TkA0TLrrnpBAU6PAC-Ka9cGvWc", // wsy
   ];
 
   public static regist(req: express.Request, res: express.Response, next: express.NextFunction) {
