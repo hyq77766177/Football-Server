@@ -92,7 +92,9 @@ export namespace game {
             delete dataObj.session_key;
           }
           dataObj["isAdmin"] = Referee.adminOpenids.indexOf(dataObj.openid) >= 0;
-          res.write(JSON.stringify(dataObj));
+          const responseBody = JSON.stringify(dataObj);
+          logger.info('openid response: ', responseBody);
+          res.write(responseBody);
           res.end();
         })
       })
