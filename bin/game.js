@@ -13,7 +13,7 @@ log4js.configure(config_1.config.log4js_conf);
 var logger = log4js.getLogger('game.ts');
 var MongoClient = mongoDb.MongoClient;
 var DB_CONN_STR = mongolib_1.mongoUtil.mongoUrl;
-var Game = (function () {
+var Game = /** @class */ (function () {
     function Game() {
         // TODO parse data
     }
@@ -71,7 +71,9 @@ var game;
                         delete dataObj.session_key;
                     }
                     dataObj["isAdmin"] = referee_1.Referee.adminOpenids.indexOf(dataObj.openid) >= 0;
-                    res.write(JSON.stringify(dataObj));
+                    var responseBody = JSON.stringify(dataObj);
+                    logger.info('openid response: ', responseBody);
+                    res.write(responseBody);
                     res.end();
                 });
             });
