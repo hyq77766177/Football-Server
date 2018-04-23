@@ -32,5 +32,11 @@ var config;
         pm2: true,
         pm2InstanceVar: "football",
     };
+    config.admins = [
+        "o7TkA0Xr2Kz-xGFxkFU3c56lpmQY",
+        "o7TkA0eRYomH4r7M7tE9kUY6RRQs",
+        "o7TkA0TLrrnpBAU6PAC-Ka9cGvWc",
+        "o7TkA0dDhh__AE15mlTHXmDmLHdM",
+    ];
 })(config = exports.config || (exports.config = {}));
 //# sourceMappingURL=config.js.map

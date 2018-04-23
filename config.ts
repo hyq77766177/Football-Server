@@ -33,4 +33,11 @@ export namespace config {
     pm2: true,
     pm2InstanceVar: "football",
   };
+
+  export const admins = [
+    "o7TkA0Xr2Kz-xGFxkFU3c56lpmQY", // 我
+    "o7TkA0eRYomH4r7M7tE9kUY6RRQs", // 王硕
+    "o7TkA0TLrrnpBAU6PAC-Ka9cGvWc", // wsy
+    "o7TkA0dDhh__AE15mlTHXmDmLHdM", // dsb
+  ];
 }

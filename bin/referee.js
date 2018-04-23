@@ -112,11 +112,7 @@ var Referee = /** @class */ (function () {
             this_db.close();
         });
     };
-    Referee.adminOpenids = [
-        "o7TkA0Xr2Kz-xGFxkFU3c56lpmQY",
-        "o7TkA0eRYomH4r7M7tE9kUY6RRQs",
-        "o7TkA0TLrrnpBAU6PAC-Ka9cGvWc",
-    ];
+    Referee.adminOpenids = config_1.config.admins;
     return Referee;
 }());
 exports.Referee = Referee;
