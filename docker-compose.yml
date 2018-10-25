@@ -9,7 +9,7 @@ services:
     env_file:
       - .env
     ports:
-      - '80:8012'
+      - '8012:8012'
     restart: always
     volumes:
       - app_log:/app/log
