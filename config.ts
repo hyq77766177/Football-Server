@@ -1,14 +1,25 @@
 import * as log4js from 'log4js'
+
+const {
+  SERVER_PORT,
+  MONGO_HOST,
+  MONGO_PORT,
+  MONGO_USER,
+  MONGO_PWD,
+  MONGO_DB,
+  APP_ID,
+  APP_SECRET,
+} = process.env
 export namespace config {
 
-  export const port = 8012;
-  export const appId = 'wx9b38dcab2de2fd02';
-  export const appSecret = 'e8db9dff4ce17f7712aacadc9fe5df5e';
-  export const mongoHost = '127.0.0.1';
-  export const mongoPort = '27017';
-  export const mongoUser = 'sorayama';
-  export const mongoPass = 'sorayama';
-  export const mongoDb = 'football';
+  export const port = SERVER_PORT;
+  export const appId = APP_ID;
+  export const appSecret = APP_SECRET;
+  export const mongoHost = MONGO_HOST;
+  export const mongoPort = MONGO_PORT;
+  export const mongoUser = MONGO_USER;
+  export const mongoPass = MONGO_PWD;
+  export const mongoDb = MONGO_DB;
 
   /** 微信openid的url获取方法 */
   export function getWXOpenIdUrl(code: string) {
@@ -22,16 +33,25 @@ export namespace config {
     appenders: {
       app: {
         type: 'console',
+        layout: {
+          type: 'colored'
+        },
+      },
+      verbose: {
+        type: 'file',
+        filename: './log/verbose.log',
+        maxLogSize: 10485760,
+        layout: {
+          type: 'colored'
+        },
       },
     },
     categories: {
       default: {
-        appenders: ['app'],
+        appenders: ['app', 'verbose'],
         level: 'debug'
       },
     },
-    pm2: true,
-    pm2InstanceVar: "football",
   };
 
   export const admins = [

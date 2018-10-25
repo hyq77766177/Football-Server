@@ -32,7 +32,7 @@ var Referee = /** @class */ (function () {
             this_db = db;
             var filter = { "openid": document.openid };
             var update = document;
-            return mongolib_1.mongoUtil.update(db, config_1.config.refereeCollection, filter, update, { upsert: true, });
+            return mongolib_1.mongoUtil.update(this_db, config_1.config.refereeCollection, filter, update, { upsert: true, });
         })
             .then(function (writeRes) {
             logger.info("referee regist insert success");
@@ -60,7 +60,7 @@ var Referee = /** @class */ (function () {
             .then(function (db) {
             logger.info("referee show mongo connect success");
             this_db = db;
-            return mongolib_1.mongoUtil.queryByOpenId(db, config_1.config.refereeCollection, data.openid);
+            return mongolib_1.mongoUtil.queryByOpenId(this_db, config_1.config.refereeCollection, data.openid);
         })
             .then(function (refereeRes) {
             response['myInfo'] = refereeRes;
@@ -93,7 +93,7 @@ var Referee = /** @class */ (function () {
             .then(function (db) {
             logger.info("referee query mongo connect success");
             this_db = db;
-            return mongolib_1.mongoUtil.queryById(db, config_1.config.refereeCollection, data.refereeId);
+            return mongolib_1.mongoUtil.queryById(this_db, config_1.config.refereeCollection, data.refereeId);
         })
             .then(function (refereeRes) {
             logger.info("referee query success");

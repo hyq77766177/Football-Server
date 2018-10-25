@@ -1,3 +1,7 @@
+if (!process.env.ENV_INIT) {
+  require('dotenv').load();
+}
+
 /// <reference path="./config.ts" />
 
 import * as express from 'express';

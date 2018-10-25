@@ -1,20 +1,14 @@
 /// <reference path="./app.ts" />
 
 import * as express from 'express';
-import * as http from 'http';
-import * as https from 'https';
-import * as qs from 'querystring';
 import * as _ from 'lodash';
 import * as mongoDb from 'mongodb';
 import * as log4js from 'log4js';
-import * as bodyParser from 'body-parser';
-import * as assert from 'assert';
 
 import { config } from './config';
 import { mongoUtil } from './mongolib';
 import { errorCode } from './errorCode';
 import { types } from './types';
-import { server } from './app';
 import { util } from './util';
 
 log4js.configure(config.log4js_conf);
@@ -53,14 +47,14 @@ export class Referee {
     logger.info("incoming referee regist data: ", req.body);
     let document = req.body as types.refereeData;
     logger.debug('document: ', document);
-    let this_db: mongoDb.Db = null;
+    let this_db: any = null;
     MongoClient.connect(DB_CONN_STR)
       .then(db => {
         logger.info("referee regist mongo connect success");
         this_db = db;
         const filter = { "openid": document.openid };
         const update = document;
-        return mongoUtil.update(db, config.refereeCollection, filter, update, { upsert: true, });
+        return mongoUtil.update(this_db, config.refereeCollection, filter, update, { upsert: true, });
       })
       .then(writeRes => {
         logger.info("referee regist insert success");
@@ -83,13 +77,13 @@ export class Referee {
   public static showReferee(req: express.Request, res: express.Response) {
     logger.info("incoming show referee data: ", req.body);
     let data = req.body as types.refereeShowData;
-    let this_db: mongoDb.Db = null
+    let this_db: any = null
     let response = {};
     MongoClient.connect(DB_CONN_STR)
       .then(db => {
         logger.info("referee show mongo connect success");
         this_db = db;
-        return mongoUtil.queryByOpenId(db, config.refereeCollection, data.openid);
+        return mongoUtil.queryByOpenId(this_db, config.refereeCollection, data.openid);
       })
       .then(refereeRes => {
         response['myInfo'] = refereeRes;
@@ -117,13 +111,13 @@ export class Referee {
   public static queryRefereeById(req: express.Request, res: express.Response) {
     logger.info("incoming query referee data: ", req.body);
     let data = req.body as types.refereeQueryData;
-    let this_db: mongoDb.Db = null
+    let this_db: any = null
     let response = {};
     MongoClient.connect(DB_CONN_STR)
       .then(db => {
         logger.info("referee query mongo connect success");
         this_db = db;
-        return mongoUtil.queryById<types.refereeData>(db, config.refereeCollection, data.refereeId);
+        return mongoUtil.queryById<types.refereeData>(this_db, config.refereeCollection, data.refereeId);
       })
       .then(refereeRes => {
         logger.info("referee query success");

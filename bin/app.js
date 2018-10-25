@@ -1,6 +1,9 @@
 "use strict";
-/// <reference path="./config.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
+if (!process.env.ENV_INIT) {
+    require('dotenv').load();
+}
+/// <reference path="./config.ts" />
 var express = require("express");
 var router_1 = require("./router");
 var server;

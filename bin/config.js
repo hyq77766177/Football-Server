@@ -1,15 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var _a = process.env, SERVER_PORT = _a.SERVER_PORT, MONGO_HOST = _a.MONGO_HOST, MONGO_PORT = _a.MONGO_PORT, MONGO_USER = _a.MONGO_USER, MONGO_PWD = _a.MONGO_PWD, MONGO_DB = _a.MONGO_DB, APP_ID = _a.APP_ID, APP_SECRET = _a.APP_SECRET;
 var config;
 (function (config) {
-    config.port = 8012;
-    config.appId = 'wx9b38dcab2de2fd02';
-    config.appSecret = 'e8db9dff4ce17f7712aacadc9fe5df5e';
-    config.mongoHost = '127.0.0.1';
-    config.mongoPort = '27017';
-    config.mongoUser = 'sorayama';
-    config.mongoPass = 'sorayama';
-    config.mongoDb = 'football';
+    config.port = SERVER_PORT;
+    config.appId = APP_ID;
+    config.appSecret = APP_SECRET;
+    config.mongoHost = MONGO_HOST;
+    config.mongoPort = MONGO_PORT;
+    config.mongoUser = MONGO_USER;
+    config.mongoPass = MONGO_PWD;
+    config.mongoDb = MONGO_DB;
     /** 微信openid的url获取方法 */
     function getWXOpenIdUrl(code) {
         return "https://api.weixin.qq.com/sns/jscode2session?appId=" + config.appId + "&secret=" + config.appSecret + "&js_code=" + code + "&grant_type=authorization_code";
@@ -21,16 +22,25 @@ var config;
         appenders: {
             app: {
                 type: 'console',
+                layout: {
+                    type: 'colored'
+                },
+            },
+            verbose: {
+                type: 'file',
+                filename: './log/verbose.log',
+                maxLogSize: 10485760,
+                layout: {
+                    type: 'colored'
+                },
             },
         },
         categories: {
             default: {
-                appenders: ['app'],
+                appenders: ['app', 'verbose'],
                 level: 'debug'
             },
         },
-        pm2: true,
-        pm2InstanceVar: "football",
     };
     config.admins = [
         "o7TkA0Xr2Kz-xGFxkFU3c56lpmQY",

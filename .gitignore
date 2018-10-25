@@ -5,4 +5,6 @@
 /bin/mochawesome-report
 /mochawesome-report
 
+.env
+
 yarn-error.log

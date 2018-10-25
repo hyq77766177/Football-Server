@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  server:
+    build:
+      context: .
+    image: football-server
+    container_name: 'football-server'
+    env_file:
+      - .env
+    ports:
+      - '80:8012'
+    restart: always
+    volumes:
+      - app_log:/app/log
+    networks:
+      - football
+  mongo:
+    image: mongo:3.6.5
+    container_name: 'football-mongo'
+    env_file:
+      - .env
+    ports:
+      - '27018:27017'
+    restart: always
+    volumes:
+      - mongo_data:/data/db
+      - ./init_user.js:/docker-entrypoint-initdb.d/init_user.js
+    networks:
+      - football
+
+networks:
+  football:
+
+volumes:
+  mongo_data:
+  app_log:

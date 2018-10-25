@@ -48,12 +48,13 @@ export namespace game {
     logger.info("incoming createData: ", req.body);
     let document: types.createGameData = req.body.formData;
     logger.debug('document: ', document);
-    let this_db: mongoDb.Db = null
+    logger.debug('DB url: ', DB_CONN_STR);
+    let this_db: any = null
     MongoClient.connect(DB_CONN_STR)
       .then(db => {
         logger.info("mongo connect success");
         this_db = db;
-        return mongoUtil.insertData<types.createGameData>(db, config.gameCollection, document);
+        return mongoUtil.insertData<types.createGameData>(this_db, config.gameCollection, document);
       })
       .then(writeRes => {
         logger.info("insert success");
@@ -105,7 +106,7 @@ export namespace game {
   export function getAllGameData(req: express.Request, res: express.Response) {
     const reqData: types.allData = req.body;
     logger.info("incoming all data: ", reqData);
-    let all_db: mongoDb.Db;
+    let all_db: any;
     let resultGameData = {
       myCreatedGames: null,
       myEnroledGames: null,
@@ -152,7 +153,7 @@ export namespace game {
   export function assign(req: express.Request, res: express.Response, next: express.NextFunction) {
     let reqData = req.body as types.assignData;
     logger.info('incoming assign data: ', req.body);
-    let assign_db: mongoDb.Db = null;
+    let assign_db: any = null;
     MongoClient.connect(DB_CONN_STR)
       .then(db => {
         assign_db = db;
@@ -166,7 +167,7 @@ export namespace game {
         const update = {
           "$set": { "referees.$.assigned": !assign },
         }
-        return mongoUtil.update(db, config.gameCollection, filter, update);
+        return mongoUtil.update(assign_db, config.gameCollection, filter, update);
       })
       .then(writeRes => {
         logger.info("assign success");
@@ -188,13 +189,13 @@ export namespace game {
   /** 根据gameId查询比赛信息 */
   export function queryGameById(req: express.Request, res: express.Response) {
     const data = req.body as types.gameByIdReqData;
-    let this_db: mongoDb.Db = null;
+    let this_db: any = null;
     MongoClient.connect(DB_CONN_STR)
       .then(db => {
         this_db = db;
         logger.info('mongo query by id connected, request: ', data);
         const id = util.getValue(data, "colId");
-        return mongoUtil.queryById(db, config.gameCollection, id);
+        return mongoUtil.queryById(this_db, config.gameCollection, id);
       })
       .then(game => {
         logger.info("query game by id success, game: ", game);
@@ -217,13 +218,13 @@ export namespace game {
   export function enrol(req, res, next) {
     logger.info('incoming enrol data: ', req.body);
     const data = req.body.data as types.enrolReqData;
-    let this_db: mongoDb.Db = null;
+    let this_db: any = null;
     MongoClient.connect(DB_CONN_STR)
       .then(db => {
         this_db = db;
         logger.info("enrol mongo connected");
         const gameId = util.getValue(data, "gameId");
-        return mongoUtil.queryById<types.gameData>(db, config.gameCollection, gameId);
+        return mongoUtil.queryById<types.gameData>(this_db, config.gameCollection, gameId);
       })
       .then(game => {
         const exists = game.referees && game.referees.some(r => r.openid === util.getValue(data, "openid"));
@@ -264,7 +265,7 @@ export namespace game {
   /** 取消报名 */
   export function cancelEnrol(req: express.Request, res: express.Response, next: express.NextFunction) {
     let data = req.body as types.cancelEnrolData;
-    let this_db: mongoDb.Db = null;
+    let this_db: any = null;
     logger.info("incoming cancel enrol data: ", req.body);
 
     MongoClient.connect(DB_CONN_STR)
@@ -303,7 +304,7 @@ export namespace game {
   export function updateEnrolInfo(req: express.Request, res: express.Response, next: express.NextFunction) {
     const data = req.body.data as types.enrolReqData;
     logger.info('incoming update enrol data: ', data);
-    let this_db: mongoDb.Db = null;
+    let this_db: any = null;
     MongoClient.connect(DB_CONN_STR)
       .then(db => {
         logger.info('update enrol mongo connected');
@@ -340,13 +341,13 @@ export namespace game {
   /** 删除比赛 */
   export function deleteGame(req: express.Request, res: express.Response, next: express.NextFunction) {
     logger.info('incoming delete game data: ', req.body);
-    let this_db: mongoDb.Db = null;
+    let this_db: any = null;
     const reqData = req.body as types.deleteGameData;
     MongoClient.connect(DB_CONN_STR)
       .then(db => {
         logger.info("delete game mongo connected");
         this_db = db;
-        return mongoUtil.queryById<types.gameData>(db, config.gameCollection, req.body.gameId);
+        return mongoUtil.queryById<types.gameData>(this_db, config.gameCollection, req.body.gameId);
       })
       .then(game => {
         if (!game) throw new Error("no such game!");
