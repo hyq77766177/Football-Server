@@ -59,5 +59,6 @@ export namespace config {
     "o7TkA0eRYomH4r7M7tE9kUY6RRQs", // 王硕
     "o7TkA0TLrrnpBAU6PAC-Ka9cGvWc", // wsy
     "o7TkA0dDhh__AE15mlTHXmDmLHdM", // dsb
+    "o7TkA0ZTRA6LbpXnX1XSJOVd8Gk4", // wyb
   ];
 }
