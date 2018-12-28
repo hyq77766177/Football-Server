@@ -1,6 +1,20 @@
 version: '3'
 
 services:
+  football-nginx:
+    image: nginx:alpine
+    container_name: 'football-nginx'
+    ports:
+      - '443:443'
+    restart: always
+    volumes:
+      - ~/myrepo/sorayama-live/dist:/usr/share/nginx/html
+      - /etc/nginx/1_www.sorayamah.org_bundle.crt:/etc/nginx/1_www.sorayamah.org_bundle.crt
+      - /etc/nginx/2_www.sorayamah.org.key:/etc/nginx/2_www.sorayamah.org.key
+      - /etc/nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - football
+
   server:
     build:
       context: .
@@ -28,6 +42,7 @@ services:
       - ./init_user.js:/docker-entrypoint-initdb.d/init_user.js
     networks:
       - football
+
 
 networks:
   football:
