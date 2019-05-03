@@ -60,5 +60,6 @@ export namespace config {
     "o7TkA0TLrrnpBAU6PAC-Ka9cGvWc", // wsy
     "o7TkA0dDhh__AE15mlTHXmDmLHdM", // dsb
     "o7TkA0ZTRA6LbpXnX1XSJOVd8Gk4", // wyb
+    "o7TkA0dZ17uhShy3vEKAcgEtWPIg", // zxh
   ];
 }
