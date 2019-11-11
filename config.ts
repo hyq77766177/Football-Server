@@ -1,4 +1,4 @@
-import * as log4js from 'log4js'
+import * as log4js from "log4js";
 
 const {
   SERVER_PORT,
@@ -8,10 +8,9 @@ const {
   MONGO_PWD,
   MONGO_DB,
   APP_ID,
-  APP_SECRET,
-} = process.env
+  APP_SECRET
+} = process.env;
 export namespace config {
-
   export const port = SERVER_PORT;
   export const appId = APP_ID;
   export const appSecret = APP_SECRET;
@@ -32,26 +31,26 @@ export namespace config {
   export const log4js_conf: log4js.Configuration = {
     appenders: {
       app: {
-        type: 'console',
+        type: "console",
         layout: {
-          type: 'colored'
-        },
+          type: "colored"
+        }
       },
       verbose: {
-        type: 'file',
-        filename: './log/verbose.log',
+        type: "file",
+        filename: "./log/verbose.log",
         maxLogSize: 10485760,
         layout: {
-          type: 'colored'
-        },
-      },
+          type: "colored"
+        }
+      }
     },
     categories: {
       default: {
-        appenders: ['app', 'verbose'],
-        level: 'debug'
-      },
-    },
+        appenders: ["app", "verbose"],
+        level: "debug"
+      }
+    }
   };
 
   export const admins = [
@@ -61,5 +60,6 @@ export namespace config {
     "o7TkA0dDhh__AE15mlTHXmDmLHdM", // dsb
     "o7TkA0ZTRA6LbpXnX1XSJOVd8Gk4", // wyb
     "o7TkA0dZ17uhShy3vEKAcgEtWPIg", // zxh
+    "o7TkA0TjGvo21waZDW_bNKzod-Bg" // lxy
   ];
 }
