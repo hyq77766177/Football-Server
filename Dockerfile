@@ -1,23 +1,23 @@
-FROM node:9-alpine
+FROM node:10-alpine
 
-ENV PROJECT_DIR=/app
+ENV TIME_ZONE=Asia/Shanghai
 
-WORKDIR $PROJECT_DIR
-RUN sed -i 's#http://dl-cdn.alpinelinux.org#https://mirrors.ustc.edu.cn#g' /etc/apk/repositories
-# 时区
-RUN apk add --no-cache tzdata
-ENV TZ Asia/Shanghai
+RUN \
+  mkdir -p /usr/src/app \
+  && apk add --no-cache tzdata \
+  && echo "${TIME_ZONE}" > /etc/timezone \
+  && ln -sf /usr/share/zoneinfo/${TIME_ZONE} /etc/localtime
 
-COPY ./package.json .
-COPY ./yarn.lock .
+WORKDIR /usr/src/app
 
-#RUN yarn --registry=https://registry.npm.taobao.org
-RUN yarn --registry=https://npmreg.proxy.ustclug.org
+COPY package.json /usr/src/app/
 
-COPY . .
+RUN npm i
 
-EXPOSE 80
+# RUN npm i --registry=https://registry.npm.taobao.org
 
-#ENTRYPOINT ["/docker-entrypoint.sh"]
+COPY . /usr/src/app
 
-CMD ["yarn", "start"]
+EXPOSE 7001
+
+CMD npm run start
