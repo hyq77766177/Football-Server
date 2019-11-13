@@ -1,4 +1,17 @@
 import { Application } from 'egg'
+import { Document } from 'mongoose'
+import { RefereeModel } from './referee'
+
+export interface GameModel extends Document {
+  gameName: string
+  gameDate: string
+  gameTime: string
+  gameEndTime: string
+  gameAvailablePeriod: string[]
+  refereeNumber: number
+  openid: string
+  referees: RefereeModel[]
+}
 
 export default (app: Application) => {
   const mongoose = app.mongoose
@@ -27,6 +40,5 @@ export default (app: Application) => {
       },
     }
   )
-
-  return app.mongoose.model('Game', gameSchema)
+  return app.mongoose.model<GameModel>('Game', gameSchema)
 }

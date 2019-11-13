@@ -3,9 +3,11 @@
 
 import 'egg';
 import ExportGame from '../../../app/model/game';
+import ExportReferee from '../../../app/model/referee';
 
 declare module 'egg' {
   interface IModel {
     Game: ReturnType<typeof ExportGame>;
+    Referee: ReturnType<typeof ExportReferee>;
   }
 }

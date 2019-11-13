@@ -48,6 +48,10 @@ export default (appInfo: EggAppInfo) => {
     origin: (ctx: Context) => ctx.request.get('origin'),
   }
 
+  config.security = {
+    csrf: false,
+  }
+
   // add your special config in here
   const bizConfig: BizConfig = {
     sourceUrl: `https://github.com/eggjs/examples/tree/master/${appInfo.name}`,

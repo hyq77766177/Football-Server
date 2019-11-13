@@ -63,6 +63,9 @@
   "eslintIgnore": [
     "coverage"
   ],
-  "author": "SoraYama",
+  "author": {
+    "name": "SoraYama",
+    "email": "sorayamahou@gmail.com"
+  },
   "license": "MIT"
 }
