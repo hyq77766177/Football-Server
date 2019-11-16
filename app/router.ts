@@ -4,5 +4,6 @@ export default (app: Application) => {
   const { controller, router } = app
 
   router.get('/', controller.home.index)
-  router.post('/game', controller.game.createGame)
+  router.get('/api/game', controller.game.getGames)
+  router.post('/api/game', controller.game.createGame)
 }

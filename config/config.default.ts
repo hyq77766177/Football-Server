@@ -11,6 +11,11 @@ export default (appInfo: EggAppInfo) => {
   // use for cookie sign key, should change to your own and keep security
   config.keys = appInfo.name + '_1573541543157_1398'
 
+  config.session = {
+    key: 'FOOTBALL_SESS',
+    renew: true,
+  }
+
   config.mongoose = {
     client: {
       url: 'mongodb://sorayama:sorayama@127.0.0.1:27017/football',
@@ -24,19 +29,20 @@ export default (appInfo: EggAppInfo) => {
   config.middleware = ['requestLogging', 'throwBizError']
 
   config.onerror = {
-    all(err: Error, ctx: Context) {
-      ctx.logger.error(err)
+    all(err: any, ctx: Context) {
       if (err.message === 'Validation Failed') {
         ctx.status = ctx.HTTP_STATUS_CODES.BAD_REQUEST
-        ctx.body = {
+        const resp = {
+          data: err.errors,
           errMsg: '请求参数错误',
           status: ctx.helper.errCode.INVALID_PARAM,
         }
+        ctx.body = ctx.headers.accept === 'application/json' ? resp : JSON.stringify(resp)
         return
       }
       ctx.status = ctx.HTTP_STATUS_CODES.OK
       ctx.body = {
-        errMsg: err,
+        errMsg: err.message,
         status: 1,
       }
     },

@@ -20,7 +20,7 @@ const errCode2MsgMap = new Map([
   [errCode.NOT_SIGNIN, '会话超时或未登录'],
 ])
 
-const responseFormat = (data: any) => ({
+const responseFormat = <T = any>(data: T) => ({
   data,
   errMsg: '',
   status: 0,

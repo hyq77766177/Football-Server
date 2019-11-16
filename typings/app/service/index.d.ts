@@ -2,10 +2,12 @@
 // Do not modify this file!!!!!!!!!
 
 import 'egg';
+import ExportGame from '../../../app/service/game';
 import ExportHome from '../../../app/service/home';
 
 declare module 'egg' {
   interface IService {
+    game: ExportGame;
     home: ExportHome;
   }
 }

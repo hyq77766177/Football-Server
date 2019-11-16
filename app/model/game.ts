@@ -16,29 +16,31 @@ export interface GameModel extends Document {
 export default (app: Application) => {
   const mongoose = app.mongoose
   const { Schema } = mongoose
-  const gameSchema = new Schema(
-    {
-      gameName: String,
-      gameDate: String,
-      gameTime: String,
-      gameEndTime: String,
-      gameAvailablePeriod: [String],
-      refereeNumber: Number,
+  const {
+    Types: { ObjectId },
+  } = Schema
+  const gameSchema = new Schema({
+    gameName: String,
+    gameDate: String,
+    gameTime: String,
+    gameEndTime: String,
+    gameAvailablePeriod: [String],
+    requiredRefereeAmount: Number,
+    publisher: {
       openid: String,
-      referees: [
+      avatar: { type: String, default: '' },
+    },
+    referees: {
+      type: [
         {
-          type: Number,
+          type: ObjectId,
           ref: 'Referee',
         },
       ],
+      default: [],
     },
-    {
-      toObject: {
-        transform(_, ret) {
-          delete ret.__v
-        },
-      },
-    }
-  )
+    __v: { type: Number, select: false },
+  })
+  gameSchema.index({ gameDate: -1 })
   return app.mongoose.model<GameModel>('Game', gameSchema)
 }
