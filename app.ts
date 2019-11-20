@@ -16,14 +16,11 @@ export default class AppBootHook {
     }
     this.app.logger.debug('.env loaded:\n', result.parsed)
     const { REDIS_HOST, REDIS_PORT, REDIS_PASSWORD, REDIS_DB } = result.parsed!
-    this.app.config.redis = {
-      client: {
-        host: REDIS_HOST,
-        port: (REDIS_PORT && +REDIS_PORT) || 6379,
-        password: REDIS_PASSWORD,
-        db: (REDIS_DB && +REDIS_DB) || 0,
-      },
-      agent: true,
+    this.app.config.redis.client = {
+      host: REDIS_HOST,
+      port: (REDIS_PORT && +REDIS_PORT) || 6379,
+      password: REDIS_PASSWORD,
+      db: (REDIS_DB && +REDIS_DB) || 0,
     }
   }
 }

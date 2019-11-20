@@ -3,8 +3,8 @@ import { Service } from 'egg'
 export default class Account extends Service {
   public async getWeixinSession() {
     const { code } = this.ctx.request.query
-    const { APPID, APPSECRET } = process.env
-    const wxUrl = `https://api.weixin.qq.com/sns/jscode2session?appId=${APPID}&secret=${APPSECRET}&js_code=${code}&grant_type=authorization_code`
+    const { APP_ID, APP_SECRET } = process.env
+    const wxUrl = `https://api.weixin.qq.com/sns/jscode2session?appId=${APP_ID}&secret=${APP_SECRET}&js_code=${code}&grant_type=authorization_code`
     this.ctx.logger.debug('wxurl', wxUrl)
     try {
       const resp = await this.ctx.curl(wxUrl, { contentType: 'application/json' })

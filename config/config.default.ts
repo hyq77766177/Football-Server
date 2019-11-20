@@ -58,6 +58,10 @@ export default (appInfo: EggAppInfo) => {
     csrf: false,
   }
 
+  config.redis = {
+    agent: true,
+  }
+
   config.session = {
     key: 'EGG_SESS',
     renew: true,
