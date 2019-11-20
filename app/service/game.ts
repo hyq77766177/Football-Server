@@ -15,6 +15,12 @@ export default class Game extends Service {
     return games
   }
 
+  public async getGameById() {
+    const { gameId } = this.ctx.request.query
+    const game = await this.ctx.model.Game.findById(gameId)
+    return game
+  }
+
   public async create() {
     const {
       gameName,

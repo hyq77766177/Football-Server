@@ -1,7 +1,20 @@
 import { Controller } from 'egg'
 
 export default class Game extends Controller {
-  public async getGames() {
+  /**
+   * 返回比赛数据
+   *
+   * @query gameId - string
+   *    如果不传取全部比赛, 否则取指定Id比赛; 查询不到为`null`
+   * @memberof Game
+   */
+  public async getGame() {
+    const { gameId } = this.ctx.request.query
+    if (gameId) {
+      const game = await this.service.game.getGameById()
+      this.ctx.body = this.ctx.helper.responseFormat(game)
+      return
+    }
     const games = await this.service.game.getAll()
     this.ctx.body = this.ctx.helper.responseFormat(games)
   }

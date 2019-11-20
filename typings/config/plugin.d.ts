@@ -16,6 +16,8 @@ import 'egg-jsonp';
 import 'egg-view';
 import 'egg-mongoose';
 import 'egg-validate';
+import 'egg-redis';
+import 'egg-session-redis';
 import 'egg-cors';
 import { EggPluginItem } from 'egg';
 declare module 'egg' {
@@ -34,6 +36,8 @@ declare module 'egg' {
     view?: EggPluginItem;
     mongoose?: EggPluginItem;
     validate?: EggPluginItem;
+    redis?: EggPluginItem;
+    sessionRedis?: EggPluginItem;
     cors?: EggPluginItem;
   }
 }

@@ -58,6 +58,11 @@ export default (appInfo: EggAppInfo) => {
     csrf: false,
   }
 
+  config.session = {
+    key: 'EGG_SESS',
+    renew: true,
+  }
+
   // add your special config in here
   const bizConfig: BizConfig = {
     sourceUrl: `https://github.com/eggjs/examples/tree/master/${appInfo.name}`,

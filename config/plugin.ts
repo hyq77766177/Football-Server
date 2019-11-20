@@ -12,6 +12,16 @@ const plugin: EggPlugin = {
     package: 'egg-validate',
   },
 
+  redis: {
+    enable: true,
+    package: 'egg-redis',
+  },
+
+  sessionRedis: {
+    enable: true,
+    package: 'egg-session-redis',
+  },
+
   cors: {
     enable: true,
     package: 'egg-cors',
