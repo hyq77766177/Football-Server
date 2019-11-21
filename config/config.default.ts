@@ -26,7 +26,7 @@ export default (appInfo: EggAppInfo) => {
   }
 
   // add your egg config in here
-  config.middleware = ['requestLogging', 'throwBizError']
+  config.middleware = ['requestLogging', 'authentication', 'throwBizError']
 
   config.onerror = {
     all(err: any, ctx: Context) {

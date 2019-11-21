@@ -5,10 +5,31 @@ export default class Account extends Controller {
     this.ctx.validate(
       {
         code: { type: 'string', required: true },
+        identity: {
+          type: 'object',
+          required: true,
+          rule: {
+            signature: 'string',
+            rawData: 'string',
+          },
+        },
+        userInfo: {
+          type: 'object',
+          required: true,
+          rule: {
+            avatarUrl: 'string',
+            city: 'string',
+            country: 'string',
+            gender: 'number',
+            language: 'string',
+            nickName: 'string',
+            province: 'string',
+          },
+        },
       },
-      this.ctx.query
+      this.ctx.body
     )
-    const result = await this.ctx.service.account.getWeixinSession()
+    const result = await this.ctx.service.account.validateWeixinSession()
     this.ctx.body = this.ctx.helper.responseFormat(result)
   }
 }

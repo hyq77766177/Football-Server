@@ -19,6 +19,7 @@ export default (app: Application) => {
   const { Schema } = mongoose
   const refereeSchema = new Schema(
     {
+      openid: String,
       refereeName: String,
       refereeHeight: String,
       refereeWeight: String,
@@ -28,7 +29,19 @@ export default (app: Application) => {
       refereeBankNumber: String,
       refereeCardNumber: String,
       refereeClass: String,
-      openid: String,
+      refereeWeixinInfo: {
+        avatarUrl: String,
+        city: String,
+        country: String,
+        gender: Number,
+        language: String,
+        nickName: String,
+        province: String,
+      },
+      isAdmin: {
+        type: Boolean,
+        default: false,
+      },
     },
     {
       toObject: {

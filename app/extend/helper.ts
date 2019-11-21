@@ -7,6 +7,8 @@ const errCode = {
   USER_DUPLICATE: 1001,
   NO_USER: 1002,
   NOT_SIGNIN: 1003,
+
+  WX_CODE_ERROR: 40029,
 }
 
 const errCode2MsgMap = new Map([
@@ -18,6 +20,8 @@ const errCode2MsgMap = new Map([
   [errCode.USER_DUPLICATE, '用户重复'],
   [errCode.NO_USER, '用户不存在'],
   [errCode.NOT_SIGNIN, '会话超时或未登录'],
+
+  [errCode.WX_CODE_ERROR, '微信code错误'],
 ])
 
 const responseFormat = <T = any>(data: T) => ({
