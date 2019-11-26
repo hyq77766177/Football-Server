@@ -11,14 +11,9 @@ export default (appInfo: EggAppInfo) => {
   // use for cookie sign key, should change to your own and keep security
   config.keys = appInfo.name + '_1573541543157_1398'
 
-  config.session = {
-    key: 'FOOTBALL_SESS',
-    renew: true,
-  }
-
   config.mongoose = {
     client: {
-      url: 'mongodb://sorayama:sorayama@127.0.0.1:27017/football',
+      url: '', // set in app.ts
       options: {
         useNewUrlParser: true,
       },
@@ -60,10 +55,11 @@ export default (appInfo: EggAppInfo) => {
 
   config.redis = {
     agent: true,
+    // other set in app.ts
   }
 
   config.session = {
-    key: 'EGG_SESS',
+    key: 'collina_session',
     renew: true,
   }
 

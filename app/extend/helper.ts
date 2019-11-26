@@ -8,6 +8,7 @@ const errCode = {
   NO_USER: 1002,
   NOT_SIGNIN: 1003,
 
+  WX_SIGNATURE_INVALID: 1004,
   WX_CODE_ERROR: 40029,
 }
 
@@ -22,6 +23,7 @@ const errCode2MsgMap = new Map([
   [errCode.NOT_SIGNIN, '会话超时或未登录'],
 
   [errCode.WX_CODE_ERROR, '微信code错误'],
+  [errCode.WX_SIGNATURE_INVALID, '签名错误或session过期'],
 ])
 
 const responseFormat = <T = any>(data: T) => ({

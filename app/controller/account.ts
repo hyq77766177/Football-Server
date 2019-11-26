@@ -29,7 +29,8 @@ export default class Account extends Controller {
       },
       this.ctx.body
     )
-    const result = await this.ctx.service.account.validateWeixinSession()
+
+    const result = await this.ctx.service.account.login()
     this.ctx.body = this.ctx.helper.responseFormat(result)
   }
 }

@@ -11,6 +11,7 @@ export interface RefereeModel extends Document {
   refereeBankNumber: string
   refereeCardNumber: string
   refereeClass: string
+  isAdmin: boolean
   openid: string
 }
 
