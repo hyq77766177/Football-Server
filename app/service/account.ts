@@ -70,7 +70,7 @@ export default class Account extends Service {
     const { Referee } = this.ctx.model
     let user = await Referee.findOne({ openid })
     if (!user) {
-      await Referee.create({
+      user = await Referee.create({
         openid,
         refereeWeixinInfo: userInfo,
       })

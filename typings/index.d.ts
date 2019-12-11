@@ -10,6 +10,7 @@ declare module 'egg' {
   }
 
   interface IBizSession {
+    id?: string | null
     openid?: string | null
     sessionKey?: string | null
     [key: string]: any

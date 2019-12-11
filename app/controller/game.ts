@@ -22,22 +22,30 @@ export default class Game extends Controller {
   public async createGame() {
     const rules = {
       gameName: { type: 'string', required: true },
-      gameDate: { type: 'string', required: true },
-      gameTime: { type: 'string', required: true },
-      gameEndTime: { type: 'string', required: true },
+      gameStartTime: { type: 'number', required: true },
+      gameEndTime: { type: 'number', required: true },
+      gameAvailablePeriod: { type: 'array', required: true, itemType: 'string' },
       requiredRefereeAmount: { type: 'number', required: true },
-      publisher: {
-        type: 'object',
+      avatar: {
+        type: 'string',
         required: true,
-        rule: {
-          openid: { type: 'string', required: true },
-          avatar: 'string',
-        },
       },
     }
     this.ctx.validate(rules, this.ctx.request.body)
-    await this.ctx.service.game.create()
+    const result = await this.ctx.service.game.create()
     this.ctx.status = this.ctx.HTTP_STATUS_CODES.CREATED
-    this.ctx.body = this.ctx.helper.responseFormat('创建成功')
+    this.ctx.body = this.ctx.helper.responseFormat(result)
+  }
+
+  public async deleteGame() {
+    this.ctx.validate({ gameId: { type: 'string', required: true } }, this.ctx.request.body)
+    const result = await this.ctx.service.game.deleteGameById()
+    this.ctx.body = this.ctx.helper.responseFormat(result)
+  }
+
+  public async enrolGame() {
+    this.ctx.validate({ gameId: { type: 'string', required: true } }, this.ctx.request.query)
+    const result = await this.ctx.service.enrol.enrolGame()
+    this.ctx.body = this.ctx.helper.responseFormat(result)
   }
 }

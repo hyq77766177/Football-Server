@@ -18,39 +18,31 @@ export interface RefereeModel extends Document {
 export default (app: Application) => {
   const mongoose = app.mongoose
   const { Schema } = mongoose
-  const refereeSchema = new Schema(
-    {
-      openid: String,
-      refereeName: String,
-      refereeHeight: String,
-      refereeWeight: String,
-      refereePhoneNumber: String,
-      refereeIdNumber: String,
-      refereeScholarId: String,
-      refereeBankNumber: String,
-      refereeCardNumber: String,
-      refereeClass: String,
-      refereeWeixinInfo: {
-        avatarUrl: String,
-        city: String,
-        country: String,
-        gender: Number,
-        language: String,
-        nickName: String,
-        province: String,
-      },
-      isAdmin: {
-        type: Boolean,
-        default: false,
-      },
+  const refereeSchema = new Schema({
+    openid: { type: String, select: false },
+    __v: { type: Number, select: false },
+    refereeName: String,
+    refereeHeight: String,
+    refereeWeight: String,
+    refereePhoneNumber: String,
+    refereeIdNumber: String,
+    refereeScholarId: String,
+    refereeBankNumber: String,
+    refereeCardNumber: String,
+    refereeClass: String,
+    refereeWeixinInfo: {
+      avatarUrl: String,
+      city: String,
+      country: String,
+      gender: Number,
+      language: String,
+      nickName: String,
+      province: String,
     },
-    {
-      toObject: {
-        transform(_, ret) {
-          delete ret.__v
-        },
-      },
-    }
-  )
+    isAdmin: {
+      type: Boolean,
+      default: false,
+    },
+  })
   return app.mongoose.model<RefereeModel>('Referee', refereeSchema)
 }

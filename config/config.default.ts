@@ -16,6 +16,7 @@ export default (appInfo: EggAppInfo) => {
       url: '', // set in app.ts
       options: {
         useNewUrlParser: true,
+        useFindAndModify: false,
       },
     },
   }
