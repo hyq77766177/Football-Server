@@ -12,7 +12,11 @@ export interface GameModel extends Document {
     id: string
     avatar: string
   }
-  referees: RefereeModel[]
+  referees: Array<{
+    referee: RefereeModel
+    enrolName: string
+    availablePeriod: string[]
+  }>
 }
 
 export default (app: Application) => {
@@ -34,8 +38,12 @@ export default (app: Application) => {
     referees: {
       type: [
         {
-          type: ObjectId,
-          ref: 'Referee',
+          referee: {
+            type: ObjectId,
+            ref: 'Referee',
+          },
+          availablePeriod: [String],
+          enrolName: String,
         },
       ],
       default: [],

@@ -11,6 +11,7 @@ const errCode = {
   CANNOT_DELETE_GAME_CREATED_BY_OTHER: 1005,
   CANNOT_RE_ENROL: 1006,
   BAD_GAME_ID: 1007,
+  CANNOT_CANCEL_NOT_ENROLED_GAME: 1008,
 
   WX_CODE_ERROR: 40029,
 }
@@ -30,6 +31,7 @@ const errCode2MsgMap = new Map([
   [errCode.CANNOT_DELETE_GAME_CREATED_BY_OTHER, '不能删除他人创建的比赛'],
   [errCode.CANNOT_RE_ENROL, '不能重复报名'],
   [errCode.BAD_GAME_ID, '错误的比赛ID'],
+  [errCode.CANNOT_CANCEL_NOT_ENROLED_GAME, '不能取消未报名的比赛'],
 ])
 
 const responseFormat = <T = any>(data: T) => ({

@@ -1,5 +1,5 @@
 import { Service } from 'egg'
-import { filter, some, xorWith, isEqual } from 'lodash'
+import { filter, some, differenceWith, isEqual } from 'lodash'
 
 /**
  * Game Service
@@ -13,7 +13,7 @@ export default class Game extends Service {
    */
   public async getAll() {
     // const { _id } = this.ctx.request.query
-    const games = await this.ctx.model.Game.find().populate('referees')
+    const games = await this.ctx.model.Game.find().populate('referees.referee')
     const openid = this.ctx.session?.openid
     const { id } = this.ctx.user
     this.ctx.logger.debug('openid', openid)
@@ -26,9 +26,9 @@ export default class Game extends Service {
     }
     const myCreatedGames = filter(games, game => game.publisher.id === id)
     const myEnroledGames = filter(games, game =>
-      some(game.referees, referee => referee.openid === openid)
+      some(game.referees, referee => referee.referee.id === id)
     )
-    const availableGames = xorWith(xorWith(games, myCreatedGames, isEqual), myEnroledGames, isEqual)
+    const availableGames = differenceWith(games, myCreatedGames, myEnroledGames, isEqual)
     return {
       myCreatedGames,
       myEnroledGames,

@@ -11,5 +11,7 @@ export default (app: Application) => {
   router.post('/api/game', controller.game.createGame)
   router.del('/api/game', controller.game.deleteGame)
   // enrol
-  router.put('/api/enrol', controller.game.enrolGame)
+  router.post('/api/enrol', controller.game.enrolGame)
+  router.put('/api/enrol', controller.game.updateEnrol)
+  router.delete('/api/enrol', controller.game.cancelEnrol)
 }

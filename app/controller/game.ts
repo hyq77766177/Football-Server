@@ -44,8 +44,30 @@ export default class Game extends Controller {
   }
 
   public async enrolGame() {
-    this.ctx.validate({ gameId: { type: 'string', required: true } }, this.ctx.request.query)
-    const result = await this.ctx.service.enrol.enrolGame()
+    const rules = {
+      gameId: { type: 'string', required: true },
+      availablePeriod: { type: 'array', itemType: 'string', default: [] },
+      refereeName: { type: 'string', required: true },
+    }
+    this.ctx.validate(rules, this.ctx.request.body)
+    const result = await this.ctx.service.enrol.enrolGame(false)
+    this.ctx.body = this.ctx.helper.responseFormat(result)
+  }
+
+  public async updateEnrol() {
+    const rules = {
+      gameId: { type: 'string', required: true },
+      availablePeriod: { type: 'array', itemType: 'string', default: [] },
+      refereeName: { type: 'string', required: true },
+    }
+    this.ctx.validate(rules, this.ctx.request.body)
+    const result = await this.ctx.service.enrol.enrolGame(true)
+    this.ctx.body = this.ctx.helper.responseFormat(result)
+  }
+
+  public async cancelEnrol() {
+    this.ctx.validate({ gameId: { type: 'string', required: true } }, this.ctx.request.body)
+    const result = await this.ctx.service.enrol.cancelEnrol()
     this.ctx.body = this.ctx.helper.responseFormat(result)
   }
 }

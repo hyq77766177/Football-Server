@@ -10,7 +10,7 @@ const requestLogging = () => async (ctx: Context, next: () => Promise<any>) => {
   ctx.logger.debug(chalk.magenta('Request body\n'), ctx.request.body)
   ctx.logger.debug(chalk.magenta('Request query\n'), ctx.request.query)
   await next()
-  ctx.logger.debug(chalk.greenBright('\nResponse body'), ctx.body)
+  ctx.logger.debug(chalk.greenBright('Response body\n'), ctx.body)
 }
 
 export default requestLogging
