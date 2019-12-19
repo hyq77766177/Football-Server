@@ -22,25 +22,31 @@ export default (appInfo: EggAppInfo) => {
   }
 
   // add your egg config in here
-  config.middleware = ['requestLogging', 'authentication', 'throwBizError']
+  config.middleware = ['requestLogging', 'authentication']
 
   config.onerror = {
     all(err: any, ctx: Context) {
+      const { CustomError, HttpError } = ctx.helper
+      let status = 500
+      let data = null
+      let errMsg = '服务器内部错误'
       if (err.message === 'Validation Failed') {
         ctx.status = ctx.HTTP_STATUS_CODES.BAD_REQUEST
-        const resp = {
-          data: err.errors,
-          errMsg: '请求参数错误',
-          status: ctx.helper.errCode.INVALID_PARAM,
-        }
-        ctx.body = ctx.headers.accept === 'application/json' ? resp : JSON.stringify(resp)
-        return
+        data = err.errors
+        errMsg = '请求参数错误'
+        status = ctx.helper.errCode.INVALID_PARAM
+      } else if (err instanceof CustomError || err instanceof HttpError) {
+        const info = err.getInfo()
+        ctx.status = err instanceof HttpError ? info.status : 200
+        status = info.status
+        errMsg = info.message
       }
-      ctx.status = ctx.HTTP_STATUS_CODES.OK
-      ctx.body = {
-        errMsg: err.message,
-        status: 1,
+      const resp = {
+        data,
+        errMsg,
+        status,
       }
+      ctx.body = ctx.headers.accept === 'application/json' ? resp : JSON.stringify(resp)
     },
   }
 

@@ -11,7 +11,7 @@ export default class Game extends Controller {
   public async getGame() {
     const { gameId } = this.ctx.request.query
     if (gameId) {
-      const game = await this.service.game.getGameById()
+      const game = await this.service.game.getGameById(gameId)
       this.ctx.body = this.ctx.helper.responseFormat(game)
       return
     }
@@ -32,14 +32,15 @@ export default class Game extends Controller {
       },
     }
     this.ctx.validate(rules, this.ctx.request.body)
-    const result = await this.ctx.service.game.create()
+    const result = await this.ctx.service.game.create(this.ctx.request.body)
     this.ctx.status = this.ctx.HTTP_STATUS_CODES.CREATED
     this.ctx.body = this.ctx.helper.responseFormat(result)
   }
 
   public async deleteGame() {
     this.ctx.validate({ gameId: { type: 'string', required: true } }, this.ctx.request.body)
-    const result = await this.ctx.service.game.deleteGameById()
+    const { gameId } = this.ctx.request.body
+    const result = await this.ctx.service.game.deleteGameById(gameId)
     this.ctx.body = this.ctx.helper.responseFormat(result)
   }
 
@@ -50,7 +51,7 @@ export default class Game extends Controller {
       refereeName: { type: 'string', required: true },
     }
     this.ctx.validate(rules, this.ctx.request.body)
-    const result = await this.ctx.service.enrol.enrolGame(false)
+    const result = await this.ctx.service.enrol.enrolGame(this.ctx.request.body, false)
     this.ctx.body = this.ctx.helper.responseFormat(result)
   }
 
@@ -61,13 +62,14 @@ export default class Game extends Controller {
       refereeName: { type: 'string', required: true },
     }
     this.ctx.validate(rules, this.ctx.request.body)
-    const result = await this.ctx.service.enrol.enrolGame(true)
+    const result = await this.ctx.service.enrol.enrolGame(this.ctx.request.body, true)
     this.ctx.body = this.ctx.helper.responseFormat(result)
   }
 
   public async cancelEnrol() {
     this.ctx.validate({ gameId: { type: 'string', required: true } }, this.ctx.request.body)
-    const result = await this.ctx.service.enrol.cancelEnrol()
+    const { gameId } = this.ctx.request.body
+    const result = await this.ctx.service.enrol.cancelEnrol(gameId)
     this.ctx.body = this.ctx.helper.responseFormat(result)
   }
 }

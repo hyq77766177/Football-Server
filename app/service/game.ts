@@ -15,9 +15,9 @@ export default class Game extends Service {
     // const { _id } = this.ctx.request.query
     const games = await this.ctx.model.Game.find().populate('referees.referee')
     const openid = this.ctx.session?.openid
-    const { id } = this.ctx.user
+    const id = this.ctx.user?.id
     this.ctx.logger.debug('openid', openid)
-    if (!openid) {
+    if (!openid || !id) {
       return {
         availableGames: games,
         myEnroledGames: [],
@@ -36,13 +36,12 @@ export default class Game extends Service {
     }
   }
 
-  public async getGameById() {
-    const { gameId } = this.ctx.request.query
+  public async getGameById(gameId: string) {
     const game = await this.ctx.model.Game.findById(gameId)
     return game
   }
 
-  public async create() {
+  public async create(body: gameRequest.ICreateGame) {
     const {
       gameName,
       gameStartTime,
@@ -50,7 +49,7 @@ export default class Game extends Service {
       gameAvailablePeriod,
       requiredRefereeAmount,
       avatar,
-    } = this.ctx.request.body
+    } = body
     await this.ctx.model.Game.create({
       gameName,
       gameStartTime,
@@ -59,22 +58,21 @@ export default class Game extends Service {
       requiredRefereeAmount,
       publisher: {
         avatar,
-        id: this.ctx.user._id,
+        id: this.ctx.user?._id,
       },
     })
     return '创建成功'
   }
 
-  public async deleteGameById() {
-    const { gameId } = this.ctx.request.body
+  public async deleteGameById(gameId: string) {
     const game = await this.ctx.model.Game.findById(gameId)
     if (!game) {
-      this.ctx.bizErrorCode = this.ctx.helper.errCode.INVALID_PARAM
-      return
+      throw new this.ctx.helper.CustomError(this.ctx.helper.errCode.INVALID_PARAM)
     }
-    if (game.publisher.id !== this.ctx.user._id) {
-      this.ctx.bizErrorCode = this.ctx.helper.errCode.CANNOT_DELETE_GAME_CREATED_BY_OTHER
-      return
+    if (game.publisher.id !== this.ctx.user?._id) {
+      throw new this.ctx.helper.CustomError(
+        this.ctx.helper.errCode.CANNOT_DELETE_GAME_CREATED_BY_OTHER
+      )
     }
     await this.ctx.model.Game.findByIdAndDelete(gameId)
     return '删除成功'

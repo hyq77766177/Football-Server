@@ -8,23 +8,21 @@ import { some, isEqual } from 'lodash'
  * @extends {Service}
  */
 export default class Enrol extends Service {
-  public async enrolGame(isUpdate: boolean) {
-    const { gameId, availablePeriod, refereeName } = this.ctx.request.body
+  public async enrolGame(body: gameRequest.IEnrolGame, isUpdate: boolean) {
+    const { gameId, availablePeriod, refereeName } = body
     const { user } = this.ctx
     const game = await this.ctx.model.Game.findById(gameId)
     if (!game) {
-      this.ctx.bizErrorCode = this.ctx.helper.errCode.BAD_GAME_ID
-      return
+      throw new this.ctx.helper.CustomError(this.ctx.helper.errCode.BAD_GAME_ID)
     }
-    const isEnrolled = some(game.referees, ({ referee }) => isEqual(referee._id, user._id))
+    const isEnrolled = some(game.referees, ({ referee }) => isEqual(referee._id, user?._id))
     if (isEnrolled && !isUpdate) {
-      this.ctx.bizErrorCode = this.ctx.helper.errCode.CANNOT_RE_ENROL
-      return
+      throw new this.ctx.helper.CustomError(this.ctx.helper.errCode.CANNOT_RE_ENROL)
     }
     await game.update(
       {
         [isUpdate ? '$set' : '$push']: {
-          referees: { referee: user._id, availablePeriod, enrolName: refereeName },
+          referees: { referee: user?._id, availablePeriod, enrolName: refereeName },
         },
       },
       { upsert: true }
@@ -32,17 +30,14 @@ export default class Enrol extends Service {
     return `${isUpdate ? '更新' : '报名'}成功`
   }
 
-  public async cancelEnrol() {
-    const { gameId } = this.ctx.request.body
-    const { _id } = this.ctx.user
+  public async cancelEnrol(gameId: string) {
+    const _id = this.ctx.user?._id
     const game = await this.ctx.model.Game.findById(gameId)
     if (!game) {
-      this.ctx.bizErrorCode = this.ctx.helper.errCode.BAD_GAME_ID
-      return
+      throw new this.ctx.helper.CustomError(this.ctx.helper.errCode.BAD_GAME_ID)
     }
-    if (!some(game.referees, ({ referee }) => isEqual(referee._id, this.ctx.user._id))) {
-      this.ctx.bizErrorCode = this.ctx.helper.errCode.CANNOT_CANCEL_NOT_ENROLED_GAME
-      return
+    if (!some(game.referees, ({ referee }) => isEqual(referee._id, _id))) {
+      throw new this.ctx.helper.CustomError(this.ctx.helper.errCode.CANNOT_CANCEL_NOT_ENROLED_GAME)
     }
     await this.ctx.model.Game.findOneAndUpdate(
       { _id: gameId },

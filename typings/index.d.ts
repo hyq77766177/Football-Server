@@ -5,7 +5,7 @@ import { RefereeModel } from '../app/model/referee'
 declare module 'egg' {
   interface Context {
     model: IModel
-    user: RefereeModel
+    user?: RefereeModel
     session: null | IBizSession
   }
 

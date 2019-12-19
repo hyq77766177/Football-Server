@@ -2,15 +2,15 @@ import { Application } from 'egg'
 import { Document } from 'mongoose'
 
 export interface RefereeModel extends Document {
-  refereeName: string
-  refereeHeight: string
-  refereeWeight: string
-  refereePhoneNumber: string
-  refereeIdNumber: string
-  refereeScholarId: string
-  refereeBankNumber: string
-  refereeCardNumber: string
-  refereeClass: string
+  refereeName?: string
+  refereeHeight?: string
+  refereeWeight?: string
+  refereePhoneNumber?: string
+  refereeIdNumber?: string
+  refereeScholarId?: string
+  refereeBankNumber?: string
+  refereeCardNumber?: string
+  refereeClass?: string
   isAdmin: boolean
   openid: string
 }

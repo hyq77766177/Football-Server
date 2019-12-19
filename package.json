@@ -8,7 +8,7 @@
     "declarations": true
   },
   "scripts": {
-    "start": "egg-scripts start --title=egg-server-new-football-server",
+    "start": "npm run tsc && egg-scripts start --title=egg-server-new-football-server",
     "startd": "egg-scripts start --daemon --title=egg-server-new-football-server",
     "stop": "egg-scripts stop --title=egg-server-new-football-server",
     "dev": "egg-bin dev",

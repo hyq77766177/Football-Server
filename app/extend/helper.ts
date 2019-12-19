@@ -1,19 +1,19 @@
-const errCode = {
-  INVALID_PARAM: 400,
-  NOT_FOUND: 404,
-  INTERNAL_ERROR: 500,
+enum errCode {
+  INVALID_PARAM = 400,
+  NOT_FOUND = 404,
+  INTERNAL_ERROR = 500,
 
-  PWD_INCONSISTENT: 1000,
-  USER_DUPLICATE: 1001,
-  NO_USER: 1002,
-  NOT_SIGNIN: 1003,
-  WX_SIGNATURE_INVALID: 1004,
-  CANNOT_DELETE_GAME_CREATED_BY_OTHER: 1005,
-  CANNOT_RE_ENROL: 1006,
-  BAD_GAME_ID: 1007,
-  CANNOT_CANCEL_NOT_ENROLED_GAME: 1008,
+  PWD_INCONSISTENT = 1000,
+  USER_DUPLICATE = 1001,
+  NO_USER = 1002,
+  NOT_SIGNIN = 1003,
+  WX_SIGNATURE_INVALID = 1004,
+  CANNOT_DELETE_GAME_CREATED_BY_OTHER = 1005,
+  CANNOT_RE_ENROL = 1006,
+  BAD_GAME_ID = 1007,
+  CANNOT_CANCEL_NOT_ENROLED_GAME = 1008,
 
-  WX_CODE_ERROR: 40029,
+  WX_CODE_ERROR = 40029,
 }
 
 const errCode2MsgMap = new Map([
@@ -40,8 +40,41 @@ const responseFormat = <T = any>(data: T) => ({
   status: 0,
 })
 
+class CustomError extends Error {
+  public status: number
+
+  public message: string
+
+  constructor(status: errCode) {
+    super()
+    this.status = status
+    this.message = errCode2MsgMap.get(status) || ''
+  }
+
+  public getInfo() {
+    return {
+      data: null,
+      status: this.status,
+      message: this.message,
+    }
+  }
+}
+
+const inRange = (target: number, min: number, max: number) => target >= min && target <= max
+
+class HttpError extends CustomError {
+  constructor(status: errCode) {
+    super(status)
+    if (typeof status !== 'number' || !inRange(status, 200, 600)) {
+      throw Error('Status code is not an valid http code')
+    }
+  }
+}
+
 export default {
-  errCode,
+  CustomError,
+  HttpError,
   responseFormat,
-  getErrMsg: (code: number) => errCode2MsgMap.get(code),
+  errCode,
+  errCode2MsgMap,
 }

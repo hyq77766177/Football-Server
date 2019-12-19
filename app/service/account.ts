@@ -26,8 +26,7 @@ export default class Account extends Service {
       const data = (resp.data as Buffer).toString()
       const parsed = JSON.parse(data)
       if (parsed.errcode) {
-        this.ctx.bizErrorCode = this.ctx.helper.errCode.WX_CODE_ERROR
-        return
+        throw new this.ctx.helper.CustomError(this.ctx.helper.errCode.WX_CODE_ERROR)
       }
       const { session_key, openid } = parsed
       this.setSession(session_key, openid)
@@ -38,24 +37,22 @@ export default class Account extends Service {
         isAdmin: user.isAdmin,
       }
     } catch (e) {
-      this.ctx.logger.error(e)
-      this.ctx.bizErrorCode = this.ctx.helper.errCode.INTERNAL_ERROR
+      throw e
     }
   }
 
   public async validateSignature(signature: string, rawData: string, sessionKey?: string | null) {
     sessionKey = sessionKey || this.ctx.session?.sessionKey
     if (!sessionKey) {
-      this.ctx.bizErrorCode = this.ctx.helper.errCode.WX_SIGNATURE_INVALID
-      return
+      throw new this.ctx.helper.CustomError(this.ctx.helper.errCode.WX_SIGNATURE_INVALID)
     }
     const hashed = crypto
       .createHash('sha1')
       .update(`${rawData}${sessionKey}`)
       .digest('hex')
     if (hashed !== signature) {
-      this.ctx.bizErrorCode = this.ctx.helper.errCode.NOT_SIGNIN
-      return
+      this.ctx.logger.warn('bad signature: hashed: %s, signature: %s', hashed, signature)
+      throw new this.ctx.helper.CustomError(this.ctx.helper.errCode.NOT_SIGNIN)
     }
   }
 
