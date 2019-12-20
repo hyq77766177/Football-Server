@@ -29,7 +29,7 @@ export default (appInfo: EggAppInfo) => {
       const { CustomError, HttpError } = ctx.helper
       let status = 500
       let data = null
-      let errMsg = '服务器内部错误'
+      let errMsg = err.message
       if (err.message === 'Validation Failed') {
         ctx.status = ctx.HTTP_STATUS_CODES.BAD_REQUEST
         data = err.errors

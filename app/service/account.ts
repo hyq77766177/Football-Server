@@ -21,23 +21,19 @@ export default class Account extends Service {
     } = this.ctx.request.body
     const { APP_ID, APP_SECRET } = process.env
     const wxUrl = `https://api.weixin.qq.com/sns/jscode2session?appId=${APP_ID}&secret=${APP_SECRET}&js_code=${code}&grant_type=authorization_code`
-    try {
-      const resp = await this.ctx.curl(wxUrl, { contentType: 'application/json' })
-      const data = (resp.data as Buffer).toString()
-      const parsed = JSON.parse(data)
-      if (parsed.errcode) {
-        throw new this.ctx.helper.CustomError(this.ctx.helper.errCode.WX_CODE_ERROR)
-      }
-      const { session_key, openid } = parsed
-      this.setSession(session_key, openid)
-      this.validateSignature(signature, rawData, session_key)
-      const user = await this.setUser(openid, userInfo)
-      return {
-        id: user._id,
-        isAdmin: user.isAdmin,
-      }
-    } catch (e) {
-      throw e
+    const resp = await this.ctx.curl(wxUrl, { contentType: 'application/json' })
+    const data = (resp.data as Buffer).toString()
+    const parsed = JSON.parse(data)
+    if (parsed.errcode) {
+      throw new this.ctx.helper.CustomError(this.ctx.helper.errCode.WX_CODE_ERROR)
+    }
+    const { session_key, openid } = parsed
+    this.setSession(session_key, openid)
+    this.validateSignature(signature, rawData, session_key)
+    const user = await this.setUser(openid, userInfo)
+    return {
+      id: user._id,
+      isAdmin: user.isAdmin,
     }
   }
 
