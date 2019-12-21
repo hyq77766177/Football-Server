@@ -30,7 +30,7 @@ export default class Account extends Controller {
       this.ctx.body
     )
 
-    const result = await this.ctx.service.account.login()
+    const result = await this.ctx.service.account.login(this.ctx.request.body)
     this.ctx.body = this.ctx.helper.responseFormat(result)
   }
 }

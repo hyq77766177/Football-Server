@@ -41,20 +41,20 @@ const responseFormat = <T = any>(data: T) => ({
 })
 
 class CustomError extends Error {
-  public status: number
+  public statusCode: number
 
   public message: string
 
   constructor(status: errCode) {
     super()
-    this.status = status
+    this.statusCode = status
     this.message = errCode2MsgMap.get(status) || ''
   }
 
   public getInfo() {
     return {
       data: null,
-      status: this.status,
+      status: this.statusCode,
       message: this.message,
     }
   }

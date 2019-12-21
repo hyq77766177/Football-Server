@@ -50,7 +50,7 @@ export default class Game extends Service {
       requiredRefereeAmount,
       avatar,
     } = body
-    await this.ctx.model.Game.create({
+    const game = await this.ctx.model.Game.create({
       gameName,
       gameStartTime,
       gameEndTime,
@@ -61,7 +61,9 @@ export default class Game extends Service {
         id: this.ctx.user?._id,
       },
     })
-    return '创建成功'
+    return {
+      gameId: game.id,
+    }
   }
 
   public async deleteGameById(gameId: string) {
@@ -69,7 +71,7 @@ export default class Game extends Service {
     if (!game) {
       throw new this.ctx.helper.CustomError(this.ctx.helper.errCode.INVALID_PARAM)
     }
-    if (game.publisher.id !== this.ctx.user?._id) {
+    if (game.publisher.id !== this.ctx.user?.id) {
       throw new this.ctx.helper.CustomError(
         this.ctx.helper.errCode.CANNOT_DELETE_GAME_CREATED_BY_OTHER
       )

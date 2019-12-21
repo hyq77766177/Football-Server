@@ -19,7 +19,7 @@ export default class Enrol extends Service {
     if (isEnrolled && !isUpdate) {
       throw new this.ctx.helper.CustomError(this.ctx.helper.errCode.CANNOT_RE_ENROL)
     }
-    await game.update(
+    await game.updateOne(
       {
         [isUpdate ? '$set' : '$push']: {
           referees: { referee: user?._id, availablePeriod, enrolName: refereeName },

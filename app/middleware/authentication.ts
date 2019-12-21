@@ -14,7 +14,8 @@ const authentication = (_, app: Application) => async (ctx: Context, next: () =>
     ctx.user = user
     await next()
     return
-  } else if (app.config.env === 'local' || app.config.env === 'unittest') {
+    // } else if (app.config.env === 'local' || app.config.env === 'unittest') {
+  } else if (app.config.env === 'local') {
     // FIXME: mock data
     const user = await ctx.model.Referee.findOne({})
     if (!user) {
@@ -24,6 +25,10 @@ const authentication = (_, app: Application) => async (ctx: Context, next: () =>
     await next()
     return
   }
+  // } else if (app.config.env === 'unittest') {
+  //   await next()
+  //   return
+  // }
   throw new ctx.helper.CustomError(ctx.helper.errCode.NOT_SIGNIN)
 }
 

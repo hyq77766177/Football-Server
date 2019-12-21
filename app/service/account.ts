@@ -1,24 +1,20 @@
 import crypto from 'crypto'
 import { Service } from 'egg'
 
-export interface IWeixinUserInfo {
-  avatarUrl: string
-  city: string
-  country: string
-  /** 1: ♂ */
-  gender: number
-  language: string
-  nickName: string
-  province: string
-}
-
 export default class Account extends Service {
-  public async login() {
+  public async login(body: loginRequest.ILoginRequest) {
     const {
       code,
       userInfo,
       identity: { signature, rawData },
-    } = this.ctx.request.body
+    } = body
+    if (this.app.config.env === 'unittest') {
+      const user = await this.setUser('test123', userInfo)
+      return {
+        id: user._id,
+        isAdmin: user.isAdmin,
+      }
+    }
     const { APP_ID, APP_SECRET } = process.env
     const wxUrl = `https://api.weixin.qq.com/sns/jscode2session?appId=${APP_ID}&secret=${APP_SECRET}&js_code=${code}&grant_type=authorization_code`
     const resp = await this.ctx.curl(wxUrl, { contentType: 'application/json' })
@@ -28,8 +24,8 @@ export default class Account extends Service {
       throw new this.ctx.helper.CustomError(this.ctx.helper.errCode.WX_CODE_ERROR)
     }
     const { session_key, openid } = parsed
+    await this.validateSignature(signature, rawData, session_key)
     this.setSession(session_key, openid)
-    this.validateSignature(signature, rawData, session_key)
     const user = await this.setUser(openid, userInfo)
     return {
       id: user._id,
@@ -59,7 +55,7 @@ export default class Account extends Service {
     }
   }
 
-  private async setUser(openid: string, userInfo: IWeixinUserInfo) {
+  private async setUser(openid: string, userInfo: loginRequest.IWeixinUserInfo) {
     const { Referee } = this.ctx.model
     let user = await Referee.findOne({ openid })
     if (!user) {

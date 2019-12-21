@@ -14,3 +14,24 @@ declare namespace gameRequest {
     availablePeriod?: string[]
   }
 }
+
+declare namespace loginRequest {
+  interface IWeixinUserInfo {
+    avatarUrl: string
+    city: string
+    country: string
+    /** 1: ♂ */
+    gender: number
+    language: string
+    nickName: string
+    province: string
+  }
+  interface ILoginRequest {
+    code: string
+    identity: {
+      signature: string
+      rawData: string
+    }
+    userInfo: IWeixinUserInfo
+  }
+}
