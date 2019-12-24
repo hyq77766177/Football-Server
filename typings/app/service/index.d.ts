@@ -6,6 +6,7 @@ import ExportAccount from '../../../app/service/account';
 import ExportEnrol from '../../../app/service/enrol';
 import ExportGame from '../../../app/service/game';
 import ExportHome from '../../../app/service/home';
+import ExportReferee from '../../../app/service/referee';
 
 declare module 'egg' {
   interface IService {
@@ -13,5 +14,6 @@ declare module 'egg' {
     enrol: ExportEnrol;
     game: ExportGame;
     home: ExportHome;
+    referee: ExportReferee;
   }
 }
