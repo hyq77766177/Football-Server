@@ -35,3 +35,16 @@ declare namespace loginRequest {
     userInfo: IWeixinUserInfo
   }
 }
+
+declare namespace refereeRequest {
+  interface IUpdateInfo {
+    refereeName?: string
+    refereeHeight?: string
+    refereeWeight?: string
+    refereePhoneNumber?: string
+    refereeIdNumber?: string
+    refereeScholarId?: string
+    refereeCardNumber?: string
+    refereeClass?: string
+  }
+}

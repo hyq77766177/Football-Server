@@ -8,7 +8,19 @@ export default class Referee extends Controller {
     return
   }
 
-  // public async updateReferee() {
-  //   const rules = {}
-  // }
+  public async updateReferee() {
+    const rules = {
+      refereeName: 'string',
+      refereeHeight: 'string',
+      refereeWeight: 'string',
+      refereePhoneNumber: 'string',
+      refereeIdNumber: 'string',
+      refereeScholarId: 'string',
+      refereeCardNumber: 'string',
+      refereeClass: 'string',
+    }
+    this.ctx.validate(rules, this.ctx.request.body)
+    const result = await this.ctx.service.referee.updateRefereeInfo(this.ctx.request.body)
+    this.ctx.body = this.ctx.helper.responseFormat(result)
+  }
 }

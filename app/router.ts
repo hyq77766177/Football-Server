@@ -16,4 +16,5 @@ export default (app: Application) => {
   router.delete('/api/enrol', controller.game.cancelEnrol)
   // referee
   router.get('/api/referee', controller.referee.getReferee)
+  router.post('/api/referee', controller.referee.updateReferee)
 }

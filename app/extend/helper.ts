@@ -12,7 +12,7 @@ enum errCode {
   CANNOT_RE_ENROL,
   BAD_GAME_ID,
   CANNOT_CANCEL_NOT_ENROLED_GAME,
-  LOW_AUTHENTICATION,
+  NO_PERMISSION,
 
   WX_CODE_ERROR = 40029,
 }
@@ -26,7 +26,7 @@ const errCode2MsgMap = new Map([
   [errCode.USER_DUPLICATE, '用户重复'],
   [errCode.NO_USER, '用户不存在'],
   [errCode.NOT_SIGNIN, '会话超时或未登录'],
-  [errCode.LOW_AUTHENTICATION, '权限不足'],
+  [errCode.NO_PERMISSION, '权限不足'],
 
   [errCode.WX_CODE_ERROR, '微信code错误'],
   [errCode.WX_SIGNATURE_INVALID, '签名错误或session过期'],

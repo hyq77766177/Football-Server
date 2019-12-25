@@ -112,7 +112,6 @@ describe('test/app/controller/game.test.ts', () => {
       })
       .expect(200)
 
-    // console.log('***********', result)
     assert.ok(result.body.status === ctx.helper.errCode.CANNOT_RE_ENROL)
   })
 

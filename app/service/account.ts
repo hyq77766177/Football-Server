@@ -9,7 +9,7 @@ export default class Account extends Service {
       identity: { signature, rawData },
     } = body
     if (this.app.config.env === 'unittest') {
-      const user = await this.setUser('test123', userInfo)
+      const user = await this.setUser('test123', userInfo, true)
       return {
         id: user._id,
         isAdmin: user.isAdmin,
@@ -55,19 +55,21 @@ export default class Account extends Service {
     }
   }
 
-  private async setUser(openid: string, userInfo: loginRequest.IWeixinUserInfo) {
+  private async setUser(openid: string, userInfo: loginRequest.IWeixinUserInfo, isAdmin = false) {
     const { Referee } = this.ctx.model
     let user = await Referee.findOne({ openid })
     if (!user) {
       user = await Referee.create({
         openid,
         refereeWeixinInfo: userInfo,
+        isAdmin,
       })
     } else {
       user = await Referee.findOneAndUpdate(
         { openid },
         {
           refereeWeixinInfo: userInfo,
+          isAdmin,
         }
       )
     }
