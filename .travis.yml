@@ -2,7 +2,7 @@ sudo: false
 language: node_js
 branches:
   only:
-    - dev
+    - new
     - master
 node_js:
   - '10'
