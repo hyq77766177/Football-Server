@@ -25,13 +25,23 @@ export default class AppBootHook {
       MONGO_USER,
       MONGO_HOST,
       MONGO_PORT,
+      SIGN_KEY,
     } = result.parsed!
     const { redis, mongoose } = this.app.config
+    this.app.config.keys = SIGN_KEY
     redis.client = {
-      host: REDIS_HOST,
+      host: REDIS_HOST || 'localhost',
       port: (REDIS_PORT && +REDIS_PORT) || 6379,
       password: REDIS_PASSWORD,
       db: (REDIS_DB && +REDIS_DB) || 0,
+    }
+    if (this.app.config.env === 'unittest') {
+      redis.client = {
+        host: 'localhost',
+        port: 6379,
+        db: 0,
+      }
+      return
     }
     mongoose.client &&
       (mongoose.client.url = `mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST}:${MONGO_PORT}/${MONGO_DB}`)

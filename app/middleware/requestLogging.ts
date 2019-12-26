@@ -6,7 +6,7 @@ const requestLogging = () => async (ctx: Context, next: () => Promise<any>) => {
   const headerStr = _.entries(ctx.header)
     .map(item => `\n  - ${item[0]}: ${item[1]}`)
     .join('')
-  ctx.logger.info(chalk.cyan(`\nIncoming reqeust header`), `${headerStr}`)
+  ctx.logger.info(headerStr)
   ctx.logger.debug(chalk.magenta('Request body\n'), ctx.request.body)
   ctx.logger.debug(chalk.magenta('Request query\n'), ctx.request.query)
   await next()

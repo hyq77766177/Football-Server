@@ -5,11 +5,17 @@ branches:
     - dev
     - master
 node_js:
-  - '8'
+  - '10'
+services:
+  - mongodb
+  - redis-server
 before_install:
   - npm i npminstall -g
 install:
   - npminstall
+before_script:
+  - sleep 15
+  - mongo mydb_test --eval 'db.createUser({user:"test",pwd:"test",roles:["readWrite"]});'
 script:
   - npm run ci
 after_script:

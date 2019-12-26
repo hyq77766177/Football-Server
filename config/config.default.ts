@@ -9,7 +9,6 @@ export default (appInfo: EggAppInfo) => {
 
   // override config from framework / plugin
   // use for cookie sign key, should change to your own and keep security
-  config.keys = appInfo.name + '_1573541543157_1398'
 
   config.mongoose = {
     client: {
