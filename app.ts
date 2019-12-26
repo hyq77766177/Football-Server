@@ -9,9 +9,21 @@ export default class AppBootHook {
   }
 
   public configWillLoad() {
+    const { redis, mongoose } = this.app.config
+
+    if (this.app.config.env === 'unittest') {
+      redis.client = {
+        host: 'localhost',
+        port: 6379,
+        db: 0,
+      }
+      this.app.config.keys = 'test_sign_key'
+      return
+    }
+
     const result = dotenv.config()
     if (result.error) {
-      this.app.logger.error('Config ".env" error:\n', result.error)
+      this.app.logger.warn('No Config ".env" ', result.error)
       return
     }
     this.app.logger.debug('.env loaded:\n', result.parsed)
@@ -27,21 +39,12 @@ export default class AppBootHook {
       MONGO_PORT,
       SIGN_KEY,
     } = result.parsed!
-    const { redis, mongoose } = this.app.config
-    this.app.config.keys = SIGN_KEY || 'test_sign_key'
+    this.app.config.keys = SIGN_KEY
     redis.client = {
       host: REDIS_HOST || 'localhost',
       port: (REDIS_PORT && +REDIS_PORT) || 6379,
       password: REDIS_PASSWORD,
       db: (REDIS_DB && +REDIS_DB) || 0,
-    }
-    if (this.app.config.env === 'unittest') {
-      redis.client = {
-        host: 'localhost',
-        port: 6379,
-        db: 0,
-      }
-      return
     }
     mongoose.client &&
       (mongoose.client.url = `mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST}:${MONGO_PORT}/${MONGO_DB}`)
