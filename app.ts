@@ -28,7 +28,7 @@ export default class AppBootHook {
       SIGN_KEY,
     } = result.parsed!
     const { redis, mongoose } = this.app.config
-    this.app.config.keys = SIGN_KEY
+    this.app.config.keys = SIGN_KEY || 'test_sign_key'
     redis.client = {
       host: REDIS_HOST || 'localhost',
       port: (REDIS_PORT && +REDIS_PORT) || 6379,
