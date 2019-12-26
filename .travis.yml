@@ -8,7 +8,6 @@ node_js:
   - '10'
 services:
   - mongodb
-  - redis-server
 before_install:
   - npm i npminstall -g
 install:
@@ -16,6 +15,7 @@ install:
 before_script:
   - sleep 15
   - mongo football --eval 'db.createUser({user:"test",pwd:"test",roles:[{role:"dbOwner",db:"football"}]});'
+  - sudo redis-server /etc/redis/redis.conf --port 6379 --requirepass 'test'
 script:
   - npm run ci
 after_script:
