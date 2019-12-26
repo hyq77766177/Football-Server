@@ -8,7 +8,7 @@ export default class Account extends Service {
       userInfo,
       identity: { signature, rawData },
     } = body
-    if (this.app.config.env === 'unittest') {
+    if (this.app.config.env === 'unittest' || this.app.config.env === 'ci') {
       const user = await this.setUser('test123', userInfo, true)
       return {
         id: user._id,
