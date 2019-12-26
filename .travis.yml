@@ -15,7 +15,7 @@ install:
   - npminstall
 before_script:
   - sleep 15
-  - mongo mydb_test --eval 'db.createUser({user:"test",pwd:"test",roles:[{role:"dbOwner",db:"football"}]});'
+  - mongo football --eval 'db.createUser({user:"test",pwd:"test",roles:[{role:"dbOwner",db:"football"}]});'
 script:
   - npm run ci
 after_script:

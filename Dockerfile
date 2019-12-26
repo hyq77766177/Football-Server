@@ -21,4 +21,3 @@ COPY . /usr/src/app
 EXPOSE 7001
 
 CMD npm run start
-
