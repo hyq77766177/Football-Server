@@ -22,10 +22,12 @@ const mockUser = {
 describe('test/app/controller/game.test.ts', () => {
   let ctx: Context
   let gameId: string
+  let userId: string
 
   beforeEach(() => {
     ctx = app.mockContext({ user: mockUser })
     app.mockSession({
+      id: userId || 'test123',
       openid: 'test123',
       session_key: 'test_session_key',
     })
@@ -47,6 +49,7 @@ describe('test/app/controller/game.test.ts', () => {
     assert.ok(result.body.status === 0)
     mockUser.id = result.body.data.id
     mockUser._id = result.body.data.id
+    userId = mockUser._id
   })
 
   it('should get all games', async () => {
@@ -71,7 +74,7 @@ describe('test/app/controller/game.test.ts', () => {
         gameEndTime: 1576819960800,
         gameAvailablePeriod: ['t1', 't2'],
         requiredRefereeAmount: 4,
-        avatar: 'http://img.sorayamah.org/test.png',
+        gamePublisherName: 'testPublisher',
       })
       .expect(201)
 
@@ -82,7 +85,7 @@ describe('test/app/controller/game.test.ts', () => {
   it('should enrol a game', async () => {
     const result = await app
       .httpRequest()
-      .post('/api/enrol')
+      .post('/api/game/enrol')
       .type('application/json')
       .send({
         gameId,
@@ -102,7 +105,7 @@ describe('test/app/controller/game.test.ts', () => {
   it('should NOT enrol again', async () => {
     const result = await app
       .httpRequest()
-      .post('/api/enrol')
+      .post('/api/game/enrol')
       .accept('application/json')
       .type('application/json')
       .send({
@@ -115,10 +118,28 @@ describe('test/app/controller/game.test.ts', () => {
     assert.ok(result.body.status === ctx.helper.errCode.CANNOT_RE_ENROL)
   })
 
+  it('should assign successfully', async () => {
+    const refereeId = String(ctx.user?._id)
+    const result = await app
+      .httpRequest()
+      .put('/api/game/assign')
+      .type('application/json')
+      .accept('application/json')
+      .send({
+        gameId,
+        refereeId,
+        assigned: true,
+      })
+      .expect(200)
+    const game = await ctx.model.Game.findById(gameId).populate('referees.referee')
+    assert.ok(result.body.status === 0)
+    assert.ok(some(game?.referees, r => String(r.referee._id) === refereeId && r.assigned))
+  })
+
   it('should update enrol', async () => {
     const result = await app
       .httpRequest()
-      .put('/api/enrol')
+      .put('/api/game/enrol')
       .type('application/json')
       .send({
         gameId,
@@ -136,7 +157,7 @@ describe('test/app/controller/game.test.ts', () => {
   it('should cancel enrol', async () => {
     const result = await app
       .httpRequest()
-      .del('/api/enrol')
+      .del('/api/game/enrol')
       .type('application/json')
       .send({
         gameId,
@@ -154,7 +175,7 @@ describe('test/app/controller/game.test.ts', () => {
         gameId,
       })
       .expect(200)
-    assert.ok(result.body.status === 0)
-    assert.ok(result.body.data === '删除成功')
+    assert.equal(result.body.status, 0)
+    assert.equal(result.body.data, '删除成功')
   })
 })

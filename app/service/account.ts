@@ -8,6 +8,7 @@ export default class Account extends Service {
       userInfo,
       identity: { signature, rawData },
     } = body
+    // for test
     if (this.app.config.env === 'unittest' || this.app.config.env === 'ci') {
       const user = await this.setUser('test123', userInfo, true)
       return {
@@ -15,6 +16,16 @@ export default class Account extends Service {
         isAdmin: user.isAdmin,
       }
     }
+    // session not expired
+    const userId = this.ctx.session?.id
+    if (userId) {
+      const user = await this.ctx.model.Referee.findById(userId)
+      return {
+        id: userId,
+        isAdmin: user?.isAdmin || false,
+      }
+    }
+
     const { APP_ID, APP_SECRET } = process.env
     const wxUrl = `https://api.weixin.qq.com/sns/jscode2session?appId=${APP_ID}&secret=${APP_SECRET}&js_code=${code}&grant_type=authorization_code`
     const resp = await this.ctx.curl(wxUrl, { contentType: 'application/json' })
@@ -25,8 +36,9 @@ export default class Account extends Service {
     }
     const { session_key, openid } = parsed
     await this.validateSignature(signature, rawData, session_key)
-    this.setSession(session_key, openid)
     const user = await this.setUser(openid, userInfo)
+    const { _id } = user
+    this.setSession(session_key, _id, openid)
     return {
       id: user._id,
       isAdmin: user.isAdmin,
@@ -48,9 +60,10 @@ export default class Account extends Service {
     }
   }
 
-  public setSession(sessionKey?: string | null, openid?: string | null) {
+  public setSession(sessionKey?: string | null, id?: string | null, openid?: string | null) {
     this.ctx.session = {
       sessionKey,
+      id,
       openid,
     }
   }
@@ -69,7 +82,6 @@ export default class Account extends Service {
         { openid },
         {
           refereeWeixinInfo: userInfo,
-          isAdmin,
         }
       )
     }

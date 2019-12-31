@@ -27,7 +27,7 @@ export default class Account extends Controller {
           },
         },
       },
-      this.ctx.body
+      this.ctx.request.body
     )
 
     const result = await this.ctx.service.account.login(this.ctx.request.body)

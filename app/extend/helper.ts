@@ -11,6 +11,7 @@ enum errCode {
   CANNOT_DELETE_GAME_CREATED_BY_OTHER,
   CANNOT_RE_ENROL,
   BAD_GAME_ID,
+  BAD_REFEREE_ID,
   CANNOT_CANCEL_NOT_ENROLED_GAME,
   NO_PERMISSION,
 
@@ -33,6 +34,7 @@ const errCode2MsgMap = new Map([
   [errCode.CANNOT_DELETE_GAME_CREATED_BY_OTHER, '不能删除他人创建的比赛'],
   [errCode.CANNOT_RE_ENROL, '不能重复报名'],
   [errCode.BAD_GAME_ID, '错误的比赛ID'],
+  [errCode.BAD_REFEREE_ID, '错误的用户ID'],
   [errCode.CANNOT_CANCEL_NOT_ENROLED_GAME, '不能取消未报名的比赛'],
 ])
 

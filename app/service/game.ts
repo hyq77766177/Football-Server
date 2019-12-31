@@ -13,7 +13,9 @@ export default class Game extends Service {
    */
   public async getAll() {
     // const { _id } = this.ctx.request.query
-    const games = await this.ctx.model.Game.find().populate('referees.referee')
+    const games = await this.ctx.model.Game.find()
+      .populate('referees.referee')
+      .populate('gamePublisher.userInfo')
     const openid = this.ctx.session?.openid
     const id = this.ctx.user?.id
     this.ctx.logger.debug('openid', openid)
@@ -24,7 +26,7 @@ export default class Game extends Service {
         myCreatedGames: [],
       }
     }
-    const myCreatedGames = filter(games, game => game.publisher.id === id)
+    const myCreatedGames = filter(games, game => game.gamePublisher.userInfo.id === id)
     const myEnroledGames = filter(games, game =>
       some(game.referees, referee => referee.referee.id === id)
     )
@@ -38,6 +40,8 @@ export default class Game extends Service {
 
   public async getGameById(gameId: string) {
     const game = await this.ctx.model.Game.findById(gameId)
+      .populate('referees.referee')
+      .populate('gamePublisher.userInfo')
     return game
   }
 
@@ -48,7 +52,7 @@ export default class Game extends Service {
       gameEndTime,
       gameAvailablePeriod,
       requiredRefereeAmount,
-      avatar,
+      gamePublisherName,
     } = body
     const game = await this.ctx.model.Game.create({
       gameName,
@@ -56,9 +60,9 @@ export default class Game extends Service {
       gameEndTime,
       gameAvailablePeriod,
       requiredRefereeAmount,
-      publisher: {
-        avatar,
-        id: this.ctx.user?._id,
+      gamePublisher: {
+        name: gamePublisherName,
+        userInfo: this.ctx.user?._id,
       },
     })
     return {
@@ -71,7 +75,7 @@ export default class Game extends Service {
     if (!game) {
       throw new this.ctx.helper.CustomError(this.ctx.helper.errCode.INVALID_PARAM)
     }
-    if (game.publisher.id !== this.ctx.user?.id) {
+    if (String(game.gamePublisher.userInfo._id) !== String(this.ctx.user?._id)) {
       throw new this.ctx.helper.CustomError(
         this.ctx.helper.errCode.CANNOT_DELETE_GAME_CREATED_BY_OTHER
       )

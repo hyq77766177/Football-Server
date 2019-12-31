@@ -5,7 +5,7 @@ declare namespace gameRequest {
     gameEndTime: number
     gameAvailablePeriod: string[]
     requiredRefereeAmount: number
-    avatar: string
+    gamePublisherName: string
   }
 
   interface IEnrolGame {

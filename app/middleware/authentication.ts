@@ -5,8 +5,8 @@ const authentication = (_, app: Application) => async (ctx: Context, next: () =>
     await next()
     return
   }
-  if (ctx.session && ctx.session.openid) {
-    const user = await ctx.model.Referee.findOne({ openid: ctx.session.openid })
+  if (ctx.session?.id) {
+    const user = await ctx.model.Referee.findById(ctx.session?.id)
     ctx.logger.debug('User Query', user)
     if (!user) {
       throw new ctx.helper.CustomError(ctx.helper.errCode.NO_USER)

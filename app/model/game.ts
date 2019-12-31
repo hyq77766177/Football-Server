@@ -8,12 +8,14 @@ export interface GameModel extends Document {
   gameEndTime: number
   gameAvailablePeriod: string[]
   requiredRefereeAmount: number
-  publisher: {
-    id: string
-    avatar: string
+  gamePublisher: {
+    name: string
+    userInfo: RefereeModel
   }
   referees: Array<{
+    _id: string
     referee: RefereeModel
+    assigned: boolean
     enrolName: string
     availablePeriod: string[]
   }>
@@ -31,9 +33,12 @@ export default (app: Application) => {
     gameEndTime: Schema.Types.Date,
     gameAvailablePeriod: [String],
     requiredRefereeAmount: Number,
-    publisher: {
-      id: String,
-      avatar: { type: String, default: '' },
+    gamePublisher: {
+      name: String,
+      userInfo: {
+        type: ObjectId,
+        ref: 'Referee',
+      },
     },
     referees: {
       type: [
@@ -41,6 +46,10 @@ export default (app: Application) => {
           referee: {
             type: ObjectId,
             ref: 'Referee',
+          },
+          assigned: {
+            type: Boolean,
+            default: false,
           },
           availablePeriod: [String],
           enrolName: String,

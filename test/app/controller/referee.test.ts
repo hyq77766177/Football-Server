@@ -20,10 +20,12 @@ const mockUser = {
 
 describe('test/app/controller/referee.test.ts', () => {
   let ctx: Context
+  let userId: string
 
   beforeEach(() => {
     ctx = app.mockContext({ user: mockUser })
     app.mockSession({
+      id: userId || 'test123',
       openid: 'test123',
       session_key: 'test_session_key',
     })
@@ -45,6 +47,7 @@ describe('test/app/controller/referee.test.ts', () => {
     assert.ok(result.body.status === 0)
     mockUser.id = result.body.data.id
     mockUser._id = result.body.data.id
+    userId = mockUser._id
   })
 
   it('should get referee info', async () => {

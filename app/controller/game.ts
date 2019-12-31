@@ -26,7 +26,7 @@ export default class Game extends Controller {
       gameEndTime: { type: 'number', required: true },
       gameAvailablePeriod: { type: 'array', required: true, itemType: 'string' },
       requiredRefereeAmount: { type: 'number', required: true },
-      avatar: {
+      gamePublisherName: {
         type: 'string',
         required: true,
       },
@@ -70,6 +70,18 @@ export default class Game extends Controller {
     this.ctx.validate({ gameId: { type: 'string', required: true } }, this.ctx.request.body)
     const { gameId } = this.ctx.request.body
     const result = await this.ctx.service.enrol.cancelEnrol(gameId)
+    this.ctx.body = this.ctx.helper.responseFormat(result)
+  }
+
+  public async assign() {
+    const rules = {
+      gameId: { type: 'string', required: true },
+      refereeId: { type: 'string', required: true },
+      assigned: { type: 'boolean', default: true },
+    }
+    this.ctx.validate(rules, this.ctx.request.body)
+    const { gameId, refereeId, assigned } = this.ctx.request.body
+    const result = await this.ctx.service.enrol.updateAssignStatus(gameId, refereeId, assigned)
     this.ctx.body = this.ctx.helper.responseFormat(result)
   }
 }
