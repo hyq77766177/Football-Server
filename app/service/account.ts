@@ -13,7 +13,7 @@ export default class Account extends Service {
       const user = await this.setUser('test123', userInfo, true)
       return {
         id: user._id,
-        isAdmin: user.isAdmin,
+        isAdmin: true,
       }
     }
     // session not expired
@@ -68,9 +68,10 @@ export default class Account extends Service {
     }
   }
 
-  private async setUser(openid: string, userInfo: loginRequest.IWeixinUserInfo, isAdmin = false) {
+  private async setUser(openid: string, userInfo: loginRequest.IWeixinUserInfo, isAdmin?: boolean) {
     const { Referee } = this.ctx.model
     let user = await Referee.findOne({ openid })
+    isAdmin = typeof isAdmin === 'boolean' ? isAdmin : false
     if (!user) {
       user = await Referee.create({
         openid,
@@ -82,6 +83,7 @@ export default class Account extends Service {
         { openid },
         {
           refereeWeixinInfo: userInfo,
+          isAdmin,
         }
       )
     }

@@ -39,10 +39,7 @@ export default (app: Application) => {
       nickName: String,
       province: String,
     },
-    isAdmin: {
-      type: Boolean,
-      default: false,
-    },
+    isAdmin: Boolean,
   })
   return app.mongoose.model<RefereeModel>('Referee', refereeSchema)
 }

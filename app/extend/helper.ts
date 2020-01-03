@@ -1,5 +1,6 @@
 enum errCode {
   INVALID_PARAM = 400,
+  UNAUTHORIZED = 401,
   NOT_FOUND = 404,
   INTERNAL_ERROR = 500,
 
@@ -20,6 +21,7 @@ enum errCode {
 
 const errCode2MsgMap = new Map([
   [errCode.NOT_FOUND, '资源不存在'],
+  [errCode.UNAUTHORIZED, '未登录或会话过期'],
   [errCode.INVALID_PARAM, '请求参数错误'],
   [errCode.INTERNAL_ERROR, '服务内部错误'],
 

@@ -82,6 +82,7 @@ describe('test/app/controller/referee.test.ts', () => {
         refereePhoneNumber: '1111111111',
         refereeIdNumber: '1111111',
         refereeScholarId: '44444',
+        refereeBankNumber: '44444',
         refereeCardNumber: '2333',
         refereeClass: '1',
       })

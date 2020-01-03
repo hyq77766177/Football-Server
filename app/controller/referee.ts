@@ -17,6 +17,7 @@ export default class Referee extends Controller {
       refereeIdNumber: 'string',
       refereeScholarId: 'string',
       refereeCardNumber: 'string',
+      refereeBankNumber: 'string',
       refereeClass: 'string',
     }
     this.ctx.validate(rules, this.ctx.request.body)

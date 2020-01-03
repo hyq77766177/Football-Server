@@ -29,7 +29,7 @@ const authentication = (_, app: Application) => async (ctx: Context, next: () =>
   //   await next()
   //   return
   // }
-  throw new ctx.helper.CustomError(ctx.helper.errCode.NOT_SIGNIN)
+  throw new ctx.helper.HttpError(ctx.helper.errCode.UNAUTHORIZED)
 }
 
 export default authentication
