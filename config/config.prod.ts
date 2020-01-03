@@ -4,6 +4,7 @@ export default () => {
   const config: PowerPartial<EggAppConfig> = {}
   config.logger = {
     level: 'INFO',
+    dir: '/var/logs/new-football-server',
   }
   return config
 }

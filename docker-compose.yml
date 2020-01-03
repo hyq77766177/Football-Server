@@ -1,0 +1,57 @@
+version: '3'
+
+services:
+  football-nginx:
+    image: nginx:alpine
+    container_name: 'football-nginx'
+    ports:
+      - '443:443'
+    restart: always
+    volumes:
+      - ~/myrepo/sorayama-live/dist:/usr/share/nginx/html
+      - /etc/nginx/1_www.sorayamah.org_bundle.crt:/etc/nginx/1_www.sorayamah.org_bundle.crt
+      - /etc/nginx/2_www.sorayamah.org.key:/etc/nginx/2_www.sorayamah.org.key
+      - /etc/nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - football
+
+  server:
+    build:
+      context: .
+    image: football-server
+    container_name: 'football-server'
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - EGG_SERVER_ENV=prod
+    depends_on:
+      - mongo
+    networks:
+      - football
+    ports:
+      - 80:7001
+    volumes:
+      - app_log:/var/logs/new-football-server
+
+  mongo:
+    image: mongo:3.6.5
+    container_name: 'football-mongo'
+    env_file:
+      - .env
+    ports:
+      - '27018:27017'
+    restart: always
+    volumes:
+      - mongo_data:/data/db
+      - ./init_user.js:/docker-entrypoint-initdb.d/init_user.js
+    networks:
+      - football
+
+volumes:
+  mongo_data:
+  app_log:
+
+networks:
+  football:
