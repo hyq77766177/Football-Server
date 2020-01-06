@@ -31,9 +31,10 @@ services:
     networks:
       - football
     ports:
-      - 80:7001
+      - 8012:7001
     volumes:
-      - app_log:/var/logs/new-football-server
+      - /var/log/new-football-server:/root/logs/new-football-server
+      # - app_log:/var/logs/new-football-server
 
   mongo:
     image: mongo:3.6.5
@@ -41,7 +42,7 @@ services:
     env_file:
       - .env
     ports:
-      - '27018:27017'
+      - '27017:27017'
     restart: always
     volumes:
       - mongo_data:/data/db
@@ -49,9 +50,24 @@ services:
     networks:
       - football
 
+  redis:
+    image: redis
+    container_name: 'redis'
+    env_file:
+      - .env
+    command: redis-server --requirepass ${REDIS_PASSWORD} --appendonly yes
+    ports:
+      - '6379:6379'
+    volumes:
+      - redisDb:/data
+    networks:
+      - football
+    restart: always
+
 volumes:
   mongo_data:
-  app_log:
+  # app_log:
+  redisDb:
 
 networks:
   football:
