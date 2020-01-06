@@ -13,5 +13,16 @@ export default () => {
     },
   }
 
+  config.redis = {
+    client: {
+      host: 'localhost',
+      port: 6379,
+      password: 'test',
+      db: 0,
+    },
+  }
+
+  config.keys = 'test_sign_key'
+
   return config
 }

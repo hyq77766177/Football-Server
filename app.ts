@@ -12,13 +12,6 @@ export default class AppBootHook {
     const { redis, mongoose } = this.app.config
 
     if (this.app.config.env === 'ci') {
-      redis.client = {
-        host: 'localhost',
-        port: 6379,
-        password: 'test',
-        db: 0,
-      }
-      this.app.config.keys = 'test_sign_key'
       return
     }
 
