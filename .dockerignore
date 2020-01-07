@@ -1,5 +1,1 @@
-/bin
-/node_modules
-/.vscode
-
-*.log
+package-lock.json

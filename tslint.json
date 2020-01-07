@@ -1,0 +1,14 @@
+{
+  "extends": ["tslint-config-egg", "tslint-config-prettier", "tslint-plugin-prettier"],
+  "jsRules": {
+    "object-literal-sort-keys": false
+  },
+  "rules": {
+    "prettier": true,
+    "object-literal-sort-keys": false,
+    "max-classes-per-file": [true, 10],
+    "variable-name": [true, "allow-leading-underscore"],
+    "no-unused-expression": [true, "allow-fast-null-checks"],
+    "align": [true, "statements"]
+  }
+}

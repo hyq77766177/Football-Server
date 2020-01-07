@@ -1,15 +1,46 @@
-if (!process.env.ENV_INIT) {
-  require('dotenv').load();
-}
+import { Application } from 'egg'
+import dotenv from 'dotenv'
 
-/// <reference path="./config.ts" />
+export default class AppBootHook {
+  app: Application
 
-import * as express from 'express';
-import { Routers } from './router';
+  constructor(app: Application) {
+    this.app = app
+  }
 
-export namespace server {
+  public configWillLoad() {
+    const { redis, mongoose } = this.app.config
 
-  export const app = express();
-  Routers.RouterMgr = new Routers(app);
+    if (this.app.config.env === 'ci') {
+      return
+    }
 
+    const result = dotenv.config()
+    if (result.error) {
+      this.app.logger.warn('No Config ".env" ', result.error)
+      return
+    }
+    this.app.logger.debug('.env loaded:\n', result.parsed)
+    const {
+      REDIS_HOST,
+      REDIS_PORT,
+      REDIS_PASSWORD,
+      REDIS_DB,
+      MONGO_DB,
+      MONGO_PASSWORD,
+      MONGO_USER,
+      MONGO_HOST,
+      MONGO_PORT,
+      SIGN_KEY,
+    } = result.parsed!
+    this.app.config.keys = SIGN_KEY
+    redis.client = {
+      host: REDIS_HOST || 'localhost',
+      port: (REDIS_PORT && +REDIS_PORT) || 6379,
+      password: REDIS_PASSWORD,
+      db: (REDIS_DB && +REDIS_DB) || 0,
+    }
+    mongoose.client &&
+      (mongoose.client.url = `mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST}:${MONGO_PORT}/${MONGO_DB}`)
+  }
 }
