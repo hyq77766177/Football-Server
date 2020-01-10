@@ -6,7 +6,7 @@ export default class Account extends Service {
     const {
       code,
       userInfo,
-      identity: { signature, rawData },
+      // identity: { signature, rawData },
     } = body
     // for test
     if (this.app.config.env === 'unittest' || this.app.config.env === 'ci') {
@@ -35,7 +35,7 @@ export default class Account extends Service {
       throw new this.ctx.helper.CustomError(this.ctx.helper.errCode.WX_CODE_ERROR)
     }
     const { session_key, openid } = parsed
-    await this.validateSignature(signature, rawData, session_key)
+    // await this.validateSignature(signature, rawData, session_key)
     const user = await this.setUser(openid, userInfo)
     const { _id } = user
     this.setSession(session_key, _id, openid)
@@ -68,7 +68,11 @@ export default class Account extends Service {
     }
   }
 
-  private async setUser(openid: string, userInfo: loginRequest.IWeixinUserInfo, isAdmin?: boolean) {
+  private async setUser(
+    openid: string,
+    userInfo: loginRequest.IWeixinUserInfo = {},
+    isAdmin?: boolean
+  ) {
     const { Referee } = this.ctx.model
     let user = await Referee.findOne({ openid })
     isAdmin = typeof isAdmin === 'boolean' ? isAdmin : false

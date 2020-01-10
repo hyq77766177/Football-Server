@@ -18,7 +18,7 @@ export default (appInfo: EggAppInfo) => {
   }
 
   // add your egg config in here
-  config.middleware = ['requestLogging', 'authentication']
+  config.middleware = ['requestLogging']
 
   config.onerror = {
     all(err: any, ctx: Context) {
@@ -42,7 +42,7 @@ export default (appInfo: EggAppInfo) => {
         errMsg,
         status,
       }
-      ctx.body = ctx.headers.accept === 'application/json' ? resp : JSON.stringify(resp)
+      ctx.body = ctx.headers.accept?.indexOf('application/json') > -1 ? resp : JSON.stringify(resp)
     },
   }
 
