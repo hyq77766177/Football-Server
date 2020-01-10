@@ -1,5 +1,7 @@
 # Personal Football Referee Manage System Backend
 
+[![Build Status](https://travis-ci.org/SoraYama/Football-Server.svg?branch=master)](https://travis-ci.org/SoraYama/Football-Server)
+
 ## QuickStart
 
 ### Development
