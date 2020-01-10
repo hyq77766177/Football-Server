@@ -8,7 +8,6 @@ services:
       - '443:443'
     restart: always
     volumes:
-      # - ~/myrepo/sorayama-live/dist:/usr/share/nginx/html
       - /etc/nginx/1_www.sorayamah.org_bundle.crt:/etc/nginx/1_www.sorayamah.org_bundle.crt
       - /etc/nginx/2_www.sorayamah.org.key:/etc/nginx/2_www.sorayamah.org.key
       - /etc/nginx/conf.d:/etc/nginx/conf.d
@@ -30,11 +29,8 @@ services:
       - mongo
     networks:
       - football
-    ports:
-      - '8012:7001'
     volumes:
       - /var/log/new-football-server:/root/logs/new-football-server
-      # - app_log:/var/logs/new-football-server
 
   mongo:
     image: mongo:3.6.5
