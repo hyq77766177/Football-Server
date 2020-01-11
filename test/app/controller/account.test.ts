@@ -93,7 +93,7 @@ describe('test/app/controller/account.test.ts', () => {
   })
 
   after(async () => {
-    await ctx.model.Auth.deleteMany({ openid: mockUser.openid })
+    await ctx.model.Auth.deleteMany({ openid: targetOpenid })
     await ctx.model.Referee.deleteOne({ openid: targetOpenid })
   })
 })
