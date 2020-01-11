@@ -68,14 +68,32 @@ export default class Account extends Service {
     }
   }
 
+  public async setAdmin(openid: string, admin: boolean) {
+    const { Auth, Referee } = this.ctx.model
+    const { CustomError, errCode } = this.ctx.helper
+    const operatorAuth = await Auth.findOne({ openid: this.ctx.session?.openid || '' })
+    if (!operatorAuth?.superAdmin) {
+      throw new CustomError(errCode.NO_PERMISSION)
+    }
+    const targetUser = await Referee.findOne({ openid })
+    const result = await Auth.updateOne(
+      { openid },
+      { admin, user: targetUser?._id || '' },
+      { upsert: true }
+    )
+    return result
+  }
+
   private async setUser(
     openid: string,
     userInfo: loginRequest.IWeixinUserInfo = {},
     isAdmin?: boolean
   ) {
-    const { Referee } = this.ctx.model
+    const { Referee, Auth } = this.ctx.model
     let user = await Referee.findOne({ openid })
-    isAdmin = typeof isAdmin === 'boolean' ? isAdmin : false
+    const auth = await Auth.findOne({ openid })
+    this.ctx.logger.debug('auth, ', auth)
+    isAdmin = typeof isAdmin === 'boolean' ? isAdmin : auth?.admin || false
     if (!user) {
       user = await Referee.create({
         openid,

@@ -33,4 +33,19 @@ export default class Account extends Controller {
     const result = await this.ctx.service.account.login(this.ctx.request.body)
     this.ctx.body = this.ctx.helper.responseFormat(result)
   }
+
+  public async setAdmin() {
+    const rule = {
+      openid: 'string',
+      admin: {
+        type: 'boolean',
+        required: false,
+        default: true,
+      },
+    }
+    this.ctx.validate(rule, this.ctx.request.body)
+    const { openid, admin = true } = this.ctx.request.body
+    const result = await this.ctx.service.account.setAdmin(openid, admin)
+    this.ctx.body = this.ctx.helper.responseFormat(result)
+  }
 }
