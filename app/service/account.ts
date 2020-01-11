@@ -1,6 +1,11 @@
 import crypto from 'crypto'
 import { Service } from 'egg'
 
+interface IWechatLoginResponse {
+  session_key: string
+  openid: string
+}
+
 export default class Account extends Service {
   public async login(body: loginRequest.ILoginRequest) {
     const {
@@ -18,30 +23,43 @@ export default class Account extends Service {
     }
     // session not expired
     const userId = this.ctx.session?.id
+    let auth = await this.ctx.model.Auth.findOne({ openid: this.ctx.session?.openid })
     if (userId) {
-      const user = await this.ctx.model.Referee.findById(userId)
       return {
         id: userId,
-        isAdmin: user?.isAdmin || false,
+        isAdmin: auth?.admin || false,
       }
     }
-
-    const { APP_ID, APP_SECRET } = process.env
-    const wxUrl = `https://api.weixin.qq.com/sns/jscode2session?appId=${APP_ID}&secret=${APP_SECRET}&js_code=${code}&grant_type=authorization_code`
-    const resp = await this.ctx.curl(wxUrl, { contentType: 'application/json' })
-    const data = (resp.data as Buffer).toString()
-    const parsed = JSON.parse(data)
-    if (parsed.errcode) {
-      throw new this.ctx.helper.CustomError(this.ctx.helper.errCode.WX_CODE_ERROR)
-    }
-    const { session_key, openid } = parsed
+    const { session_key, openid } = await this.getWechatLoginData(code)
     // await this.validateSignature(signature, rawData, session_key)
     const user = await this.setUser(openid, userInfo)
     const { _id } = user
     this.setSession(session_key, _id, openid)
+    auth = await this.ctx.model.Auth.findOne({ openid })
     return {
       id: user._id,
-      isAdmin: user.isAdmin,
+      isAdmin: auth?.admin || false,
+    }
+  }
+
+  public async getLoginStatus(code: string) {
+    const {
+      model,
+      helper: { CustomError, errCode },
+    } = this.ctx
+    const { session_key, openid } = await this.getWechatLoginData(code)
+    const auth = await model.Auth.findOne({ openid })
+    const isAdmin = auth?.admin || false
+    this.ctx.logger.debug('auth in login', auth)
+    const user = await model.Referee.findOneAndUpdate({ openid }, { isAdmin })
+    if (!user) {
+      throw new CustomError(errCode.NO_USER_NEED_SIGN_UP)
+    }
+    this.setSession(session_key, user._id, openid)
+    return {
+      id: user._id,
+      userInfo: user.refereeWeixinInfo,
+      isAdmin,
     }
   }
 
@@ -82,6 +100,21 @@ export default class Account extends Service {
       { upsert: true }
     )
     return result
+  }
+
+  private async getWechatLoginData(code: string): Promise<IWechatLoginResponse> {
+    const { APP_ID, APP_SECRET } = process.env
+    const wxUrl = `https://api.weixin.qq.com/sns/jscode2session?appId=${APP_ID}&secret=${APP_SECRET}&js_code=${code}&grant_type=authorization_code`
+    const resp = await this.ctx.curl(wxUrl, { contentType: 'application/json' })
+    const data = JSON.parse((resp.data as Buffer).toString())
+    if (data.errcode) {
+      throw new this.ctx.helper.CustomError(this.ctx.helper.errCode.WX_CODE_ERROR)
+    }
+    const { session_key, openid } = data
+    return {
+      session_key,
+      openid,
+    }
   }
 
   private async setUser(

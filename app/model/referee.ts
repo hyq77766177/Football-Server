@@ -11,6 +11,7 @@ export interface RefereeModel extends Document {
   refereeBankNumber?: string
   refereeCardNumber?: string
   refereeClass?: string
+  refereeWeixinInfo?: loginRequest.IWeixinUserInfo
   isAdmin: boolean
   openid: string
 }

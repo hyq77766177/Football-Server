@@ -5,6 +5,7 @@ enum errCode {
   INTERNAL_ERROR = 500,
 
   PWD_INCONSISTENT = 1000,
+  NO_USER_NEED_SIGN_UP,
   USER_DUPLICATE,
   NO_USER,
   NOT_SIGNIN,
@@ -26,6 +27,7 @@ const errCode2MsgMap = new Map([
   [errCode.INTERNAL_ERROR, '服务内部错误'],
 
   [errCode.PWD_INCONSISTENT, '密码不一致'],
+  [errCode.NO_USER_NEED_SIGN_UP, '需先注册'],
   [errCode.USER_DUPLICATE, '用户重复'],
   [errCode.NO_USER, '用户不存在'],
   [errCode.NOT_SIGNIN, '会话超时或未登录'],

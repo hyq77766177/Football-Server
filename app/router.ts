@@ -5,7 +5,8 @@ export default (app: Application) => {
   // index
   router.get('/', controller.home.index)
   // login
-  router.post('/api/login', controller.account.login)
+  router.get('/api/login', controller.account.login)
+  router.post('/api/login', controller.account.register)
   // account
   router.post('/api/admin', middleware.authentication(), controller.account.setAdmin)
   // game
