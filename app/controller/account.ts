@@ -7,7 +7,6 @@ export default class Account extends Controller {
         code: { type: 'string', required: true },
         identity: {
           type: 'object',
-          // required: true,
           rule: {
             signature: 'string',
             rawData: 'string',
@@ -15,7 +14,6 @@ export default class Account extends Controller {
         },
         userInfo: {
           type: 'object',
-          // required: true,
           rule: {
             avatarUrl: 'string',
             city: 'string',
