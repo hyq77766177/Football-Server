@@ -12,14 +12,6 @@ const authentication = () => async (ctx: Context, next: () => Promise<any>) => {
     ctx.user = user!
     await next()
     return
-    // } else if (app.config.env === 'local') {
-    //   const user = await ctx.model.Referee.findOne({})
-    //   if (!user) {
-    //     throw new ctx.helper.CustomError(ctx.helper.errCode.NO_USER)
-    //   }
-    //   ctx.user = user
-    //   await next()
-    //   return
   }
   throw new ctx.helper.HttpError(ctx.helper.errCode.UNAUTHORIZED)
 }
