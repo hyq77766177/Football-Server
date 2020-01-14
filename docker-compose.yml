@@ -8,11 +8,14 @@ services:
       - '443:443'
     restart: always
     volumes:
+      - /etc/nginx/1_githook.sorayamah.org_bundle.crt:/etc/nginx/1_githook.sorayamah.org_bundle.crt
       - /etc/nginx/1_www.sorayamah.org_bundle.crt:/etc/nginx/1_www.sorayamah.org_bundle.crt
+      - /etc/nginx/2_githook.sorayamah.org.key:/etc/nginx/2_githook.sorayamah.org.key
       - /etc/nginx/2_www.sorayamah.org.key:/etc/nginx/2_www.sorayamah.org.key
       - /etc/nginx/conf.d:/etc/nginx/conf.d
     networks:
       - football
+      - nginx-bridge-network
 
   server:
     build:
@@ -66,4 +69,6 @@ volumes:
   redisDb:
 
 networks:
+  nginx-bridge-network:
+    external: true
   football:
