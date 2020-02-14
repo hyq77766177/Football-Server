@@ -17,8 +17,8 @@ export default class Game extends Service {
       .populate('referees.referee')
       .populate('gamePublisher.userInfo')
     const openid = this.ctx.session?.openid
-    const id = this.ctx.user?.id
-    this.ctx.logger.debug('openid', openid)
+    const id = this.ctx.session?.id
+    this.ctx.logger.debug('openid, id', openid, id)
     if (!openid || !id) {
       return {
         availableGames: games,
@@ -26,7 +26,8 @@ export default class Game extends Service {
         myCreatedGames: [],
       }
     }
-    const myCreatedGames = filter(games, game => game.gamePublisher.userInfo.id === id)
+
+    const myCreatedGames = filter(games, game => game.gamePublisher.userInfo?.id === id)
     const myEnroledGames = filter(games, game =>
       some(game.referees, referee => referee.referee.id === id)
     )
