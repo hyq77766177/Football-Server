@@ -9,8 +9,8 @@ describe('test/app/service/home.test.js', () => {
     ctx = app.mockContext()
   })
 
-  it('sayHi', async () => {
-    const result = await ctx.service.home.sayHi()
-    assert(typeof result === 'string')
+  it('home', async () => {
+    const result = await ctx.service.home.index()
+    assert(typeof result.title === 'string')
   })
 })

@@ -66,6 +66,13 @@ export default (appInfo: EggAppInfo) => {
     renew: true,
   }
 
+  config.view = {
+    defaultViewEngine: 'nunjucks',
+    mapping: {
+      '.tpl': 'nunjucks',
+    },
+  }
+
   // add your special config in here
   const bizConfig: BizConfig = {
     sourceUrl: `https://github.com/eggjs/examples/tree/master/${appInfo.name}`,

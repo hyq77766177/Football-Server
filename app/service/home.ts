@@ -7,7 +7,9 @@ export default class Home extends Service {
   /**
    * Hello message from egg
    */
-  public async sayHi() {
-    return `Response from Egg, locale time ${new Date()}`
+  public async index() {
+    return {
+      title: '空山小站',
+    }
   }
 }

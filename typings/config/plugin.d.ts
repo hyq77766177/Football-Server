@@ -19,6 +19,7 @@ import 'egg-validate';
 import 'egg-redis';
 import 'egg-session-redis';
 import 'egg-cors';
+import 'egg-view-nunjucks';
 import { EggPluginItem } from 'egg';
 declare module 'egg' {
   interface EggPlugin {
@@ -39,5 +40,6 @@ declare module 'egg' {
     redis?: EggPluginItem;
     sessionRedis?: EggPluginItem;
     cors?: EggPluginItem;
+    nunjucks?: EggPluginItem;
   }
 }

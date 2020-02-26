@@ -25,6 +25,11 @@ const plugin: EggPlugin = {
     enable: true,
     package: 'egg-cors',
   },
+
+  nunjucks: {
+    enable: true,
+    package: 'egg-view-nunjucks',
+  },
 }
 
 export default plugin
